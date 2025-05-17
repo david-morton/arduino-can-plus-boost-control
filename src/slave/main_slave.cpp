@@ -1,18 +1,18 @@
 #include <Arduino.h>
+#include <ptScheduler.h> // The task scheduling library of choice
 
-// put function declarations here:
-int myFunction(int, int);
+#include "shared/common/setup_ethernet.h"
+
+#define CAN_2515
+
+EthernetConfig ethConfig = {
+    .mac = {0xA8, 0x61, 0x0A, 0xAE, 0xAB, 0x8D},
+    .ip = IPAddress(192, 168, 11, 3)};
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  initialiseEthernetShield(ethConfig);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
 }

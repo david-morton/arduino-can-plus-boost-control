@@ -1,0 +1,22 @@
+#include <Ethernet.h>
+#include <SPI.h>
+
+#include "setup_ethernet.h"
+
+// Global client instance
+EthernetClient ethClient;
+
+// Function for setting up the ethernet shield
+void initialiseEthernetShield(EthernetConfig &config) {
+  Serial.println("INFO - Initialising ethernet shield");
+  Ethernet.begin(config.mac, config.ip);
+
+  char eth_status = Ethernet.hardwareStatus();
+
+  if (eth_status == EthernetW5500) {
+    Serial.println("\tOK - W5500 Ethernet controller detected");
+  } else if (eth_status != EthernetW5500) {
+    Serial.print("\tFATAL - Ethernet status is ");
+    Serial.println(eth_status);
+  }
+}
