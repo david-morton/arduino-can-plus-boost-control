@@ -1,0 +1,30 @@
+{
+  "Major Section Heading": {
+    "prefix": "section",
+    "body": [
+      "/* ======================================================================",
+      "   ${1:SECTION TITLE}",
+      "   ====================================================================== */"
+    ],
+    "description": "Insert a major section header"
+  },
+  "Subsection Heading": {
+    "prefix": "subsection",
+    "body": [
+      "// -- ${1:Subsection title} ---------------------------------------------"
+    ],
+    "description": "Insert a subsection header"
+  },
+  "Function Doc Comment": {
+    "prefix": "funcdoc",
+    "body": [
+      "/**",
+      " * ${1:Function description}",
+      " *",
+      " * @param ${2:param} ${3:description}",
+      " * @return ${4:return value}",
+      " */"
+    ],
+    "description": "Insert function doc block"
+  }
+}

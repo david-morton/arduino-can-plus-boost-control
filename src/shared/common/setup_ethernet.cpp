@@ -3,10 +3,16 @@
 
 #include "setup_ethernet.h"
 
-// Global client instance
+/* ======================================================================
+   CONFIGURE THINGS
+   ====================================================================== */
 EthernetClient ethClient;
 
-// Function for setting up the ethernet shield
+/* ======================================================================
+   FUNCTION DEFINITIONS
+   ====================================================================== */
+
+// Initialise the ethernet shield ready for use
 void initialiseEthernetShield(EthernetConfig &config) {
   Serial.println("INFO - Initialising ethernet shield");
   Ethernet.begin(config.mac, config.ip);

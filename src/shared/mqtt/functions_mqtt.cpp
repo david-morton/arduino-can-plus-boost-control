@@ -3,7 +3,10 @@
 #include <PubSubClient.h>
 
 #include "functions_mqtt.h"
-// #include "../master/setup_ethernet.h"
+
+/* ======================================================================
+   CONFIGURE THINGS
+   ====================================================================== */
 
 // Create ethernet client from external
 extern EthernetClient ethClient;
@@ -12,11 +15,15 @@ extern EthernetClient ethClient;
 bool mqttBrokerConnected = false;
 
 // Configure MQTT client
-PubSubClient mqttClient(ethClient);    // Create MQTT client on ethernet
-IPAddress mqtt_server(192, 168, 11, 2); // Grafana server address on Raspberry Pi
-const int mqtt_port = 1883;             // Grafana server port on Raspberry Pi
+PubSubClient mqttClient(ethClient);          // Create MQTT client on ethernet
+IPAddress    mqtt_server(192, 168, 10, 102); // Grafana server address on Orange Pi
+const int    mqtt_port = 1883;               // Grafana server port on Orange Pi
 
-// Function for creating the MQTT client and connecting to server
+/* ======================================================================
+   FUNCTION DEFINITIONS
+   ====================================================================== */
+
+// Connect MQTT client to broker
 void connectMqttClientToBroker() {
   if (!mqttClient.connected()) {
     Serial.println("INFO - Connecting to MQTT broker");

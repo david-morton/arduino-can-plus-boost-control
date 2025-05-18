@@ -5,14 +5,31 @@
 
 #define CAN_2515
 
-EthernetConfig ethConfig = {
-    .mac = {0xA8, 0x61, 0x0A, 0xAE, 0xAB, 0x8D},
-    .ip = IPAddress(192, 168, 11, 3)};
+/* ======================================================================
+   VARIABLES: More words
+   ====================================================================== */
 
+EthernetConfig ethConfig = {
+    .mac = {0xA8, 0x61, 0x0A, 0xAE, 0x1F, 0xF4},
+    .ip  = IPAddress(192, 168, 10, 101)};
+
+/* ======================================================================
+   SETUP
+   ====================================================================== */
 void setup() {
+  Serial.begin(115200);
+  while (!Serial) {
+  };
+
+  Serial.println("INFO: Entering main setup phase ...\n");
+
   initialiseEthernetShield(ethConfig);
 }
 
+/* ======================================================================
+   MAIN LOOP
+   ====================================================================== */
 void loop() {
-  // put your main code here, to run repeatedly:
+  Serial.println("BLA");
+  delay(1000);
 }

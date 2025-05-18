@@ -4,19 +4,16 @@
 #include <Ethernet.h>
 
 /* ======================================================================
-   GLOBALS: Used by other modules
+   CONFIGURE THINGS
    ====================================================================== */
 extern EthernetClient ethClient;
 
-/* ======================================================================
-   CUSTOM STRUCTURES
-   ====================================================================== */
 struct EthernetConfig {
-  byte mac[6];
+  byte      mac[6];
   IPAddress ip;
 };
 
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
-void initialiseEthernetShield(EthernetConfig& config);
+void initialiseEthernetShield(EthernetConfig &config);

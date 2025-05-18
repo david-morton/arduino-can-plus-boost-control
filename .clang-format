@@ -1,7 +1,11 @@
 BasedOnStyle: LLVM
 IndentWidth: 2
-TabWidth: 2
-UseTab: Never
-BreakBeforeBraces: Attach
 ColumnLimit: 0
+AllowShortFunctionsOnASingleLine: Inline
+BreakBeforeBraces: Attach
+AlignConsecutiveDeclarations: true
+AlignConsecutiveAssignments: true
+AlignTrailingComments: true
+SortIncludes: true
+SpaceBeforeParens: ControlStatements
 IndentCaseLabels: true
