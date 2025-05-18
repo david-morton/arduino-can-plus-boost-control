@@ -1,7 +1,7 @@
 #include <Ethernet.h>
 #include <SPI.h>
 
-#include "setup_ethernet.h"
+#include "ethernet_helpers.h"
 
 /* ======================================================================
    CONFIGURE THINGS

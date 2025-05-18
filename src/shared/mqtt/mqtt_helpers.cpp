@@ -2,7 +2,7 @@
 #include <Ethernet.h>
 #include <PubSubClient.h>
 
-#include "functions_mqtt.h"
+#include "mqtt_helpers.h"
 
 /* ======================================================================
    CONFIGURE THINGS
