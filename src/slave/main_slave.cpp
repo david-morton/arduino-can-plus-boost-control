@@ -13,21 +13,23 @@
 /* ======================================================================
    VARIABLES: Debug and stat output
    ====================================================================== */
-bool debugEthernetReceive = true;
-bool debugEthernetSend    = true;
-bool debugGears           = true;
-bool debugGeneral         = true;
-bool debugLoopInfo        = true;
-
-bool reportArduinoLoopStats = true;
+bool debugEthernetFunctionality = true;
+bool debugEthernetTraffic       = true;
+bool debugGears                 = true;
+bool debugGeneral               = true;
+bool debugLoopInfo              = true;
 
 /* ======================================================================
-   VARIABLES: More words
+   VARIABLES: Ethernet related
    ====================================================================== */
 
-EthernetConfig ethConfig = {
+// Define MAC address and IP address for local Arduino
+EthernetConfig ethConfigLocal = {
     .mac = {0xA8, 0x61, 0x0A, 0xAE, 0x1F, 0xF4},
     .ip  = IPAddress(192, 168, 10, 101)};
+
+// Define remote IP address and UDP port for peer Arduino native messeging
+IPAddress remoteArduinoIp(192, 168, 10, 100);
 
 /* ======================================================================
    VARIABLES: General use / functional
@@ -43,7 +45,8 @@ unsigned long arduinoLoopExecutionCount = 0;
 // Medium frequency tasks
 
 // Low frequency tasks
-ptScheduler ptReportArduinoLoopStats = ptScheduler(PT_TIME_5S);
+ptScheduler ptReportArduinoLoopStats  = ptScheduler(PT_TIME_5S);
+ptScheduler ptSendTestEthernetMessage = ptScheduler(PT_TIME_1S);
 
 /* ======================================================================
    SETUP
@@ -53,20 +56,27 @@ void setup() {
   while (!Serial) {
   };
 
-  Serial.println("INFO: Entering main setup phase ...\n");
+  DEBUG_GENERAL("INFO: Entering main setup phase ...\n");
 
-  initialiseEthernetShield(ethConfig);
+  initialiseEthernetShield(ethConfigLocal);
 }
 
 /* ======================================================================
    MAIN LOOP
    ====================================================================== */
 void loop() {
-  // Increment loop counter if needed so we can report on stats
-  if (millis() > 10000 && reportArduinoLoopStats) {
+
+  // Increment loop counter and report on stats if needed
+  if (millis() > 10000 && debugLoopInfo) {
     arduinoLoopExecutionCount++;
     if (ptReportArduinoLoopStats.call()) {
       reportArduinoLoopRate(&arduinoLoopExecutionCount);
     }
+  }
+
+  // Send test UDP message to remote Arduino
+  if (ptSendTestEthernetMessage.call()) {
+    String message = "Hello from Arduino 1";
+    sendUdpMessage(remoteArduinoIp, message.c_str());
   }
 }

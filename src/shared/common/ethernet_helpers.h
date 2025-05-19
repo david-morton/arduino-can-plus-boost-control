@@ -17,3 +17,5 @@ struct EthernetConfig {
    FUNCTION PROTOTYPES
    ====================================================================== */
 void initialiseEthernetShield(EthernetConfig &config);
+bool checkForIncomingUdpMessage();
+bool sendUdpMessage(const IPAddress &remoteIp, const char *message);

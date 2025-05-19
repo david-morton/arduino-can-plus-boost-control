@@ -5,8 +5,8 @@
 /* ======================================================================
    HELPER: Global flags and functions for debugging
    ====================================================================== */
-extern bool debugEthernetReceive;
-extern bool debugEthernetSend;
+extern bool debugEthernetFunctionality;
+extern bool debugEthernetTraffic;
 extern bool debugGeneral;
 extern bool debugGears;
 extern bool debugLoopInfo;
@@ -14,22 +14,22 @@ extern bool debugLoopInfo;
 /* ======================================================================
    HELPERS: Debug output definitions
    ====================================================================== */
-// Define the DEBUG_ETHERNET_RECEIVE macro
-#define DEBUG_ETHERNET_RECEIVE(message)        \
-  do {                                         \
-    if (debugEthernetReceive) {                \
-      Serial.print("[DEBUG SERIAL RECEIVE] "); \
-      Serial.println(message);                 \
-    }                                          \
+// Define the DEBUG_ETHERNET_FUNCTIONALITY macro
+#define DEBUG_ETHERNET_FUNCTIONALITY(message)          \
+  do {                                                 \
+    if (debugEthernetFunctionality) {                  \
+      Serial.print("[DEBUG ETHERNET FUNCTIONALITY] "); \
+      Serial.println(message);                         \
+    }                                                  \
   } while (0)
 
-// Define the DEBUG_ETHERNET_SEND macro
-#define DEBUG_ETHERNET_SEND(message)        \
-  do {                                      \
-    if (debugEthernetSend) {                \
-      Serial.print("[DEBUG SERIAL SEND] "); \
-      Serial.println(message);              \
-    }                                       \
+// Define the DEBUG_ETHERNET_TRAFFIC macro
+#define DEBUG_ETHERNET_TRAFFIC(message)          \
+  do {                                           \
+    if (debugEthernetTraffic) {                  \
+      Serial.print("[DEBUG ETHERNET TRAFFIC] "); \
+      Serial.println(message);                   \
+    }                                            \
   } while (0)
 
 // Define the DEBUG_GENERAL macro

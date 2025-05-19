@@ -15,21 +15,27 @@
 /* ======================================================================
    VARIABLES: Debug and stat output
    ====================================================================== */
-bool debugEthernetReceive = true;
-bool debugEthernetSend    = true;
-bool debugGears           = true;
-bool debugGeneral         = true;
-bool debugLoopInfo        = true;
-
-bool reportArduinoLoopStats = true;
+bool debugEthernetFunctionality = true;
+bool debugEthernetTraffic       = true;
+bool debugGears                 = true;
+bool debugGeneral               = true;
+bool debugLoopInfo              = true;
 
 /* ======================================================================
-   VARIABLES: More words
+   VARIABLES: Ethernet related
    ====================================================================== */
 
-EthernetConfig ethConfig = {
+// Define MAC address and IP address for local Arduino
+EthernetConfig ethConfigLocal = {
     .mac = {0xA8, 0x61, 0x0A, 0xAE, 0x23, 0x6E},
     .ip  = IPAddress(192, 168, 10, 100)};
+
+// Define remote IP address and UDP port for peer Arduino native messeging
+IPAddress          remoteArduinoIp(192, 168, 10, 101);
+const unsigned int remoteArduinoListenPort = 8888;
+
+// Define local listening port for incoming Arduino native messages
+const unsigned int localArduinoListenPort = 8888;
 
 /* ======================================================================
    VARIABLES: General use / functional
@@ -43,6 +49,7 @@ unsigned long arduinoLoopExecutionCount = 0;
 // High frequency tasks
 
 // Medium frequency tasks
+ptScheduler ptCheckForEthernetMessages = ptScheduler(PT_TIME_100MS);
 
 // Low frequency tasks
 ptScheduler ptReportArduinoLoopStats = ptScheduler(PT_TIME_5S);
@@ -55,9 +62,9 @@ void setup() {
   while (!Serial) {
   };
 
-  Serial.println("INFO: Entering main setup phase ...\n");
+  DEBUG_GENERAL("INFO: Entering main setup phase ...\n");
 
-  initialiseEthernetShield(ethConfig);
+  initialiseEthernetShield(ethConfigLocal);
   connectMqttClientToBroker();
 }
 
@@ -65,11 +72,17 @@ void setup() {
    MAIN LOOP
    ====================================================================== */
 void loop() {
-  // Increment loop counter if needed so we can report on stats
-  if (millis() > 10000 && reportArduinoLoopStats) {
+
+  // Increment loop counter and report on stats if needed
+  if (millis() > 10000 && debugLoopInfo) {
     arduinoLoopExecutionCount++;
     if (ptReportArduinoLoopStats.call()) {
       reportArduinoLoopRate(&arduinoLoopExecutionCount);
     }
+  }
+
+  // Check for incoming UDP packets
+  if (ptCheckForEthernetMessages.call()) {
+    checkForIncomingUdpMessage();
   }
 }
