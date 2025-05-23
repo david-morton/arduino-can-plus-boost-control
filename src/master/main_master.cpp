@@ -4,7 +4,9 @@
 
 #include "shared/common/ethernet_helpers.h"
 #include "shared/common/general_helpers.h"
+#include "shared/common/variables.h"
 #include "shared/mqtt/mqtt_helpers.h"
+
 
 #define CAN_2515
 
@@ -22,7 +24,7 @@ bool debugGeneral               = true;
 bool debugLoopInfo              = true;
 
 /* ======================================================================
-   VARIABLES: Ethernet related
+   VARIABLES: Ethernet and communication related
    ====================================================================== */
 
 // Define MAC address and IP address for local Arduino
@@ -30,12 +32,8 @@ EthernetConfig ethConfigLocal = {
     .mac = {0xA8, 0x61, 0x0A, 0xAE, 0x23, 0x6E},
     .ip  = IPAddress(192, 168, 10, 100)};
 
-// Define remote IP address and UDP port for peer Arduino native messeging
-IPAddress          remoteArduinoIp(192, 168, 10, 101);
-const unsigned int remoteArduinoListenPort = 8888;
-
-// Define local listening port for incoming Arduino native messages
-const unsigned int localArduinoListenPort = 8888;
+// Define remote IP address for peer Arduino native messeging
+IPAddress remoteArduinoIp(192, 168, 10, 101);
 
 /* ======================================================================
    VARIABLES: General use / functional
@@ -62,7 +60,7 @@ void setup() {
   while (!Serial) {
   };
 
-  DEBUG_GENERAL("INFO: Entering main setup phase ...\n");
+  DEBUG_GENERAL("INFO: Entering main setup phase ...");
 
   initialiseEthernetShield(ethConfigLocal);
   connectMqttClientToBroker();

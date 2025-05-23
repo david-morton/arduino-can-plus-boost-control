@@ -12,52 +12,34 @@ extern bool debugGears;
 extern bool debugLoopInfo;
 
 /* ======================================================================
-   HELPERS: Debug output definitions
+   HELPERS: Debug output macros using snprintf (safe, no String)
    ====================================================================== */
-// Define the DEBUG_ETHERNET_FUNCTIONALITY macro
-#define DEBUG_ETHERNET_FUNCTIONALITY(message)          \
-  do {                                                 \
-    if (debugEthernetFunctionality) {                  \
-      Serial.print("[DEBUG ETHERNET FUNCTIONALITY] "); \
-      Serial.println(message);                         \
-    }                                                  \
+#define _DEBUG_PRINTF(enabled, tag, fmt, ...)           \
+  do {                                                  \
+    if (enabled) {                                      \
+      char _buf[256];                                   \
+      snprintf(_buf, sizeof(_buf), fmt, ##__VA_ARGS__); \
+      Serial.print("[DEBUG ");                          \
+      Serial.print(tag);                                \
+      Serial.print("] ");                               \
+      Serial.println(_buf);                             \
+    }                                                   \
   } while (0)
 
-// Define the DEBUG_ETHERNET_TRAFFIC macro
-#define DEBUG_ETHERNET_TRAFFIC(message)          \
-  do {                                           \
-    if (debugEthernetTraffic) {                  \
-      Serial.print("[DEBUG ETHERNET TRAFFIC] "); \
-      Serial.println(message);                   \
-    }                                            \
-  } while (0)
+#define DEBUG_ETHERNET_FUNCTIONALITY(fmt, ...) \
+  _DEBUG_PRINTF(debugEthernetFunctionality, "ETHERNET FUNCTIONALITY", fmt, ##__VA_ARGS__)
 
-// Define the DEBUG_GENERAL macro
-#define DEBUG_GENERAL(message)          \
-  do {                                  \
-    if (debugGeneral) {                 \
-      Serial.print("[DEBUG GENERAL] "); \
-      Serial.println(message);          \
-    }                                   \
-  } while (0)
+#define DEBUG_ETHERNET_TRAFFIC(fmt, ...) \
+  _DEBUG_PRINTF(debugEthernetTraffic, "ETHERNET TRAFFIC", fmt, ##__VA_ARGS__)
 
-// Define the DEBUG_GEARS macro
-#define DEBUG_GEARS(message)          \
-  do {                                \
-    if (debugGears) {                 \
-      Serial.print("[DEBUG GEARS] "); \
-      Serial.println(message);        \
-    }                                 \
-  } while (0)
+#define DEBUG_GENERAL(fmt, ...) \
+  _DEBUG_PRINTF(debugGeneral, "GENERAL", fmt, ##__VA_ARGS__)
 
-// Define the DEBUG_LOOP_INFO macro
-#define DEBUG_LOOP_INFO(message)          \
-  do {                                    \
-    if (debugLoopInfo) {                  \
-      Serial.print("[DEBUG LOOP INFO] "); \
-      Serial.print(message);              \
-    }                                     \
-  } while (0)
+#define DEBUG_GEARS(fmt, ...) \
+  _DEBUG_PRINTF(debugGears, "GEARS", fmt, ##__VA_ARGS__)
+
+#define DEBUG_LOOP_INFO(fmt, ...) \
+  _DEBUG_PRINTF(debugLoopInfo, "LOOP INFO", fmt, ##__VA_ARGS__)
 
 /* ======================================================================
    FUNCTION PROTOTYPES
