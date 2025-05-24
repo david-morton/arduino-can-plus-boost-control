@@ -5,8 +5,9 @@
 /* ======================================================================
    HELPER: Global flags and functions for debugging
    ====================================================================== */
-extern bool debugEthernetFunctionality;
+extern bool debugEthernetGeneral;
 extern bool debugEthernetTraffic;
+extern bool debugEthernetPing;
 extern bool debugGeneral;
 extern bool debugGears;
 extern bool debugLoopInfo;
@@ -26,11 +27,14 @@ extern bool debugLoopInfo;
     }                                                   \
   } while (0)
 
-#define DEBUG_ETHERNET_FUNCTIONALITY(fmt, ...) \
-  _DEBUG_PRINTF(debugEthernetFunctionality, "ETHERNET FUNCTIONALITY", fmt, ##__VA_ARGS__)
+#define DEBUG_ETHERNET_GENERAL(fmt, ...) \
+  _DEBUG_PRINTF(debugEthernetGeneral, "ETHERNET GENERAL", fmt, ##__VA_ARGS__)
 
 #define DEBUG_ETHERNET_TRAFFIC(fmt, ...) \
   _DEBUG_PRINTF(debugEthernetTraffic, "ETHERNET TRAFFIC", fmt, ##__VA_ARGS__)
+
+#define DEBUG_ETHERNET_PING(fmt, ...) \
+  _DEBUG_PRINTF(debugEthernetPing, "ETHERNET PING", fmt, ##__VA_ARGS__)
 
 #define DEBUG_GENERAL(fmt, ...) \
   _DEBUG_PRINTF(debugGeneral, "GENERAL", fmt, ##__VA_ARGS__)

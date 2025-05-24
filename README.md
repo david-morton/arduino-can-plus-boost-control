@@ -81,9 +81,10 @@ The standard message format is as below. The number and type of the data fields 
 Command ID's in use are as below. The master is the 'main' car module which drives the dashboard via CAN and the slave is the boost controller who's code is in this repo.
 | Command ID  | Direction       | Data Fields                                                     | Description                                       |
 | ----------- | --------------- | --------------------------------------------------------------- | ------------------------------------------------- |
-| 0           | Master to slave | salt (allows for checksum calculation)                          | Request current data from boost controller        |
-| 1           | Master to slave | currentRpm,currentSpeed,currentGear,clutchPressed               | Push current data from master to boost controller |
-| 2           | Slave to master | errorStatus,currentBoost,currentTemp,currentValveOpenPercentage | Response to command ID 0                          |
+| 0           | Either          | Nil                                                             | Ping request                                      |
+| 1           | Either          | Nil                                                             | Ping response                                     |
+| 2           | Master to slave | currentRpm,currentSpeed,currentGear,clutchPressed               | Push current data from master to boost controller |
+| 3           | Slave to master | errorStatus,currentBoost,currentTemp,currentValveOpenPercentage | Response to command ID 0                          |
 
 # Technical Notes
 

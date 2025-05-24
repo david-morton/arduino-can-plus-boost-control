@@ -7,7 +7,6 @@
 #include "shared/common/variables.h"
 #include "shared/mqtt/mqtt_helpers.h"
 
-
 #define CAN_2515
 
 /* ======================================================================
@@ -17,11 +16,12 @@
 /* ======================================================================
    VARIABLES: Debug and stat output
    ====================================================================== */
-bool debugEthernetFunctionality = true;
-bool debugEthernetTraffic       = true;
-bool debugGears                 = true;
-bool debugGeneral               = true;
-bool debugLoopInfo              = true;
+bool debugEthernetGeneral = true;
+bool debugEthernetTraffic = false;
+bool debugEthernetPing    = false;
+bool debugGears           = false;
+bool debugGeneral         = false;
+bool debugLoopInfo        = false;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related
@@ -33,7 +33,10 @@ EthernetConfig ethConfigLocal = {
     .ip  = IPAddress(192, 168, 10, 100)};
 
 // Define remote IP address for peer Arduino native messeging
-IPAddress remoteArduinoIp(192, 168, 10, 101);
+const IPAddress remoteArduinoIp(192, 168, 10, 101);
+
+// Define UDP receive buffer
+char udpReceiveBuffer[RECEIVE_PACKET_BUFFER_SIZE];
 
 /* ======================================================================
    VARIABLES: General use / functional
@@ -47,18 +50,18 @@ unsigned long arduinoLoopExecutionCount = 0;
 // High frequency tasks
 
 // Medium frequency tasks
-ptScheduler ptCheckForEthernetMessages = ptScheduler(PT_TIME_100MS);
+ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_50MS);
+ptScheduler ptCheckForEthernetMessages       = ptScheduler(PT_TIME_100MS);
 
 // Low frequency tasks
 ptScheduler ptReportArduinoLoopStats = ptScheduler(PT_TIME_5S);
+ptScheduler ptReportArduinoPingStats = ptScheduler(PT_TIME_5S);
 
 /* ======================================================================
    SETUP
    ====================================================================== */
 void setup() {
-  Serial.begin(115200);
-  while (!Serial) {
-  };
+  Serial.begin(1000000); // Use a high baud rate for faster serial communication
 
   DEBUG_GENERAL("INFO: Entering main setup phase ...");
 
@@ -71,16 +74,54 @@ void setup() {
    ====================================================================== */
 void loop() {
 
+  // Check for incoming UDP packets
+  if (getIncomingUdpMessage(udpReceiveBuffer, sizeof(udpReceiveBuffer))) {
+    // Extract command ID
+    char *commandIdStr = strtok(udpReceiveBuffer, ",");
+    if (!commandIdStr) {
+      DEBUG_GENERAL("Malformed UDP payload: missing command ID");
+      return;
+    }
+    // Extract payload pointer — the remainder of the message after the command ID
+    char *payloadStr = strtok(nullptr, "");
+
+    int commandId = atoi(commandIdStr);
+
+    // Dispatch by command ID
+    switch (commandId) {
+      case 0: { // Ping request
+        // Extract sender's sendSequenceNumber used as ping identifier
+        char *pingSeqStr = strtok(nullptr, ",");
+        sendPingResponseToRemoteArduino(atoi(pingSeqStr));
+        break;
+      }
+      case 1: { // Ping response, extract ping sequence number from payload and handle it
+        unsigned long pingSeq = strtoul(payloadStr, nullptr, 10);
+        handlePingResponse(micros(), pingSeq); // Your handler
+        break;
+      }
+
+      default:
+        DEBUG_GENERAL("Unknown command ID: %d", commandId);
+        break;
+    }
+  }
+
+  // Report ping RTT stats if needed from buffer average
+  if (ptReportArduinoPingStats.call()) {
+    DEBUG_ETHERNET_GENERAL("Average ping RTT: %.2f ms", getAveragePingRtt() / 1000.0);
+  }
+
+  // Issue ping request to remote Arduino
+  if (ptSendPingRequestToRemoteArduino.call()) {
+    sendArduinoPingRequest();
+  }
+
   // Increment loop counter and report on stats if needed
   if (millis() > 10000 && debugLoopInfo) {
     arduinoLoopExecutionCount++;
     if (ptReportArduinoLoopStats.call()) {
       reportArduinoLoopRate(&arduinoLoopExecutionCount);
     }
-  }
-
-  // Check for incoming UDP packets
-  if (ptCheckForEthernetMessages.call()) {
-    checkForIncomingUdpMessage();
   }
 }

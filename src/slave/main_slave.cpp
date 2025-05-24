@@ -14,11 +14,12 @@
 /* ======================================================================
    VARIABLES: Debug and stat output
    ====================================================================== */
-bool debugEthernetFunctionality = true;
-bool debugEthernetTraffic       = true;
-bool debugGears                 = true;
-bool debugGeneral               = true;
-bool debugLoopInfo              = true;
+bool debugEthernetGeneral = false;
+bool debugEthernetTraffic = false;
+bool debugEthernetPing    = false;
+bool debugGears           = false;
+bool debugGeneral         = false;
+bool debugLoopInfo        = false;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related
@@ -30,7 +31,10 @@ EthernetConfig ethConfigLocal = {
     .ip  = IPAddress(192, 168, 10, 101)};
 
 // Define remote IP address for peer Arduino native messeging
-IPAddress remoteArduinoIp(192, 168, 10, 100);
+const IPAddress remoteArduinoIp(192, 168, 10, 100);
+
+// Define UDP receive buffer
+char udpReceiveBuffer[SEND_PACKET_BUFFER_SIZE];
 
 /* ======================================================================
    VARIABLES: General use / functional
@@ -46,16 +50,13 @@ unsigned long arduinoLoopExecutionCount = 0;
 // Medium frequency tasks
 
 // Low frequency tasks
-ptScheduler ptReportArduinoLoopStats  = ptScheduler(PT_TIME_5S);
-ptScheduler ptSendTestEthernetMessage = ptScheduler(PT_TIME_1S);
+ptScheduler ptReportArduinoLoopStats = ptScheduler(PT_TIME_5S);
 
 /* ======================================================================
    SETUP
    ====================================================================== */
 void setup() {
-  Serial.begin(115200);
-  while (!Serial) {
-  };
+  Serial.begin(500000); // Use a high baud rate for faster serial communication
 
   DEBUG_GENERAL("INFO: Entering main setup phase ...");
 
@@ -67,17 +68,36 @@ void setup() {
    ====================================================================== */
 void loop() {
 
+  // Check for incoming UDP packets
+  if (getIncomingUdpMessage(udpReceiveBuffer, sizeof(udpReceiveBuffer))) {
+    // Extract command ID
+    char *commandIdStr = strtok(udpReceiveBuffer, ",");
+    if (!commandIdStr) {
+      DEBUG_GENERAL("Malformed UDP payload: missing command ID");
+      return;
+    }
+
+    int commandId = atoi(commandIdStr);
+
+    // Dispatch by command ID
+    switch (commandId) {
+      case 0: { // Ping request
+        // Extract sender's sendSequenceNumber used as ping identifier
+        char *pingSeqStr = strtok(nullptr, ",");
+        sendPingResponseToRemoteArduino(atoi(pingSeqStr));
+      }
+
+      default:
+        DEBUG_GENERAL("Unknown command ID: %d", commandId);
+        break;
+    }
+  }
+
   // Increment loop counter and report on stats if needed
   if (millis() > 10000 && debugLoopInfo) {
     arduinoLoopExecutionCount++;
     if (ptReportArduinoLoopStats.call()) {
       reportArduinoLoopRate(&arduinoLoopExecutionCount);
     }
-  }
-
-  // Send test UDP message to remote Arduino
-  if (ptSendTestEthernetMessage.call()) {
-    String message = "Hello from Arduino 1";
-    sendUdpMessage(remoteArduinoIp, message.c_str());
   }
 }
