@@ -2,10 +2,11 @@
 #include <mcp2515_can.h> // Used for CAN shields
 #include <ptScheduler.h> // The task scheduling library of choice
 
-#include "shared/common/ethernet_helpers.h"
-#include "shared/common/ethernet_ping.h"
-#include "shared/common/ethernet_receive.h"
-#include "shared/common/ethernet_send.h"
+#include "shared/common/enums.h"
+#include "shared/common/ethernet/ethernet_helpers.h"
+#include "shared/common/ethernet/ethernet_ping.h"
+#include "shared/common/ethernet/ethernet_receive.h"
+#include "shared/common/ethernet/ethernet_send.h"
 #include "shared/common/helpers_logging.h"
 #include "shared/common/variables.h"
 #include "shared/mqtt/mqtt_helpers.h"
@@ -92,13 +93,13 @@ void loop() {
 
     // Dispatch by command ID
     switch (commandId) {
-      case 0: { // Ping request
+      case CMD_PING_REQUEST: { // Ping request
         // Extract sender's sendSequenceNumber used as ping identifier
         char *pingSeqStr = strtok(nullptr, ",");
         sendPingResponseToRemoteArduino(atoi(pingSeqStr));
         break;
       }
-      case 1: { // Ping response, extract ping sequence number from payload and handle it
+      case CMD_PING_RESPONSE: { // Ping response, extract ping sequence number from payload and handle it
         unsigned long pingSeq = strtoul(payloadStr, nullptr, 10);
         handlePingResponse(micros(), pingSeq); // Your handler
         break;
