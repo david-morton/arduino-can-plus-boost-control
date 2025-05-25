@@ -3,8 +3,8 @@
 #include <SPI.h>
 
 #include "ethernet_helpers.h"
-#include "helpers_logging.h"
-#include "variables.h"
+#include "../helpers_logging.h"
+#include "../variables.h"
 
 /* ======================================================================
    CONFIGURE CLIENT

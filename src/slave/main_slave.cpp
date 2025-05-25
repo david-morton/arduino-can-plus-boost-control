@@ -1,13 +1,12 @@
 #include <Arduino.h>
 #include <ptScheduler.h> // The task scheduling library of choice
 
-#include "shared/common/ethernet_helpers.h"
-#include "shared/common/ethernet_ping.h"
-#include "shared/common/ethernet_receive.h"
-#include "shared/common/ethernet_send.h"
+#include "shared/common/ethernet/ethernet_helpers.h"
+#include "shared/common/ethernet/ethernet_ping.h"
+#include "shared/common/ethernet/ethernet_receive.h"
+#include "shared/common/ethernet/ethernet_send.h"
 #include "shared/common/helpers_logging.h"
 #include "shared/common/variables.h"
-
 
 #define CAN_2515
 
@@ -38,7 +37,7 @@ EthernetConfig ethConfigLocal = {
 const IPAddress remoteArduinoIp(192, 168, 10, 100);
 
 // Define UDP receive buffer
-char udpReceiveBuffer[SEND_PACKET_BUFFER_SIZE];
+char udpReceiveBuffer[RECEIVE_PACKET_BUFFER_SIZE];
 
 /* ======================================================================
    VARIABLES: General use / functional

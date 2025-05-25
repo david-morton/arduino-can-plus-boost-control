@@ -1,7 +1,8 @@
-#include "ethernet_send.h"
 #include "ethernet_ping.h"
-#include "helpers_logging.h"
-#include "variables.h"
+#include "../helpers_logging.h"
+#include "../variables.h"
+#include "ethernet_send.h"
+
 
 /* ======================================================================
    VARIABLES

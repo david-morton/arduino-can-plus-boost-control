@@ -2,9 +2,10 @@
 #include <EthernetUdp.h>
 #include <SPI.h>
 
+#include "../helpers_logging.h"
+#include "../variables.h"
 #include "ethernet_receive.h"
-#include "helpers_logging.h"
-#include "variables.h"
+
 
 /* ======================================================================
    VARIABLES
@@ -90,4 +91,3 @@ bool validateIncomingUdpMessageChecksum(const char *message) {
 
   return calculatedChecksum == receivedChecksum;
 }
-

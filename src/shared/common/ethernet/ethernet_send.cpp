@@ -2,9 +2,10 @@
 #include <EthernetUdp.h>
 #include <SPI.h>
 
+#include "../helpers_logging.h"
+#include "../variables.h"
 #include "ethernet_send.h"
-#include "helpers_logging.h"
-#include "variables.h"
+
 
 /* ======================================================================
    VARIABLES
