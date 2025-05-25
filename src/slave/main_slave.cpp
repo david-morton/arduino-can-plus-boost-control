@@ -2,8 +2,12 @@
 #include <ptScheduler.h> // The task scheduling library of choice
 
 #include "shared/common/ethernet_helpers.h"
-#include "shared/common/general_helpers.h"
+#include "shared/common/ethernet_ping.h"
+#include "shared/common/ethernet_receive.h"
+#include "shared/common/ethernet_send.h"
+#include "shared/common/helpers_logging.h"
 #include "shared/common/variables.h"
+
 
 #define CAN_2515
 
