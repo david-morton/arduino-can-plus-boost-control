@@ -3,7 +3,10 @@
 #include <ptScheduler.h> // The task scheduling library of choice
 
 #include "shared/common/ethernet_helpers.h"
-#include "shared/common/general_helpers.h"
+#include "shared/common/ethernet_ping.h"
+#include "shared/common/ethernet_receive.h"
+#include "shared/common/ethernet_send.h"
+#include "shared/common/helpers_logging.h"
 #include "shared/common/variables.h"
 #include "shared/mqtt/mqtt_helpers.h"
 
@@ -21,7 +24,7 @@ bool debugEthernetTraffic = false;
 bool debugEthernetPing    = false;
 bool debugGears           = false;
 bool debugGeneral         = false;
-bool debugLoopInfo        = false;
+bool debugLoopInfo        = true;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related
