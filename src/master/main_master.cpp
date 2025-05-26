@@ -2,7 +2,8 @@
 #include <mcp2515_can.h> // Used for CAN shields
 #include <ptScheduler.h> // The task scheduling library of choice
 
-#include "shared/common/enums.h"
+#include "shared/common/command_dispatch.h"
+#include "shared/common/command_ids.h"
 #include "shared/common/ethernet/ethernet_helpers.h"
 #include "shared/common/ethernet/ethernet_ping.h"
 #include "shared/common/ethernet/ethernet_receive.h"
@@ -10,6 +11,7 @@
 #include "shared/common/helpers_logging.h"
 #include "shared/common/variables.h"
 #include "shared/mqtt/mqtt_helpers.h"
+
 
 #define CAN_2515
 
@@ -62,6 +64,11 @@ ptScheduler ptReportArduinoLoopStats = ptScheduler(PT_TIME_5S);
 ptScheduler ptReportArduinoPingStats = ptScheduler(PT_TIME_5S);
 
 /* ======================================================================
+   TEMP: Recommended message content for testing new dispatch / handler bits
+   ====================================================================== */
+char message[] = "1,123"; // example: command 1, payload "123"
+
+/* ======================================================================
    SETUP
    ====================================================================== */
 void setup() {
@@ -77,6 +84,20 @@ void setup() {
    MAIN LOOP
    ====================================================================== */
 void loop() {
+
+  // Block of temporary code to test command dispatching via new mechanisms
+  // if this works nicely, we can remove the old command handling code below
+  // which uses the switch statement
+  char *cmdStr  = strtok(message, ",");
+  char *payload = strtok(nullptr, "");
+
+  if (!cmdStr)
+    return;
+
+  int commandId = atoi(cmdStr);
+  dispatchCommand(commandId, payload);
+  delay(2000); // for demo
+  // End of temporary code block
 
   // Check for incoming UDP packets
   if (getIncomingUdpMessage(udpReceiveBuffer, sizeof(udpReceiveBuffer))) {
