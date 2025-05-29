@@ -10,7 +10,7 @@ extern bool debugEthernetTraffic;
 extern bool debugEthernetPing;
 extern bool debugGeneral;
 extern bool debugGears;
-extern bool debugLoopInfo;
+extern bool debugPerformance;
 
 /* ======================================================================
    HELPERS: Debug output macros using snprintf (safe, no String)
@@ -42,8 +42,8 @@ extern bool debugLoopInfo;
 #define DEBUG_GEARS(fmt, ...) \
   _DEBUG_PRINTF(debugGears, "GEARS", fmt, ##__VA_ARGS__)
 
-#define DEBUG_LOOP_INFO(fmt, ...) \
-  _DEBUG_PRINTF(debugLoopInfo, "LOOP INFO", fmt, ##__VA_ARGS__)
+#define DEBUG_PERFORMANCE(fmt, ...) \
+  _DEBUG_PRINTF(debugPerformance, "PERFORMANCE", fmt, ##__VA_ARGS__)
 
 /* ======================================================================
    FUNCTION PROTOTYPES

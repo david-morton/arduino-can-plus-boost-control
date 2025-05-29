@@ -11,6 +11,6 @@
    ====================================================================== */
 bool          sendArduinoPingRequest();
 bool          sendPingResponseToRemoteArduino(int pingSeq);
-unsigned long getAveragePingRtt();
-void          handlePingResponse(unsigned long timestamp, unsigned long sequenceNumber);
-void          logPingRtt(unsigned long rtt);
+unsigned long getAveragePingRttMicros();
+void          processPingResponse(unsigned long timestamp, unsigned long sequenceNumber);
+void          updatePingRttBuffer(unsigned long rtt);

@@ -31,7 +31,7 @@ unsigned long arduinoLoopExecutionPreviousExecutionMillis;
 void reportArduinoLoopRate(unsigned long *loopCount) {
   float loopFrequencyHz = (*loopCount / ((millis() - arduinoLoopExecutionPreviousExecutionMillis) / 1000));
   float loopExecutionMs = (millis() - arduinoLoopExecutionPreviousExecutionMillis) / *loopCount;
-  DEBUG_LOOP_INFO("Loop execution frequency (Hz): %.2f or every %lu ms", loopFrequencyHz, loopExecutionMs);
+  DEBUG_PERFORMANCE("Loop execution frequency (Hz): %.2f or every %lu ms", loopFrequencyHz, loopExecutionMs);
   *loopCount                                  = 1;
   arduinoLoopExecutionPreviousExecutionMillis = millis();
 }

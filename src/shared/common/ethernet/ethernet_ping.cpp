@@ -3,14 +3,13 @@
 #include "../variables.h"
 #include "ethernet_send.h"
 
-
 /* ======================================================================
    VARIABLES
    ====================================================================== */
 
 // Define ping tracking variables
 unsigned long pingLastSequenceNumber;
-unsigned long pingLastSentTime;
+unsigned long pingLastSentTimeMicros;
 
 // Define the buffer for round trip time (RTT) measurements
 unsigned long rttBuffer[RTT_BUFFER_SIZE];
@@ -20,23 +19,9 @@ uint8_t       rttIndex = 0;
    FUNCTION DEFINITIONS
    ====================================================================== */
 
-// Send a ping request to the remote Arduino
-bool sendArduinoPingRequest() {
-  char pingRequestBuffer[32]; // Enough for "0,<seq>"
-  snprintf(pingRequestBuffer, sizeof(pingRequestBuffer), "0,%lu", sendSequenceNumber);
-
-  // Set state tracking variables
-  pingLastSentTime       = micros();
-  pingLastSequenceNumber = sendSequenceNumber;
-  // Create message to send which is simply a command ID 0 with sequence number as payload
-  if (sendUdpMessage(pingRequestBuffer)) {
-    return true;
-  }
-}
-
 // Send a ping response to the remote Arduino
 bool sendPingResponseToRemoteArduino(int pingSeq) {
-  char pingResponseBuffer[32]; // Enough for "1,<seq>"
+  char pingResponseBuffer[64]; // Enough for "1,<seq>"
   snprintf(pingResponseBuffer, sizeof(pingResponseBuffer), "1,%d", pingSeq);
 
   // Send the response
@@ -48,15 +33,27 @@ bool sendPingResponseToRemoteArduino(int pingSeq) {
   }
 }
 
-// Handle a ping response from the remote Arduino
-void handlePingResponse(unsigned long timestamp, unsigned long sequenceNumber) {
-  int pingRountTripMs = timestamp - pingLastSentTime;
-  logPingRtt(pingRountTripMs);
-  DEBUG_ETHERNET_PING("Ping round trip time: %d ms, sequence number: %lu", pingRountTripMs, sequenceNumber);
+// Send a ping request to the remote Arduino
+bool sendArduinoPingRequest() {
+  char pingRequestBuffer[32]; // Enough for "0,<seq>"
+  snprintf(pingRequestBuffer, sizeof(pingRequestBuffer), "0,%lu", sendSequenceNumber);
+
+  // Set state tracking variables
+  pingLastSentTimeMicros = micros();
+  pingLastSequenceNumber = sendSequenceNumber;
+  // Create message to send which is simply a command ID 0 with sequence number as payload
+  return sendUdpMessage(pingRequestBuffer);
+}
+
+// Process a ping response from the remote Arduino
+void processPingResponse(unsigned long timestampMicros, unsigned long sequenceNumber) {
+  unsigned long pingRountTripMicros = timestampMicros - pingLastSentTimeMicros;
+  updatePingRttBuffer(pingRountTripMicros);
+  DEBUG_ETHERNET_PING("Ping round trip time: %d µs, sequence number: %lu", pingRountTripMicros, sequenceNumber);
 }
 
 // Log the ping round trip time in a circular buffer
-void logPingRtt(unsigned long rtt) {
+void updatePingRttBuffer(unsigned long rtt) {
   rttBuffer[rttIndex++] = rtt;
   if (rttIndex >= RTT_BUFFER_SIZE) {
     rttIndex = 0; // Wrap around
@@ -64,7 +61,7 @@ void logPingRtt(unsigned long rtt) {
 }
 
 // Get the average round trip time (RTT) from the circular buffer
-unsigned long getAveragePingRtt() {
+unsigned long getAveragePingRttMicros() {
   uint8_t count = rttIndex == 0 ? RTT_BUFFER_SIZE : rttIndex;
 
   unsigned long total = 0;
