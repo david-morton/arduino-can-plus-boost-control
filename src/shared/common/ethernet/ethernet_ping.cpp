@@ -11,9 +11,13 @@
 unsigned long pingLastSequenceNumber;
 unsigned long pingLastSentTimeMicros;
 
-// Define the buffer for round trip time (RTT) measurements
+// Define the buffer and index for round trip time (RTT) measurements
 unsigned long rttBuffer[RTT_BUFFER_SIZE];
 uint8_t       rttIndex = 0;
+
+// Define the sequence number and array for outstanding ping requests
+PingResult pingHistory[MAX_OUTSTANDING_PINGS];
+uint8_t    pingHistoryIndex = 0;
 
 /* ======================================================================
    FUNCTION DEFINITIONS
@@ -35,21 +39,45 @@ bool sendPingResponseToRemoteArduino(int pingSeq) {
 
 // Send a ping request to the remote Arduino
 bool sendArduinoPingRequest() {
-  char pingRequestBuffer[32]; // Enough for "0,<seq>"
-  snprintf(pingRequestBuffer, sizeof(pingRequestBuffer), "0,%lu", sendSequenceNumber);
+  unsigned long seq = sendSequenceNumber; // Already incremented inside sendUdpMessage()
 
-  // Set state tracking variables
-  pingLastSentTimeMicros = micros();
-  pingLastSequenceNumber = sendSequenceNumber;
-  // Create message to send which is simply a command ID 0 with sequence number as payload
-  return sendUdpMessage(pingRequestBuffer);
+  char pingRequestBuffer[32];
+  snprintf(pingRequestBuffer, sizeof(pingRequestBuffer), "0,%lu", seq);
+
+  if (!sendUdpMessage(pingRequestBuffer)) {
+    return false;
+  }
+
+  // Always record this attempt in ring buffer
+  pingHistory[pingHistoryIndex].sequence       = seq;
+  pingHistory[pingHistoryIndex].sentTimeMicros = micros();
+  pingHistory[pingHistoryIndex].responded      = false;
+
+  DEBUG_ETHERNET_PING("Sent ping request with sequence number: %lu", seq);
+
+  pingHistoryIndex = (pingHistoryIndex + 1) % MAX_OUTSTANDING_PINGS;
+  return true;
 }
 
 // Process a ping response from the remote Arduino
 void processPingResponse(unsigned long timestampMicros, unsigned long sequenceNumber) {
-  unsigned long pingRountTripMicros = timestampMicros - pingLastSentTimeMicros;
-  updatePingRttBuffer(pingRountTripMicros);
-  DEBUG_ETHERNET_PING("Ping round trip time: %d µs, sequence number: %lu", pingRountTripMicros, sequenceNumber);
+  for (uint8_t i = 0; i < MAX_OUTSTANDING_PINGS; i++) {
+    if (pingHistory[i].sequence == sequenceNumber && !pingHistory[i].responded) {
+      unsigned long rtt              = timestampMicros - pingHistory[i].sentTimeMicros;
+      pingHistory[i].responded       = true;
+      pingHistory[i].roundTripMicros = rtt;
+
+      if (rtt <= PING_TIMEOUT_MICROS) {
+        updatePingRttBuffer(rtt);
+        DEBUG_ETHERNET_PING("Ping RTT: %.2f ms, seq: %lu", rtt / 1000.0f, sequenceNumber);
+      } else {
+        DEBUG_ETHERNET_PING("Ping response too late: %.2f ms, seq: %lu", rtt / 1000.0f, sequenceNumber);
+      }
+      return;
+    }
+  }
+
+  DEBUG_ETHERNET_PING("Unexpected or duplicate ping response, seq: %lu", sequenceNumber);
 }
 
 // Log the ping round trip time in a circular buffer
@@ -69,4 +97,35 @@ unsigned long getAveragePingRttMicros() {
     total += rttBuffer[i];
   }
   return total / count;
+}
+
+// Check for ping timeouts and calculate packet loss
+void checkPingTimeoutsAndLoss() {
+  unsigned long now   = micros();
+  uint8_t       count = 0;
+  uint8_t       lost  = 0;
+
+  for (uint8_t i = 0; i < MAX_OUTSTANDING_PINGS; i++) {
+    if (pingHistory[i].sequence == 0)
+      continue; // skip unused entries
+
+    count++;
+
+    unsigned long age     = now - pingHistory[i].sentTimeMicros;
+    bool          expired = !pingHistory[i].responded && age > PING_TIMEOUT_MICROS;
+
+    if (expired)
+      lost++;
+  }
+
+  if (count == 0)
+    return;
+
+  float avgRttMs    = getAveragePingRttMicros() / 1000.0f;
+  float lossPercent = (lost * 100.0f) / count;
+
+  if (lossPercent >= 25.0f) {
+    DEBUG_ETHERNET_GENERAL("ERROR: High ping loss detected: %.1f%%", lossPercent);
+  } else
+    DEBUG_ETHERNET_GENERAL("Ping RTT: %.2f ms | Loss: %.1f%%", avgRttMs, lossPercent);
 }

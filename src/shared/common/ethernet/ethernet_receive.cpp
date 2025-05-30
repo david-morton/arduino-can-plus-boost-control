@@ -67,7 +67,7 @@ bool getIncomingUdpMessage(char *buffer, size_t bufferSize) {
   buffer[bufferSize - 1] = '\0'; // Safety null-termination
   // Update sequence counter
   receiveSequenceNumber = seq;
-  DEBUG_ETHERNET_TRAFFIC("Valid UDP packet: seq=%lu, payload=%s", seq, buffer);
+  DEBUG_ETHERNET_TRAFFIC("Received valid UDP packet: seq=%lu, payload=%s", seq, buffer);
   return true;
 }
 

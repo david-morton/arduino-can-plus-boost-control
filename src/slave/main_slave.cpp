@@ -24,7 +24,7 @@ bool debugEthernetTraffic = false;
 bool debugEthernetPing    = false;
 bool debugGears           = false;
 bool debugGeneral         = false;
-bool debugLoopInfo        = false;
+bool debugPerformance     = false;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related
@@ -105,7 +105,7 @@ void loop() {
   }
 
   // Increment loop counter and report on stats if needed
-  if (millis() > 10000 && debugLoopInfo) {
+  if (millis() > 10000 && debugPerformance) {
     arduinoLoopExecutionCount++;
     if (ptReportArduinoLoopStats.call()) {
       reportArduinoLoopRate(&arduinoLoopExecutionCount);

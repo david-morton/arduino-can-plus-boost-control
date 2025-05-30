@@ -21,12 +21,12 @@
 /* ======================================================================
    VARIABLES: Debug and stat output
    ====================================================================== */
-bool debugEthernetGeneral = true;
+bool debugEthernetGeneral = false;
 bool debugEthernetTraffic = false;
 bool debugEthernetPing    = false;
 bool debugGears           = false;
 bool debugGeneral         = false;
-bool debugPerformance     = true;
+bool debugPerformance     = false;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related
@@ -59,7 +59,7 @@ unsigned long arduinoLoopExecutionCount = 0;
 // Low frequency tasks
 ptScheduler ptReportArduinoLoopStats         = ptScheduler(PT_TIME_5S);
 ptScheduler ptReportArduinoPingStats         = ptScheduler(PT_TIME_5S);
-ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_100MS);
+ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
 
 /* ======================================================================
    SETUP
@@ -110,7 +110,7 @@ void loop() {
 
   // Report ping RTT stats if needed from buffer average
   if (ptReportArduinoPingStats.call()) {
-    DEBUG_PERFORMANCE("Average ping RTT: %.2f ms", getAveragePingRttMicros() / 1000.0);
+    checkPingTimeoutsAndLoss();
   }
 
   // Issue ping request to remote Arduino
