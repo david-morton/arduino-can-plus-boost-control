@@ -21,6 +21,7 @@
 /* ======================================================================
    VARIABLES: Debug and stat output
    ====================================================================== */
+bool debugError           = true;
 bool debugEthernetGeneral = false;
 bool debugEthernetTraffic = false;
 bool debugEthernetPing    = false;
@@ -83,7 +84,7 @@ void loop() {
     // Extract command ID from the received UDP message
     char *commandIdStr = strtok(udpReceiveBuffer, ",");
     if (!commandIdStr) {
-      DEBUG_GENERAL("Malformed UDP payload: missing command ID");
+      DEBUG_ERROR("Malformed UDP payload: missing command ID");
       return;
     }
     // Extract payload pointer — the remainder of the message after the command ID
@@ -103,7 +104,7 @@ void loop() {
         break;
       }
       default:
-        DEBUG_GENERAL("Unknown command ID: %d", commandId);
+        DEBUG_ERROR("Unknown command ID: %d", commandId);
         break;
     }
   }

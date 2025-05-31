@@ -5,6 +5,7 @@
 /* ======================================================================
    HELPER: Global flags and functions for debugging
    ====================================================================== */
+extern bool debugError;
 extern bool debugEthernetGeneral;
 extern bool debugEthernetTraffic;
 extern bool debugEthernetPing;
@@ -26,6 +27,9 @@ extern bool debugPerformance;
       Serial.println(_buf);                             \
     }                                                   \
   } while (0)
+
+#define DEBUG_ERROR(fmt, ...) \
+  _DEBUG_PRINTF(debugError, "ERROR", fmt, ##__VA_ARGS__)
 
 #define DEBUG_ETHERNET_GENERAL(fmt, ...) \
   _DEBUG_PRINTF(debugEthernetGeneral, "ETHERNET GENERAL", fmt, ##__VA_ARGS__)

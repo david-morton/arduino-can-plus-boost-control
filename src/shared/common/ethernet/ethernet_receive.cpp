@@ -6,7 +6,6 @@
 #include "../variables.h"
 #include "ethernet_receive.h"
 
-
 /* ======================================================================
    VARIABLES
    ====================================================================== */
@@ -39,7 +38,7 @@ bool getIncomingUdpMessage(char *buffer, size_t bufferSize) {
   // Validate checksum using the full message string
   if (!validateIncomingUdpMessageChecksum(buffer)) {
     receiveMalformedMessageCount++;
-    DEBUG_ETHERNET_TRAFFIC("Malformed UDP packet received (checksum failed), discarding");
+    DEBUG_ERROR("Malformed UDP packet received (checksum failed), discarding");
     return false;
   }
 
@@ -49,7 +48,7 @@ bool getIncomingUdpMessage(char *buffer, size_t bufferSize) {
 
   if (!firstComma || !lastComma || firstComma == lastComma) {
     receiveMalformedMessageCount++;
-    DEBUG_ETHERNET_TRAFFIC("Malformed UDP packet (missing required fields), discarding");
+    DEBUG_ERROR("Malformed UDP packet (missing required fields), discarding");
     return false;
   }
 
@@ -75,7 +74,7 @@ bool getIncomingUdpMessage(char *buffer, size_t bufferSize) {
 bool validateIncomingUdpMessageChecksum(const char *message) {
   const char *lastComma = strrchr(message, ',');
   if (!lastComma || *(lastComma + 1) == '\0') {
-    DEBUG_ETHERNET_TRAFFIC("Invalid message: no checksum found");
+    DEBUG_ERROR("Invalid message: no checksum found");
     return false;
   }
 

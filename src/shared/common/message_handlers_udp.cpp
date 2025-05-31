@@ -13,7 +13,7 @@ bool handlePingRequestOrResponse(int cmdId, const char *payload, size_t payloadL
 
   char *seqStr = strtok(temp, ",");
   if (!seqStr) {
-    DEBUG_ETHERNET_PING("Malformed ping payload");
+    DEBUG_ERROR("Malformed ping payload");
     return false;
   }
 

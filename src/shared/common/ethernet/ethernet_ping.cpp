@@ -32,7 +32,7 @@ bool sendPingResponseToRemoteArduino(int pingSeq) {
   if (sendUdpMessage(pingResponseBuffer)) {
     return true;
   } else {
-    DEBUG_ETHERNET_PING("Failed to send ping response to remote Arduino %d", pingSeq);
+    DEBUG_ERROR("Failed to send ping response to remote Arduino %d", pingSeq);
     return false;
   }
 }
@@ -71,13 +71,13 @@ void processPingResponse(unsigned long timestampMicros, unsigned long sequenceNu
         updatePingRttBuffer(rtt);
         DEBUG_ETHERNET_PING("Ping RTT: %.2f ms, seq: %lu", rtt / 1000.0f, sequenceNumber);
       } else {
-        DEBUG_ETHERNET_PING("Ping response too late: %.2f ms, seq: %lu", rtt / 1000.0f, sequenceNumber);
+        DEBUG_ERROR("Ping response too late: %.2f ms, seq: %lu", rtt / 1000.0f, sequenceNumber);
       }
       return;
     }
   }
 
-  DEBUG_ETHERNET_PING("Unexpected or duplicate ping response, seq: %lu", sequenceNumber);
+  DEBUG_ERROR("Unexpected or duplicate ping response, seq: %lu", sequenceNumber);
 }
 
 // Log the ping round trip time in a circular buffer
@@ -125,7 +125,7 @@ void checkPingTimeoutsAndLoss() {
   float lossPercent = (lost * 100.0f) / count;
 
   if (lossPercent >= 25.0f) {
-    DEBUG_ETHERNET_GENERAL("ERROR: High ping loss detected: %.1f%%", lossPercent);
+    DEBUG_ERROR("ERROR: High ping loss detected: %.1f%%", lossPercent);
   } else
     DEBUG_ETHERNET_GENERAL("Ping RTT: %.2f ms | Loss: %.1f%%", avgRttMs, lossPercent);
 }

@@ -6,7 +6,6 @@
 #include "../variables.h"
 #include "ethernet_send.h"
 
-
 /* ======================================================================
    VARIABLES
    ====================================================================== */
@@ -26,7 +25,7 @@ unsigned long sendMalformedMessageCount = 0; // Detected but not sent
 bool validateSendMessage(const char *message) {
   // Check if the message is too long
   if (strlen(message) > SEND_PACKET_BUFFER_SIZE - 1) {
-    DEBUG_ETHERNET_TRAFFIC("ERROR - Message too long, not sending: %s", message);
+    DEBUG_ERROR("ERROR - Message too long, not sending: %s", message);
     return false;
   }
   return true;
