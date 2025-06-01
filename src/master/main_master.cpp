@@ -21,13 +21,14 @@
 /* ======================================================================
    VARIABLES: Debug and stat output
    ====================================================================== */
-bool debugError           = true;
-bool debugEthernetGeneral = false;
-bool debugEthernetTraffic = false;
-bool debugEthernetPing    = false;
-bool debugGears           = false;
-bool debugGeneral         = false;
-bool debugPerformance     = false;
+bool debugError            = true;
+bool debugEthernetGeneral  = false;
+bool debugEthernetMessages = false;
+bool debugEthernetPing     = false;
+bool debugEthernetTraffic  = false;
+bool debugGears            = false;
+bool debugGeneral          = true;
+bool debugPerformance      = true;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related
@@ -41,24 +42,21 @@ EthernetConfig ethConfigLocal = {
 // Define remote IP address for peer Arduino native messeging
 const IPAddress remoteArduinoIp(192, 168, 10, 101);
 
-// Define UDP receive buffer
-char udpReceiveBuffer[RECEIVE_PACKET_BUFFER_SIZE];
-
 /* ======================================================================
    VARIABLES: General use / functional
    ====================================================================== */
 
 unsigned long arduinoLoopExecutionCount = 0;
-int currentLuxReading = 0; // Variable to store the current lux reading from remote Arduino
+int           currentLuxReading         = 0; // Variable to store the current lux reading from remote Arduino
 
 /* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
    ====================================================================== */
-// High frequency tasks
+// High frequency tasks (tens of milliseconds)
 
-// Medium frequency tasks
+// Medium frequency tasks (hundreds of milliseconds)
 
-// Low frequency tasks
+// Low frequency tasks (seconds)
 ptScheduler ptReportArduinoLoopStats         = ptScheduler(PT_TIME_5S);
 ptScheduler ptReportArduinoPingStats         = ptScheduler(PT_TIME_5S);
 ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
@@ -80,37 +78,10 @@ void setup() {
    ====================================================================== */
 void loop() {
 
-  // Check for incoming UDP packets
-  if (getIncomingUdpMessage(udpReceiveBuffer, sizeof(udpReceiveBuffer))) {
-    // Extract command ID from the received UDP message
-    char *commandIdStr = strtok(udpReceiveBuffer, ",");
-    if (!commandIdStr) {
-      DEBUG_ERROR("Malformed UDP payload: missing command ID");
-      return;
-    }
-    // Extract payload pointer — the remainder of the message after the command ID
-    char *payloadStr = strtok(nullptr, "");
+  // Check for, and process any incoming UDP messages
+  processIncomingUdpMessages();
 
-    // Convert command ID string to integer
-    int commandId = atoi(commandIdStr);
-
-    // Dispatch by command ID
-    switch (commandId) {
-      case CMD_RECEIVE_PING_REQUEST: {
-        handlePingRequestOrResponse(0, payloadStr, strlen(payloadStr));
-        break;
-      }
-      case CMD_RECEIVE_PING_RESPONSE: {
-        handlePingRequestOrResponse(1, payloadStr, strlen(payloadStr));
-        break;
-      }
-      default:
-        DEBUG_ERROR("Unknown command ID: %d", commandId);
-        break;
-    }
-  }
-
-  // Report ping RTT stats if needed from buffer average
+  // Report ping RTT stats (if needed) from buffer average
   if (ptReportArduinoPingStats.call()) {
     checkPingTimeoutsAndLoss();
   }

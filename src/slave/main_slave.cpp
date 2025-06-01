@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ptScheduler.h> // The task scheduling library of choice
 
+#include "ethernet_slave_send_messages.h"
 #include "shared/common/command_ids.h"
 #include "shared/common/ethernet/ethernet_helpers.h"
 #include "shared/common/ethernet/ethernet_ping.h"
@@ -20,14 +21,15 @@
 /* ======================================================================
    VARIABLES: Debug and stat output
    ====================================================================== */
-bool debugError           = true;
-bool debugEthernetGeneral = false;
-bool debugEthernetTraffic = false;
-bool debugEthernetPing    = false;
-bool debugGears           = false;
-bool debugGeneral         = true;
-bool debugLightSensor     = true;
-bool debugPerformance     = false;
+bool debugError            = true;
+bool debugEthernetGeneral  = false;
+bool debugEthernetMessages = true;
+bool debugEthernetTraffic  = false;
+bool debugEthernetPing     = false;
+bool debugGears            = false;
+bool debugGeneral          = false;
+bool debugLightSensor      = false;
+bool debugPerformance      = false;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related
@@ -41,9 +43,6 @@ EthernetConfig ethConfigLocal = {
 // Define remote IP address for peer Arduino native messeging
 const IPAddress remoteArduinoIp(192, 168, 10, 100);
 
-// Define UDP receive buffer
-char udpReceiveBuffer[RECEIVE_PACKET_BUFFER_SIZE];
-
 /* ======================================================================
    VARIABLES: General use / functional
    ====================================================================== */
@@ -54,13 +53,13 @@ int           currentLuxReading         = 0; // Variable to store the current lu
 /* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
    ====================================================================== */
-// High frequency tasks
+// High frequency tasks (tens of milliseconds)
 
-// Medium frequency tasks
+// Medium frequency tasks (hundreds of milliseconds)
 
-// Low frequency tasks
-ptScheduler ptReportArduinoLoopStats   = ptScheduler(PT_TIME_5S);
+// Low frequency tasks (seconds)
 ptScheduler ptGetAmbientLightReading   = ptScheduler(PT_TIME_2S);
+ptScheduler ptReportArduinoLoopStats   = ptScheduler(PT_TIME_5S);
 ptScheduler ptSendLowFrequencyMessages = ptScheduler(PT_TIME_1S);
 
 /* ======================================================================
@@ -80,49 +79,17 @@ void setup() {
    ====================================================================== */
 void loop() {
 
-  // Check for incoming UDP packets
-  if (getIncomingUdpMessage(udpReceiveBuffer, sizeof(udpReceiveBuffer))) {
-    // Extract command ID from the received UDP message
-    char *commandIdStr = strtok(udpReceiveBuffer, ",");
-    if (!commandIdStr) {
-      DEBUG_ERROR("Malformed UDP payload: missing command ID");
-      return;
-    }
-    // Extract payload pointer — the remainder of the message after the command ID
-    char *payloadStr = strtok(nullptr, "");
-
-    // Convert command ID string to integer
-    int commandId = atoi(commandIdStr);
-
-    // Dispatch by command ID
-    switch (commandId) {
-      case CMD_RECEIVE_PING_REQUEST: {
-        handlePingRequestOrResponse(0, payloadStr, strlen(payloadStr));
-        break;
-      }
-      case CMD_RECEIVE_PING_RESPONSE: {
-        handlePingRequestOrResponse(1, payloadStr, strlen(payloadStr));
-        break;
-      }
-      default:
-        DEBUG_ERROR("Unknown command ID: %d", commandId);
-        break;
-    }
-  }
+  // Check for, and process any incoming UDP messages
+  processIncomingUdpMessages();
 
   // Read ambient light sensor value at a defined interval
   if (ptGetAmbientLightReading.call()) {
     currentLuxReading = getAverageLux();
   }
 
-  // Send low frequency messages at a defined interval
+  // Send low frequency messages at a defined interval (command ID 2)
   if (ptSendLowFrequencyMessages.call()) {
-    // Format message as: "2,<luxValue>"
-    char messageBuffer[24]; // Enough for command + comma + signed int
-    snprintf(messageBuffer, sizeof(messageBuffer), "%d,%d", CMD_LOW_FREQUENCY_MESSAGES, currentLuxReading);
-
-    DEBUG_ETHERNET_TRAFFIC("Sending lux message: %s", messageBuffer);
-    sendUdpMessage(messageBuffer);
+    sendLowFrequencyTelemetry();
   }
 
   // Increment loop counter and report on stats if needed

@@ -7,10 +7,11 @@
    ====================================================================== */
 extern bool debugError;
 extern bool debugEthernetGeneral;
-extern bool debugEthernetTraffic;
+extern bool debugEthernetMessages;
 extern bool debugEthernetPing;
-extern bool debugGeneral;
+extern bool debugEthernetTraffic;
 extern bool debugGears;
+extern bool debugGeneral;
 extern bool debugLightSensor;
 extern bool debugPerformance;
 
@@ -34,6 +35,9 @@ extern bool debugPerformance;
 
 #define DEBUG_ETHERNET_GENERAL(fmt, ...) \
   _DEBUG_PRINTF(debugEthernetGeneral, "ETHERNET GENERAL", fmt, ##__VA_ARGS__)
+
+#define DEBUG_ETHERNET_MESSAGES(fmt, ...) \
+  _DEBUG_PRINTF(debugEthernetMessages, "ETHERNET MESSAGES", fmt, ##__VA_ARGS__)
 
 #define DEBUG_ETHERNET_TRAFFIC(fmt, ...) \
   _DEBUG_PRINTF(debugEthernetTraffic, "ETHERNET TRAFFIC", fmt, ##__VA_ARGS__)

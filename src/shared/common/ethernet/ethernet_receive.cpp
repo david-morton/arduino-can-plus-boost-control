@@ -2,7 +2,9 @@
 #include <EthernetUdp.h>
 #include <SPI.h>
 
+#include "../command_ids.h"
 #include "../helpers_logging.h"
+#include "../message_handlers_udp.h"
 #include "../variables.h"
 #include "ethernet_receive.h"
 
@@ -16,6 +18,9 @@ const uint16_t localArduinoListenPort = 8888;
 // Define message sequence tracking and quality stats
 unsigned long receiveSequenceNumber        = 0;
 unsigned long receiveMalformedMessageCount = 0; // Detected and discarded
+
+// Define UDP receive buffer
+char udpReceiveBuffer[RECEIVE_PACKET_BUFFER_SIZE];
 
 /* ======================================================================
    FUNCTION DEFINITIONS
@@ -89,4 +94,40 @@ bool validateIncomingUdpMessageChecksum(const char *message) {
   }
 
   return calculatedChecksum == receivedChecksum;
+}
+
+// Process incoming UDP messages
+void processIncomingUdpMessages() {
+  if (!getIncomingUdpMessage(udpReceiveBuffer, sizeof(udpReceiveBuffer))) {
+    return; // No packet received
+  }
+
+  // Extract command ID
+  char *commandIdStr = strtok(udpReceiveBuffer, ",");
+  if (!commandIdStr) {
+    DEBUG_ERROR("Malformed UDP payload: missing command ID");
+    return;
+  }
+  int commandId = atoi(commandIdStr);
+
+  // Extract payload (rest of string)
+  char *payloadStr = strtok(nullptr, "");
+
+  switch (commandId) {
+    case CMD_RECEIVE_PING_REQUEST:
+      handlePingRequestOrResponse(0, payloadStr, strlen(payloadStr));
+      break;
+
+    case CMD_RECEIVE_PING_RESPONSE:
+      handlePingRequestOrResponse(1, payloadStr, strlen(payloadStr));
+      break;
+
+    case CMD_LOW_FREQUENCY_MESSAGES:
+      handleLowFrequencyMessages(payloadStr, strlen(payloadStr));
+      break;
+
+    default:
+      DEBUG_ERROR("Unknown command ID: %d", commandId);
+      break;
+  }
 }
