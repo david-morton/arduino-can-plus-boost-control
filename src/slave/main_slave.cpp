@@ -9,6 +9,7 @@
 #include "shared/common/helpers_logging.h"
 #include "shared/common/message_handlers_udp.h"
 #include "shared/common/variables.h"
+#include "shared/light_sensor/light_sensor.h"
 
 #define CAN_2515
 
@@ -24,7 +25,8 @@ bool debugEthernetGeneral = false;
 bool debugEthernetTraffic = false;
 bool debugEthernetPing    = false;
 bool debugGears           = false;
-bool debugGeneral         = false;
+bool debugGeneral         = true;
+bool debugLightSensor     = true;
 bool debugPerformance     = false;
 
 /* ======================================================================
@@ -47,6 +49,7 @@ char udpReceiveBuffer[RECEIVE_PACKET_BUFFER_SIZE];
    ====================================================================== */
 
 unsigned long arduinoLoopExecutionCount = 0;
+int           currentLuxReading         = 0; // Variable to store the current lux reading from ambient light sensor
 
 /* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
@@ -56,7 +59,9 @@ unsigned long arduinoLoopExecutionCount = 0;
 // Medium frequency tasks
 
 // Low frequency tasks
-ptScheduler ptReportArduinoLoopStats = ptScheduler(PT_TIME_5S);
+ptScheduler ptReportArduinoLoopStats   = ptScheduler(PT_TIME_5S);
+ptScheduler ptGetAmbientLightReading   = ptScheduler(PT_TIME_2S);
+ptScheduler ptSendLowFrequencyMessages = ptScheduler(PT_TIME_1S);
 
 /* ======================================================================
    SETUP
@@ -67,6 +72,7 @@ void setup() {
   DEBUG_GENERAL("INFO: Entering main setup phase ...");
 
   initialiseEthernetShield(ethConfigLocal);
+  initialiseAmbientLightSensor();
 }
 
 /* ======================================================================
@@ -74,7 +80,6 @@ void setup() {
    ====================================================================== */
 void loop() {
 
-  // Check for incoming UDP packets
   // Check for incoming UDP packets
   if (getIncomingUdpMessage(udpReceiveBuffer, sizeof(udpReceiveBuffer))) {
     // Extract command ID from the received UDP message
@@ -103,6 +108,21 @@ void loop() {
         DEBUG_ERROR("Unknown command ID: %d", commandId);
         break;
     }
+  }
+
+  // Read ambient light sensor value at a defined interval
+  if (ptGetAmbientLightReading.call()) {
+    currentLuxReading = getAverageLux();
+  }
+
+  // Send low frequency messages at a defined interval
+  if (ptSendLowFrequencyMessages.call()) {
+    // Format message as: "2,<luxValue>"
+    char messageBuffer[24]; // Enough for command + comma + signed int
+    snprintf(messageBuffer, sizeof(messageBuffer), "%d,%d", CMD_LOW_FREQUENCY_MESSAGES, currentLuxReading);
+
+    DEBUG_ETHERNET_TRAFFIC("Sending lux message: %s", messageBuffer);
+    sendUdpMessage(messageBuffer);
   }
 
   // Increment loop counter and report on stats if needed

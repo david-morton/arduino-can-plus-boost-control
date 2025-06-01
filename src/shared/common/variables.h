@@ -7,7 +7,7 @@
    COMMON VARIABLES: These are used across both master and slave Arduinos
    ====================================================================== */
 
-// Measured vehicle sensor variables
+// Measured sensor variables
 extern bool  clutchPressed;
 extern bool  inNeutral;
 extern float afrBank1;
@@ -21,6 +21,7 @@ extern float vehicleSpeedFront;
 extern float vehicleSpeedRear;
 extern int   brakeLinePressureFrontKpa;
 extern int   brakeLinePressureRearKpa;
+extern int   currentLuxReading;
 extern int   engineSpeedRpm;
 extern int   engineTempCelcius;
 extern int   intakePressureBank1Kpa;

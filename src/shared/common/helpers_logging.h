@@ -11,6 +11,7 @@ extern bool debugEthernetTraffic;
 extern bool debugEthernetPing;
 extern bool debugGeneral;
 extern bool debugGears;
+extern bool debugLightSensor;
 extern bool debugPerformance;
 
 /* ======================================================================
@@ -45,6 +46,9 @@ extern bool debugPerformance;
 
 #define DEBUG_GEARS(fmt, ...) \
   _DEBUG_PRINTF(debugGears, "GEARS", fmt, ##__VA_ARGS__)
+
+#define DEBUG_LIGHT_SENSOR(fmt, ...) \
+  _DEBUG_PRINTF(debugLightSensor, "LIGHT SENSOR", fmt, ##__VA_ARGS__)
 
 #define DEBUG_PERFORMANCE(fmt, ...) \
   _DEBUG_PRINTF(debugPerformance, "PERFORMANCE", fmt, ##__VA_ARGS__)

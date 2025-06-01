@@ -49,6 +49,7 @@ char udpReceiveBuffer[RECEIVE_PACKET_BUFFER_SIZE];
    ====================================================================== */
 
 unsigned long arduinoLoopExecutionCount = 0;
+int currentLuxReading = 0; // Variable to store the current lux reading from remote Arduino
 
 /* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
