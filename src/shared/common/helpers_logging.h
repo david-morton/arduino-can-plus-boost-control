@@ -12,8 +12,9 @@ extern bool debugEthernetPing;
 extern bool debugEthernetTraffic;
 extern bool debugGears;
 extern bool debugGeneral;
-extern bool debugLightSensor;
 extern bool debugPerformance;
+extern bool debugSensorReadings;
+extern bool debugTelemetry;
 
 /* ======================================================================
    HELPERS: Debug output macros using snprintf (safe, no String)
@@ -51,11 +52,14 @@ extern bool debugPerformance;
 #define DEBUG_GEARS(fmt, ...) \
   _DEBUG_PRINTF(debugGears, "GEARS", fmt, ##__VA_ARGS__)
 
-#define DEBUG_LIGHT_SENSOR(fmt, ...) \
-  _DEBUG_PRINTF(debugLightSensor, "LIGHT SENSOR", fmt, ##__VA_ARGS__)
+#define DEBUG_SENSOR_READINGS(fmt, ...) \
+  _DEBUG_PRINTF(debugSensorReadings, "SENSOR READINGS", fmt, ##__VA_ARGS__)
 
 #define DEBUG_PERFORMANCE(fmt, ...) \
   _DEBUG_PRINTF(debugPerformance, "PERFORMANCE", fmt, ##__VA_ARGS__)
+
+#define DEBUG_TELEMETRY(fmt, ...) \
+  _DEBUG_PRINTF(debugTelemetry, "TELEMETRY", fmt, ##__VA_ARGS__)
 
 /* ======================================================================
    FUNCTION PROTOTYPES

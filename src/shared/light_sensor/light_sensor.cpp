@@ -59,7 +59,7 @@ void readAmbientLightSensor() {
     int lux = BH1750.getLux();
     BH1750.start(); // Trigger next measurement
     storeLuxReading(lux);
-    DEBUG_LIGHT_SENSOR("INFO: Ambient light sensor reading: %d lux (stored at index %d)", lux, lightSensorReadingIndex);
+    DEBUG_SENSOR_READINGS("INFO: Ambient light sensor reading: %d lux (stored at index %d)", lux, lightSensorReadingIndex);
   } else {
     storeLuxReading(-1); // Store 0 if no valid reading
     DEBUG_ERROR("ERROR: No valid reading from ambient light sensor.");
@@ -81,7 +81,7 @@ int getAverageLux() {
     DEBUG_ERROR("ERROR: Average lux value is negative, defaulting to %d.", defaultLuxValue);
     return defaultLuxValue;
   } else {
-    DEBUG_LIGHT_SENSOR("INFO: Average lux value calculated from %d readings: %d", LIGHT_SENSOR_READINGS_SIZE, average);
+    DEBUG_SENSOR_READINGS("INFO: Average lux value calculated from %d readings: %d", LIGHT_SENSOR_READINGS_SIZE, average);
     return average;
   }
 }

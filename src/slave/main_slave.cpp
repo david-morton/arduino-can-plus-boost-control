@@ -9,6 +9,7 @@
 #include "shared/common/ethernet/ethernet_send.h"
 #include "shared/common/helpers_logging.h"
 #include "shared/common/message_handlers_udp.h"
+#include "shared/common/telemetry_staging.h"
 #include "shared/common/variables.h"
 #include "shared/light_sensor/light_sensor.h"
 
@@ -27,9 +28,10 @@ bool debugEthernetMessages = true;
 bool debugEthernetTraffic  = false;
 bool debugEthernetPing     = false;
 bool debugGears            = false;
-bool debugGeneral          = false;
-bool debugLightSensor      = false;
+bool debugGeneral          = true;
 bool debugPerformance      = false;
+bool debugSensorReadings   = false;
+bool debugTelemetry        = true;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related
@@ -82,14 +84,14 @@ void loop() {
   // Check for, and process any incoming UDP messages
   processIncomingUdpMessages();
 
-  // Read ambient light sensor value at a defined interval
+  // Read ambient light sensor value at a defined interval and store for transmission
   if (ptGetAmbientLightReading.call()) {
-    currentLuxReading = getAverageLux();
+    addTelemetryItem(SENSOR_LUX, currentLuxReading = getAverageLux());
   }
 
   // Send low frequency messages at a defined interval (command ID 2)
   if (ptSendLowFrequencyMessages.call()) {
-    sendLowFrequencyTelemetry();
+    buildAndSendStagedTelemetry(MSG_LOW_FREQUENCY, CMD_LOW_FREQUENCY_MESSAGES);
   }
 
   // Increment loop counter and report on stats if needed

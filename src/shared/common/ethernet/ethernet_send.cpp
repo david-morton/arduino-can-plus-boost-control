@@ -73,3 +73,11 @@ bool sendUdpMessage(const char *message) {
   sendSequenceNumber++;
   return true;
 }
+
+// Send a UDP message with a specific command ID
+void sendUdpMessageWithCommand(int commandId, const char *payload) {
+  char udpMessage[SEND_PACKET_BUFFER_SIZE];
+  snprintf(udpMessage, sizeof(udpMessage), "%d,%s", commandId, payload);
+  sendUdpMessage(udpMessage);
+  DEBUG_ETHERNET_MESSAGES("Sent UDP message with command ID %d: %s", commandId, udpMessage);
+}
