@@ -1,5 +1,9 @@
 #pragma once
 
+/* ======================================================================
+   ENUMS
+   ====================================================================== */
+
 // Mapping of command IDs to their respective commands
 typedef enum {
   CMD_RECEIVE_PING_REQUEST   = 0,

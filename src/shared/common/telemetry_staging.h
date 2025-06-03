@@ -16,11 +16,19 @@ typedef enum {
 
 // This enum defines the classes of telemetry messages that can be staged and sent
 typedef enum {
-  MSG_LOW_FREQUENCY = 0,
-  MSG_HIGH_FREQUENCY,
-  MSG_SENSOR_EVENT,
+  MSG_SLAVE_LOW_FREQUENCY = 0,
+  MSG_MASTER_LOW_FREQUENCY,
   NUM_MESSAGE_CLASSES // Always last
 } TelemetryMessageClass;
+
+/* ======================================================================
+   STRUCTS
+   ====================================================================== */
+// This struct is used to stage telemetry data before sending it.
+typedef struct {
+  float value;
+  bool  valid;
+} TelemetrySlot;
 
 /* ======================================================================
    STATIC CONSTANTS
@@ -33,11 +41,16 @@ typedef enum {
 static_assert(TELEMETRY_MESSAGE_BUFFER_SIZE <= 256, "Telemetry buffer too large!");
 
 /* ======================================================================
+   VARIABLES
+   ====================================================================== */
+extern TelemetrySlot telemetryStaging[NUM_TELEMETRY_FIELDS];
+
+/* ======================================================================
    MAPPING TELEMETRY KEYS TO MESSAGE CLASSES
    ====================================================================== */
 static inline const TelemetryMessageClass keyToMessageClass[NUM_TELEMETRY_FIELDS] = {
-    [SENSOR_LUX]  = MSG_LOW_FREQUENCY,
-    [SENSOR_TEMP] = MSG_LOW_FREQUENCY};
+    [SENSOR_LUX]  = MSG_SLAVE_LOW_FREQUENCY,
+    [SENSOR_TEMP] = MSG_SLAVE_LOW_FREQUENCY};
 
 /* ======================================================================
     FUNCTION PROTOTYPES
@@ -45,3 +58,4 @@ static inline const TelemetryMessageClass keyToMessageClass[NUM_TELEMETRY_FIELDS
 
 void addTelemetryItem(TelemetryField key, float value);
 void buildAndSendStagedTelemetry(TelemetryMessageClass msgClass, int commandId);
+TelemetryField getTelemetryFieldForKey(const char *key);

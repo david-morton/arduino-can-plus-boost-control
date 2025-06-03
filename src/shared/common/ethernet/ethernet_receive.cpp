@@ -5,6 +5,7 @@
 #include "../command_ids.h"
 #include "../helpers_logging.h"
 #include "../message_handlers_udp.h"
+#include "../telemetry_parsing.h"
 #include "../variables.h"
 #include "ethernet_receive.h"
 
@@ -123,7 +124,8 @@ void processIncomingUdpMessages() {
       break;
 
     case CMD_LOW_FREQUENCY_MESSAGES:
-      handleLowFrequencyMessages(payloadStr, strlen(payloadStr));
+      parseTelemetryPayload(payloadStr);
+      // handleLowFrequencyMessages(payloadStr, strlen(payloadStr));
       break;
 
     default:

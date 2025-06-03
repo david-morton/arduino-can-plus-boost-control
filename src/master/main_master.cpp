@@ -9,6 +9,7 @@
 #include "shared/common/ethernet/ethernet_send.h"
 #include "shared/common/helpers_logging.h"
 #include "shared/common/message_handlers_udp.h"
+#include "shared/common/telemetry_parsing.h"
 #include "shared/common/telemetry_staging.h"
 #include "shared/common/variables.h"
 #include "shared/mqtt/mqtt_helpers.h"
@@ -31,6 +32,7 @@ bool debugGears            = false;
 bool debugGeneral          = true;
 bool debugPerformance      = true;
 bool debugSensorReadings   = true;
+bool debugTelemetry        = true;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related
@@ -50,6 +52,7 @@ const IPAddress remoteArduinoIp(192, 168, 10, 101);
 
 unsigned long arduinoLoopExecutionCount = 0;
 int           currentLuxReading         = 0; // Variable to store the current lux reading from remote Arduino
+float         valueFromRemote;               // Temporary variable to transport variable values from remote Arduino
 
 /* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
@@ -59,9 +62,10 @@ int           currentLuxReading         = 0; // Variable to store the current lu
 // Medium frequency tasks (hundreds of milliseconds)
 
 // Low frequency tasks (seconds)
-ptScheduler ptReportArduinoLoopStats         = ptScheduler(PT_TIME_5S);
+ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_5S);
 ptScheduler ptReportArduinoPingStats         = ptScheduler(PT_TIME_5S);
 ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
+ptScheduler ptUpdateCurrentLuxReading        = ptScheduler(PT_TIME_2S);
 
 /* ======================================================================
    SETUP
@@ -80,7 +84,7 @@ void setup() {
    ====================================================================== */
 void loop() {
 
-  // Check for, and process any incoming UDP messages
+  // Check for, and process any incoming UDP messages as fast as possible within the main loop
   processIncomingUdpMessages();
 
   // Report ping RTT stats (if needed) from buffer average
@@ -93,10 +97,15 @@ void loop() {
     sendArduinoPingRequest();
   }
 
-  // Increment loop counter and report on stats if needed
-  if (millis() > 10000 && debugPerformance) {
+  // Update the current lux reading from the remote Arduino
+  if (ptUpdateCurrentLuxReading.call() && consumeTelemetryFloat(SENSOR_LUX, &valueFromRemote)) {
+    currentLuxReading = valueFromRemote;
+  }
+
+  // Increment loop counter and report on performance stats if needed
+  if (debugPerformance && millis() > 10000) {
     arduinoLoopExecutionCount++;
-    if (ptReportArduinoLoopStats.call()) {
+    if (ptReportArduinoPerformanceStats.call()) {
       reportArduinoLoopRate(&arduinoLoopExecutionCount);
     }
   }

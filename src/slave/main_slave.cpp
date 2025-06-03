@@ -24,14 +24,14 @@
    ====================================================================== */
 bool debugError            = true;
 bool debugEthernetGeneral  = false;
-bool debugEthernetMessages = true;
+bool debugEthernetMessages = false;
 bool debugEthernetTraffic  = false;
 bool debugEthernetPing     = false;
 bool debugGears            = false;
-bool debugGeneral          = true;
-bool debugPerformance      = false;
+bool debugGeneral          = false;
+bool debugPerformance      = true;
 bool debugSensorReadings   = false;
-bool debugTelemetry        = true;
+bool debugTelemetry        = false;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related
@@ -60,9 +60,9 @@ int           currentLuxReading         = 0; // Variable to store the current lu
 // Medium frequency tasks (hundreds of milliseconds)
 
 // Low frequency tasks (seconds)
-ptScheduler ptGetAmbientLightReading   = ptScheduler(PT_TIME_2S);
-ptScheduler ptReportArduinoLoopStats   = ptScheduler(PT_TIME_5S);
-ptScheduler ptSendLowFrequencyMessages = ptScheduler(PT_TIME_1S);
+ptScheduler ptGetAmbientLightReading        = ptScheduler(PT_TIME_2S);
+ptScheduler ptReportArduinoPerformanceStats = ptScheduler(PT_TIME_5S);
+ptScheduler ptSendLowFrequencyMessages      = ptScheduler(PT_TIME_1S);
 
 /* ======================================================================
    SETUP
@@ -81,7 +81,7 @@ void setup() {
    ====================================================================== */
 void loop() {
 
-  // Check for, and process any incoming UDP messages
+  // Check for, and process any incoming UDP messages as fast as possible within the main loop
   processIncomingUdpMessages();
 
   // Read ambient light sensor value at a defined interval and store for transmission
@@ -91,13 +91,13 @@ void loop() {
 
   // Send low frequency messages at a defined interval (command ID 2)
   if (ptSendLowFrequencyMessages.call()) {
-    buildAndSendStagedTelemetry(MSG_LOW_FREQUENCY, CMD_LOW_FREQUENCY_MESSAGES);
+    buildAndSendStagedTelemetry(MSG_SLAVE_LOW_FREQUENCY, CMD_LOW_FREQUENCY_MESSAGES);
   }
 
-  // Increment loop counter and report on stats if needed
-  if (millis() > 10000 && debugPerformance) {
+  // Increment loop counter and report on performance stats if needed
+  if (debugPerformance && millis() > 10000) {
     arduinoLoopExecutionCount++;
-    if (ptReportArduinoLoopStats.call()) {
+    if (ptReportArduinoPerformanceStats.call()) {
       reportArduinoLoopRate(&arduinoLoopExecutionCount);
     }
   }

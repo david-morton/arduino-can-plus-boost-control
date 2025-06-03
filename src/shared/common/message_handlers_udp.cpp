@@ -2,7 +2,12 @@
 #include "../common/ethernet/ethernet_ping.h"
 #include "../common/ethernet/ethernet_send.h"
 #include "helpers_logging.h"
+#include "telemetry_parsing.h"
 #include "variables.h"
+
+/* ======================================================================
+   FUNCTION DEFINITIONS
+   ====================================================================== */
 
 // Handle ping request (command ID 0) from remote Arduino (ie: we need to send a response)
 // Handle ping response (command ID 1) from remote Arduino (ie: we need to process the response, working out the RTT)
@@ -28,40 +33,40 @@ bool handlePingRequestOrResponse(int cmdId, const char *payload, size_t payloadL
   }
 }
 
-// Handle low frequency messages (command ID 2) from remote Arduino
-void handleLowFrequencyMessages(const char *payloadStr, size_t payloadLength) {
-  if (!payloadStr || payloadLength == 0) {
-    DEBUG_ERROR("Low frequency payload is empty or null");
-    return;
-  }
+// // Handle low frequency messages (command ID 2) from remote Arduino
+// void handleLowFrequencyMessages(const char *payloadStr, size_t payloadLength) {
+//   if (!payloadStr || payloadLength == 0) {
+//     DEBUG_ERROR("Low frequency payload is empty or null");
+//     return;
+//   }
 
-  // Allocate +1 to append null terminator for strtok
-  char *payloadCopy = (char *)malloc(payloadLength + 1);
-  if (!payloadCopy) {
-    DEBUG_ERROR("Failed to allocate memory for payload copy");
-    return;
-  }
+//   // Allocate +1 to append null terminator for strtok
+//   char *payloadCopy = (char *)malloc(payloadLength + 1);
+//   if (!payloadCopy) {
+//     DEBUG_ERROR("Failed to allocate memory for payload copy");
+//     return;
+//   }
 
-  memcpy(payloadCopy, payloadStr, payloadLength);
-  payloadCopy[payloadLength] = '\0'; // ensure null-terminated
+//   memcpy(payloadCopy, payloadStr, payloadLength);
+//   payloadCopy[payloadLength] = '\0'; // ensure null-terminated
 
-  char *token      = strtok(payloadCopy, ",");
-  int   fieldIndex = 0;
+//   char *token      = strtok(payloadCopy, ",");
+//   int   fieldIndex = 0;
 
-  while (token != nullptr) {
-    switch (fieldIndex) {
-      case 0:
-        currentLuxReading = atoi(token);
-        break;
+//   while (token != nullptr) {
+//     switch (fieldIndex) {
+//       case 0:
+//         currentLuxReading = atoi(token);
+//         break;
 
-      default:
-        break;
-    }
-    fieldIndex++;
-    token = strtok(nullptr, ",");
-  }
+//       default:
+//         break;
+//     }
+//     fieldIndex++;
+//     token = strtok(nullptr, ",");
+//   }
 
-  DEBUG_ETHERNET_MESSAGES("Updated variables from low-frequency message [lux=%d]", currentLuxReading);
+//   DEBUG_ETHERNET_MESSAGES("Updated variables from low-frequency message [lux=%d]", currentLuxReading);
 
-  free(payloadCopy);
-}
+//   free(payloadCopy);
+// }

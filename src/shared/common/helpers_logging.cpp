@@ -3,11 +3,12 @@
 /* ======================================================================
    VARIABLES: General use / functional
    ====================================================================== */
-const int millisWithoutSerialCommsBeforeFault = 1000; // How long is ms without serial comms from the master before we declare a critical alarm
+unsigned long arduinoLoopExecutionPreviousExecutionMillis;
 
 /* ======================================================================
-   FUNCTION: Get average readings from analogue pin
+   FUNCTION DEFINITIONS - FUNCTIONAL
    ====================================================================== */
+// This function reads an analogue pin multiple times and returns the average value.
 int getAveragedAnaloguePinReading(byte pin, int samples, int delayUs) {
   int totalReadings = 0;
 
@@ -24,10 +25,10 @@ int getAveragedAnaloguePinReading(byte pin, int samples, int delayUs) {
 }
 
 /* ======================================================================
-   FUNCTION: Report Arduino loop rate information
+   FUNCTION DEFINITIONS - PERFORMANCE
    ====================================================================== */
-unsigned long arduinoLoopExecutionPreviousExecutionMillis;
 
+// This function reports the execution frequency of the Arduino loop
 void reportArduinoLoopRate(unsigned long *loopCount) {
   float loopFrequencyHz = (*loopCount / ((millis() - arduinoLoopExecutionPreviousExecutionMillis) / 1000));
   float loopExecutionMs = (millis() - arduinoLoopExecutionPreviousExecutionMillis) / *loopCount;

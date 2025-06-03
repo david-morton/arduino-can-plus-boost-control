@@ -3,19 +3,10 @@
 #include "../common/helpers_logging.h"
 
 /* ======================================================================
-   STRUCTURES
-   ====================================================================== */
-// Create custom struct to hold telemetry data
-typedef struct {
-  float value;
-  bool  valid;
-} TelemetrySlot;
-
-/* ======================================================================
    VARIABLES
    ====================================================================== */
 // Define the number of telemetry fields
-static TelemetrySlot telemetryStaging[NUM_TELEMETRY_FIELDS];
+TelemetrySlot telemetryStaging[NUM_TELEMETRY_FIELDS];
 
 /* ======================================================================
    FUNCTION DEFINITIONS
@@ -70,4 +61,24 @@ void buildAndSendStagedTelemetry(TelemetryMessageClass msgClass, int commandId) 
       telemetryStaging[key].valid = false;
     }
   }
+}
+
+// Reverse lookup: get field enum from key string
+const char* getTelemetryKeyForField(TelemetryField field) {
+  switch (field) {
+    case SENSOR_LUX:  return "lux";
+    case SENSOR_TEMP: return "temp";
+    default:          return nullptr;
+  }
+}
+
+// Reverse lookup table matching key strings to enum fields
+TelemetryField getTelemetryFieldForKey(const char* key) {
+  for (int i = 0; i < NUM_TELEMETRY_FIELDS; i++) {
+    const char* knownKey = getTelemetryKeyForField((TelemetryField)i);
+    if (knownKey != nullptr && strcmp(knownKey, key) == 0) {
+      return (TelemetryField)i;
+    }
+  }
+  return NUM_TELEMETRY_FIELDS; // Invalid
 }
