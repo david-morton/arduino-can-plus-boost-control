@@ -2,7 +2,6 @@
 #include "../common/debug_logging.h"
 #include "../common/ethernet/ethernet_send_udp.h"
 
-
 /* ======================================================================
    VARIABLES
    ====================================================================== */
@@ -44,7 +43,7 @@ void buildAndSendStagedTelemetry(TelemetryMessageClass msgClass, int commandId) 
 
     int len = snprintf(messageBuffer + offset,
                        sizeof(messageBuffer) - offset,
-                       "%s%s=%.2f",
+                       "%s%s=%g",
                        (offset == 0 ? "" : ","),
                        getTelemetryKeyForField((TelemetryField)key),
                        telemetryStaging[key].value);
@@ -75,8 +74,8 @@ const char *getTelemetryKeyForField(TelemetryField field) {
   switch (field) {
     case SENSOR_LUX:
       return "lux";
-    case SENSOR_TEMP:
-      return "temp";
+    case SENSOR_ELECTRONICS_TEMP:
+      return "electronicsTemp";
     default:
       return nullptr;
   }

@@ -57,14 +57,14 @@ Below is a complete breakdown of the hardware used for this solution. Refer to t
 - Words here later
 
 # Communications
-Communication between Arduino's and the Orange Pi is over Ethernet. The master and slave Arduinos use UDP, and a custom message format defined below. The Arduino's process messages from the buffer in a FIFO manner.
+Communication between Arduino's and the Orange Pi is over Ethernet. The master and slave Arduinos use UDP, and a custom message format defined below. The Arduino's process messages from internal 'staging' buffers to allow decoupled send, receive and usage.
 
-According to my research the Ethernet buffer should only ever contain whole messages. If a message is unable to be accepted in full, it is discarded.
+The Ethernet buffer should only ever contain whole messages. If a message is unable to be accepted in full, it is discarded. We do include a checksum in our payloads, but do not implement any ack or retry.
 
 ### Message Structures
-- Message boundaries are indicated by < and > symbols for start and end respectively
 - We cater for multiple fields by being comma delimited
 - A basic XOR checksum is used so we can detect and discard corrupt messages
+- A sequence number is implemented for debug and checksum salting, of sorts
 
 ### Message Types
 An overview of the message types and formats can be found below:
@@ -74,7 +74,7 @@ An overview of the message types and formats can be found below:
 
 ### Example Messages
 The standard message format is as below. The number and type of the data fields is unique to each commandId.
-<sequenceNumber,commandId,data1,data2,data3,...,checksum>
+<sequenceNumber,commandId,key1=value1,key2=value2,key3=value3,...,checksum>
 
 Command ID's in use are as below. The master is the 'main' car module which drives the dashboard via CAN and the slave is the boost controller who's code is in this repo.
 | Command ID  | Direction       | Data Fields                                                     | Description                                       |
@@ -97,3 +97,68 @@ The following conditions cause a failsafe condition (as little boost as possible
 - Critical fault detected
   - No ethernet comms from master
   - Overboost condition (duration and pressure delta)
+
+## 🧠 Function Naming Standards
+
+To ensure clarity and consistency across all modules in this project (master/slave boards, shared code, telemetry), we follow a strict naming convention for functions and scheduler tasks. These prefixes describe the **intent and behavior** of each function, enabling fast comprehension and reliable maintenance.
+
+### ✅ Canonical Prefixes
+
+| **Prefix**   | **Used For**                                                                 | **Examples**                                 |
+|--------------|-------------------------------------------------------------------------------|----------------------------------------------|
+| `get`        | Accessing a previously stored or computed value (no I/O or mutation)         | `getLatestCoolantTemp()`, `getMuxState()`    |
+| `read`       | Reading directly from a sensor or hardware interface                         | `readLuxSensor()`, `readMuxChannel()`        |
+| `update`     | Refreshing internal state from sensors, events, or calculations              | `updateSensorStaging()`, `updatePingStatus()`|
+| `send`       | Transmitting data out of the device (e.g. UDP, Serial)                       | `sendStagedTelemetry()`, `sendPingRequest()` |
+| `process`    | Multi-step transformation or decision logic (routing, validation, storing)   | `processReceivedTelemetry()`, `processCommand()` |
+| `calculate`  | Mathematical operations with no side effects                                 | `calculateAFR()`, `calculateTargetBoost()`   |
+| `handle`     | Event-driven handlers (commands, interrupts, responses)                      | `handleCommand()`, `handlePingResponse()`    |
+| `build`      | Constructing structured data for output (e.g. message buffers)               | `buildAndSendStagedTelemetry()`              |
+| `parse`      | Breaking down structured input (strings, buffers) into usable fields         | `parseTelemetryPayload()`, `parseKeyValue()` |
+| `validate`   | Checking the correctness, range, or format of input or internal data         | `validateChecksum()`, `validateSensorKey()`  |
+
+> 🎯 **Rule of thumb:** If you can't explain a function's role from its name alone, rename it.
+
+---
+
+## 🧭 Prefix Decision Guide
+
+Use this table to help decide which prefix is appropriate for a new function or scheduled task:
+
+| **Action Intent**                          | **Use Prefix** |
+|--------------------------------------------|----------------|
+| Return current stored value (no work)      | `get`          |
+| Read directly from sensor or hardware      | `read`         |
+| Refresh internal state or buffers          | `update`       |
+| Transmit data externally                   | `send`         |
+| Route or act on input                      | `process`      |
+| Perform pure math computation              | `calculate`    |
+| React to an event or command               | `handle`       |
+| Construct a message or composite object    | `build`        |
+| Decode structured input                    | `parse`        |
+| Check format or range                      | `validate`     |
+
+---
+
+## 🧪 Example Naming in Practice
+
+| **Function Name**                   | **Role**               |
+|------------------------------------|------------------------|
+| `readLuxSensor()`                  | Gets value via I²C     |
+| `updateSensorStaging()`            | Refreshes telemetry buffer |
+| `getLatestCoolantTemp()`           | Pure accessor          |
+| `calculateAFR()`                   | Computes from inputs   |
+| `buildAndSendStagedTelemetry()`    | Builds and transmits UDP message |
+| `handlePingResponse()`             | Handles event-driven reply |
+| `parseTelemetryPayload()`          | Decodes key=value string |
+| `validateSensorKey()`              | Confirms known key     |
+| `processReceivedTelemetry()`       | Orchestrates full telemetry ingestion |
+
+---
+
+## 🛡️ Best Practices
+
+- Avoid vague verbs like `run`, `execute`, `do`, or `manage`.
+- Prefer **`build` + `send`** over `report`, `add`, or `log` for outbound telemetry.
+- Never use `read` for functions that don't do actual I/O.
+- All scheduled tasks should begin with one of these prefixes.

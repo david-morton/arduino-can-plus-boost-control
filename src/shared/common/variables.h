@@ -21,6 +21,7 @@ extern float vehicleSpeedFront;
 extern float vehicleSpeedRear;
 extern int   brakeLinePressureFrontKpa;
 extern int   brakeLinePressureRearKpa;
+extern int   currentElectronicsTemp;
 extern int   currentLuxReading;
 extern int   engineSpeedRpm;
 extern int   engineTempCelcius;

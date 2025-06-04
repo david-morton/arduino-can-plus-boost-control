@@ -10,15 +10,15 @@
 // Each can only be mapped into one messaege class, and the mapping is below
 typedef enum {
   SENSOR_LUX = 0,
-  SENSOR_TEMP,
-  NUM_TELEMETRY_FIELDS // Always last
+  SENSOR_ELECTRONICS_TEMP,
+  NUM_TELEMETRY_FIELDS // Always last, this is used to count the number of fields
 } TelemetryField;
 
 // This enum defines the classes of telemetry messages that can be staged and sent
 typedef enum {
   MSG_SLAVE_LOW_FREQUENCY = 0,
   MSG_MASTER_LOW_FREQUENCY,
-  NUM_MESSAGE_CLASSES // Always last
+  NUM_MESSAGE_CLASSES // Always last, this is used to count the number of fields
 } TelemetryMessageClass;
 
 /* ======================================================================
@@ -50,8 +50,8 @@ extern TelemetrySlot telemetryStaging[NUM_TELEMETRY_FIELDS];
    MAPPING TELEMETRY KEYS TO MESSAGE CLASSES
    ====================================================================== */
 static inline const TelemetryMessageClass keyToMessageClass[NUM_TELEMETRY_FIELDS] = {
-    [SENSOR_LUX]  = MSG_SLAVE_LOW_FREQUENCY,
-    [SENSOR_TEMP] = MSG_SLAVE_LOW_FREQUENCY};
+    [SENSOR_LUX]              = MSG_SLAVE_LOW_FREQUENCY,
+    [SENSOR_ELECTRONICS_TEMP] = MSG_SLAVE_LOW_FREQUENCY};
 
 /* ======================================================================
     FUNCTION PROTOTYPES
@@ -60,4 +60,4 @@ static inline const TelemetryMessageClass keyToMessageClass[NUM_TELEMETRY_FIELDS
 void           addTelemetryItem(TelemetryField key, float value);
 void           buildAndSendStagedTelemetry(TelemetryMessageClass msgClass, int commandId);
 TelemetryField getTelemetryFieldForKey(const char *key);
-const char *   getTelemetryKeyForField(TelemetryField field);
+const char    *getTelemetryKeyForField(TelemetryField field);

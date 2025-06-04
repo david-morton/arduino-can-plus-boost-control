@@ -52,7 +52,9 @@ const IPAddress remoteArduinoIp(192, 168, 10, 101);
 
 unsigned long arduinoLoopExecutionCount = 0;
 int           currentLuxReading         = 0; // Variable to store the current lux reading from remote Arduino
-float         valueFromRemote;               // Temporary variable to transport variable values from remote Arduino
+int           currentElectronicsTemp    = 0; // Variable to store the current electronics temperature reading from RTC
+
+float valueFromRemote; // Scratch variable to transport variable values from remote Arduino
 
 /* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
@@ -65,7 +67,8 @@ float         valueFromRemote;               // Temporary variable to transport 
 ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_5S);
 ptScheduler ptReportArduinoPingStats         = ptScheduler(PT_TIME_5S);
 ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
-ptScheduler ptUpdateCurrentLuxReading        = ptScheduler(PT_TIME_2S);
+ptScheduler ptGetCurrentLuxReading           = ptScheduler(PT_TIME_2S);
+ptScheduler ptReadElectronicsTemperature     = ptScheduler(PT_TIME_10S);
 
 /* ======================================================================
    SETUP
@@ -98,8 +101,12 @@ void loop() {
   }
 
   // Update the current lux reading from the remote Arduino
-  if (ptUpdateCurrentLuxReading.call() && consumeTelemetryFloat(SENSOR_LUX, &valueFromRemote)) {
+  if (ptGetCurrentLuxReading.call() && consumeTelemetryFloat(SENSOR_LUX, &valueFromRemote)) {
     currentLuxReading = valueFromRemote;
+  }
+
+  // Read the electronics temperature from the RTC sensor
+  if (ptReadElectronicsTemperature.call()) {
   }
 
   // Increment loop counter and report on performance stats if needed
