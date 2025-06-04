@@ -3,11 +3,11 @@
 #include <SPI.h>
 
 #include "../command_ids.h"
-#include "../helpers_logging.h"
-#include "../message_handlers_udp.h"
-#include "../telemetry_parsing.h"
+#include "../debug_logging.h"
+#include "../telemetry_receive_parser.h"
+#include "../udp_command_dispatcher.h"
 #include "../variables.h"
-#include "ethernet_receive.h"
+#include "ethernet_receive_udp.h"
 
 /* ======================================================================
    VARIABLES

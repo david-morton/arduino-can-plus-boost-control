@@ -3,14 +3,14 @@
 #include <ptScheduler.h> // The task scheduling library of choice
 
 #include "shared/common/command_ids.h"
+#include "shared/common/debug_logging.h"
 #include "shared/common/ethernet/ethernet_helpers.h"
-#include "shared/common/ethernet/ethernet_ping.h"
-#include "shared/common/ethernet/ethernet_receive.h"
-#include "shared/common/ethernet/ethernet_send.h"
-#include "shared/common/helpers_logging.h"
-#include "shared/common/message_handlers_udp.h"
-#include "shared/common/telemetry_parsing.h"
-#include "shared/common/telemetry_staging.h"
+#include "shared/common/ethernet/ethernet_ping_monitor.h"
+#include "shared/common/ethernet/ethernet_receive_udp.h"
+#include "shared/common/ethernet/ethernet_send_udp.h"
+#include "shared/common/telemetry_receive_parser.h"
+#include "shared/common/telemetry_send_staging.h"
+#include "shared/common/udp_command_dispatcher.h"
 #include "shared/common/variables.h"
 #include "shared/mqtt/mqtt_helpers.h"
 

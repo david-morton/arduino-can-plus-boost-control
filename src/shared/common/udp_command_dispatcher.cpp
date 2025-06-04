@@ -1,8 +1,8 @@
-#include "message_handlers_udp.h"
-#include "../common/ethernet/ethernet_ping.h"
-#include "../common/ethernet/ethernet_send.h"
-#include "helpers_logging.h"
-#include "telemetry_parsing.h"
+#include "udp_command_dispatcher.h"
+#include "../common/ethernet/ethernet_ping_monitor.h"
+#include "../common/ethernet/ethernet_send_udp.h"
+#include "debug_logging.h"
+#include "telemetry_receive_parser.h"
 #include "variables.h"
 
 /* ======================================================================

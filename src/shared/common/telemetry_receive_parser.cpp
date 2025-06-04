@@ -1,8 +1,8 @@
 #include <Arduino.h>
 
-#include "helpers_logging.h"
-#include "telemetry_parsing.h"
-#include "telemetry_staging.h"
+#include "debug_logging.h"
+#include "telemetry_receive_parser.h"
+#include "telemetry_send_staging.h"
 
 /* ======================================================================
    FUNCTION DEFINITIONS

@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <hp_BH1750.h> // Adafruit library for BH1750
 
-#include "../common/helpers_logging.h"
+#include "../common/debug_logging.h"
 #include "../common/variables.h"
-#include "light_sensor.h"
+#include "lux_sensor.h"
 
 /* ======================================================================
    CONFIGURE CLIENT

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "telemetry_staging.h"
+#include "telemetry_send_staging.h"
 
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
 
 void parseTelemetryPayload(const char *payload);
-bool consumeTelemetryFloat(TelemetryField field, float* outValue);
+bool consumeTelemetryFloat(TelemetryField field, float *outValue);

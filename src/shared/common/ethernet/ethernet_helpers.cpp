@@ -2,7 +2,7 @@
 #include <EthernetUdp.h>
 #include <SPI.h>
 
-#include "../helpers_logging.h"
+#include "../debug_logging.h"
 #include "../variables.h"
 #include "ethernet_helpers.h"
 
