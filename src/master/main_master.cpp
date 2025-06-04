@@ -30,7 +30,7 @@ bool debugEthernetPing     = false;
 bool debugEthernetTraffic  = false;
 bool debugGears            = false;
 bool debugGeneral          = true;
-bool debugPerformance      = true;
+bool debugPerformance      = false;
 bool debugSensorReadings   = true;
 bool debugTelemetry        = true;
 

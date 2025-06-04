@@ -33,11 +33,12 @@ typedef struct {
 /* ======================================================================
    STATIC CONSTANTS
    ====================================================================== */
-#define MAX_CHARS_PER_KV_PAIR 12 // e.g., "12=-123.45,"
+#define MAX_CHARS_PER_KV_PAIR 20 // e.g., "engineTemp=-123.45,"
 #define SAFETY_MARGIN_BYTES 8    // Some slack for formatting
 #define TELEMETRY_MESSAGE_BUFFER_SIZE ((NUM_TELEMETRY_FIELDS * MAX_CHARS_PER_KV_PAIR) + SAFETY_MARGIN_BYTES)
 
-// Ensure the telemetry message buffer size is reasonable for our use case
+// Ensure the telemetry message buffer size is reasonable for our use case.
+// This may need to be adjusted based on the actual number of fields and their expected sizes.
 static_assert(TELEMETRY_MESSAGE_BUFFER_SIZE <= 256, "Telemetry buffer too large!");
 
 /* ======================================================================
@@ -56,6 +57,7 @@ static inline const TelemetryMessageClass keyToMessageClass[NUM_TELEMETRY_FIELDS
     FUNCTION PROTOTYPES
    ====================================================================== */
 
-void addTelemetryItem(TelemetryField key, float value);
-void buildAndSendStagedTelemetry(TelemetryMessageClass msgClass, int commandId);
+void           addTelemetryItem(TelemetryField key, float value);
+void           buildAndSendStagedTelemetry(TelemetryMessageClass msgClass, int commandId);
 TelemetryField getTelemetryFieldForKey(const char *key);
+const char *   getTelemetryKeyForField(TelemetryField field);

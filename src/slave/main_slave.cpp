@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <ptScheduler.h> // The task scheduling library of choice
 
-#include "ethernet_slave_send_messages.h"
 #include "shared/common/command_ids.h"
 #include "shared/common/ethernet/ethernet_helpers.h"
 #include "shared/common/ethernet/ethernet_ping.h"
@@ -29,7 +28,7 @@ bool debugEthernetTraffic  = false;
 bool debugEthernetPing     = false;
 bool debugGears            = false;
 bool debugGeneral          = false;
-bool debugPerformance      = true;
+bool debugPerformance      = false;
 bool debugSensorReadings   = false;
 bool debugTelemetry        = false;
 

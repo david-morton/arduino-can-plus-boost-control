@@ -43,14 +43,20 @@ void buildAndSendStagedTelemetry(TelemetryMessageClass msgClass, int commandId) 
 
     int len = snprintf(messageBuffer + offset,
                        sizeof(messageBuffer) - offset,
-                       "%s%d=%.2f",
+                       "%s%s=%.2f",
                        (offset == 0 ? "" : ","),
-                       key,
+                       getTelemetryKeyForField((TelemetryField)key),
                        telemetryStaging[key].value);
     offset += len;
   }
 
   if (offset > 0) {
+    // Ensure the message is not filling our buffer beyond its size
+    if (offset >= TELEMETRY_MESSAGE_BUFFER_SIZE - 1) {
+      DEBUG_ERROR("Telemetry message exceeds buffer size! Size: %d / Max: %d", offset, TELEMETRY_MESSAGE_BUFFER_SIZE);
+      return; // Don't send incomplete or corrupted message
+    }
+
     sendUdpMessageWithCommand(commandId, messageBuffer);
     DEBUG_TELEMETRY("Submitted buffer to be sent via UDP: %s", messageBuffer);
   }
@@ -64,18 +70,21 @@ void buildAndSendStagedTelemetry(TelemetryMessageClass msgClass, int commandId) 
 }
 
 // Reverse lookup: get field enum from key string
-const char* getTelemetryKeyForField(TelemetryField field) {
+const char *getTelemetryKeyForField(TelemetryField field) {
   switch (field) {
-    case SENSOR_LUX:  return "lux";
-    case SENSOR_TEMP: return "temp";
-    default:          return nullptr;
+    case SENSOR_LUX:
+      return "lux";
+    case SENSOR_TEMP:
+      return "temp";
+    default:
+      return nullptr;
   }
 }
 
 // Reverse lookup table matching key strings to enum fields
-TelemetryField getTelemetryFieldForKey(const char* key) {
+TelemetryField getTelemetryFieldForKey(const char *key) {
   for (int i = 0; i < NUM_TELEMETRY_FIELDS; i++) {
-    const char* knownKey = getTelemetryKeyForField((TelemetryField)i);
+    const char *knownKey = getTelemetryKeyForField((TelemetryField)i);
     if (knownKey != nullptr && strcmp(knownKey, key) == 0) {
       return (TelemetryField)i;
     }

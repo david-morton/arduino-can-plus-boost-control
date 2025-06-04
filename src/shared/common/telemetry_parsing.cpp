@@ -9,11 +9,11 @@
    ====================================================================== */
 
 // This helper function retrieves the telemetry field for a given key if it is marked as valid
-bool consumeTelemetryFloat(TelemetryField field, float* outValue) {
+bool consumeTelemetryFloat(TelemetryField field, float *outValue) {
   if (!telemetryStaging[field].valid)
     return false;
 
-  *outValue = telemetryStaging[field].value;
+  *outValue                     = telemetryStaging[field].value;
   telemetryStaging[field].valid = false;
   return true;
 }
@@ -21,6 +21,8 @@ bool consumeTelemetryFloat(TelemetryField field, float* outValue) {
 // This function parses a telemetry payload string and updates the telemetry staging area
 // Once values are in the staging buffer, they can be read by other parts of the code
 void parseTelemetryPayload(const char *payload) {
+  DEBUG_TELEMETRY("Parsing telemetry payload: [%s]", payload);
+
   // Define a buffer size for the telemetry message
   char buffer[TELEMETRY_MESSAGE_BUFFER_SIZE];
 
@@ -48,6 +50,7 @@ void parseTelemetryPayload(const char *payload) {
     const char *valueStr = equals + 1;
 
     TelemetryField field = getTelemetryFieldForKey(key);
+
     if (field == NUM_TELEMETRY_FIELDS) {
       DEBUG_ERROR("Telemetry parse error: unknown key [%s]", key);
       pair = strtok(nullptr, ",");
@@ -64,7 +67,7 @@ void parseTelemetryPayload(const char *payload) {
     telemetryStaging[field].value = value;
     telemetryStaging[field].valid = true;
 
-    DEBUG_TELEMETRY("Received telemetry [%s] = %.2f", key, value);
+    DEBUG_TELEMETRY("Stored telemetry value [%s] = %.2f", key, value);
 
     pair = strtok(nullptr, ",");
   }
