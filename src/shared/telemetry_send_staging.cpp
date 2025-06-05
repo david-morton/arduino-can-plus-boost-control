@@ -1,6 +1,6 @@
 #include "telemetry_send_staging.h"
-#include "../common/debug_logging.h"
-#include "../common/ethernet/ethernet_send_udp.h"
+#include "../shared/debug_logging.h"
+#include "../shared/ethernet/ethernet_send_udp.h"
 
 /* ======================================================================
    VARIABLES

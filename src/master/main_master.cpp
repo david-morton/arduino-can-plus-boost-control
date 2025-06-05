@@ -2,17 +2,17 @@
 #include <mcp2515_can.h> // Used for CAN shields
 #include <ptScheduler.h> // The task scheduling library of choice
 
-#include "shared/common/command_ids.h"
-#include "shared/common/debug_logging.h"
-#include "shared/common/ethernet/ethernet_helpers.h"
-#include "shared/common/ethernet/ethernet_ping_monitor.h"
-#include "shared/common/ethernet/ethernet_receive_udp.h"
-#include "shared/common/ethernet/ethernet_send_udp.h"
-#include "shared/common/telemetry_receive_parser.h"
-#include "shared/common/telemetry_send_staging.h"
-#include "shared/common/udp_command_dispatcher.h"
-#include "shared/common/variables.h"
-#include "shared/mqtt/mqtt_helpers.h"
+#include "mqtt/mqtt_helpers.h"
+#include "shared/command_ids.h"
+#include "shared/debug_logging.h"
+#include "shared/ethernet/ethernet_helpers.h"
+#include "shared/ethernet/ethernet_ping_monitor.h"
+#include "shared/ethernet/ethernet_receive_udp.h"
+#include "shared/ethernet/ethernet_send_udp.h"
+#include "shared/telemetry_receive_parser.h"
+#include "shared/telemetry_send_staging.h"
+#include "shared/udp_command_dispatcher.h"
+#include "shared/variables.h"
 
 #define CAN_2515
 

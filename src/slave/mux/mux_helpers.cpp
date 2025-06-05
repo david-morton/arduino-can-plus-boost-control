@@ -1,5 +1,5 @@
 #include "mux_helpers.h"
-#include "../common/debug_logging.h"
+#include "../../shared/debug_logging.h"
 #include <light_CD74HC4067.h>
 
 /* ======================================================================
