@@ -12,7 +12,7 @@ TelemetrySlot telemetryStaging[NUM_TELEMETRY_FIELDS];
    FUNCTION DEFINITIONS
    ====================================================================== */
 // Add a telemetry item to the staging area
-void addTelemetryItem(TelemetryField key, float value) {
+void buildTelemetryItem(TelemetryField key, float value) {
   if (key >= NUM_TELEMETRY_FIELDS) {
     DEBUG_ERROR("Invalid telemetry key during staging: %d", key);
     return;
@@ -24,7 +24,7 @@ void addTelemetryItem(TelemetryField key, float value) {
 
 // Build and send staged telemetry for a specific message class
 // This function will send all valid telemetry items for the specified message class
-void buildAndSendStagedTelemetry(TelemetryMessageClass msgClass, int commandId) {
+void sendStagedTelemetry(TelemetryMessageClass msgClass, int commandId) {
   if (msgClass >= NUM_MESSAGE_CLASSES) {
     DEBUG_ERROR("Invalid message class: %d", msgClass);
     return;

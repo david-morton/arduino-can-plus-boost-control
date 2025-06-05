@@ -57,7 +57,7 @@ static inline const TelemetryMessageClass keyToMessageClass[NUM_TELEMETRY_FIELDS
     FUNCTION PROTOTYPES
    ====================================================================== */
 
-void           addTelemetryItem(TelemetryField key, float value);
-void           buildAndSendStagedTelemetry(TelemetryMessageClass msgClass, int commandId);
+void           buildTelemetryItem(TelemetryField key, float value);
+void           sendStagedTelemetry(TelemetryMessageClass msgClass, int commandId);
 TelemetryField getTelemetryFieldForKey(const char *key);
 const char    *getTelemetryKeyForField(TelemetryField field);

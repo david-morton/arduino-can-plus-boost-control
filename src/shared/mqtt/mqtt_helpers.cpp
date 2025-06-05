@@ -40,14 +40,14 @@ void connectMqttClientToBroker() {
 }
 
 // Publish metric via MQTT
-void publishMqttMetric(String topic, String metricName, int metricValue) {
+void sendMqttMetric(String topic, String metricName, int metricValue) {
   if (mqttBrokerConnected) {
     String payload = "{\"" + metricName + "\":" + String(metricValue) + "}";
     mqttClient.publish(topic.c_str(), payload.c_str());
   }
 }
 
-void publishMqttMetric(String topic, String metricName, String metricValue) {
+void sendMqttMetric(String topic, String metricName, String metricValue) {
   if (mqttBrokerConnected) {
     String payload = "{\"" + metricName + "\":" + String(metricValue) + "}";
     mqttClient.publish(topic.c_str(), payload.c_str());

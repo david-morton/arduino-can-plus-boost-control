@@ -28,8 +28,8 @@ void setupMux() {
 /* ======================================================================
    FUNCTION: Get average readings from multiplexed channel via CD74HC4067
    ====================================================================== */
-int getAveragedMuxAnalogueChannelReading(byte channel, int samples, int delayUs) {
+int readAveragedMuxAnalogueChannelReading(byte channel, int samples, int delayUs) {
   mux.channel(channel);
-  int averageReading = getAveragedAnaloguePinReading(muxSignalPin, samples, delayUs);
+  int averageReading = readAveragedAnaloguePinReading(muxSignalPin, samples, delayUs);
   return averageReading;
 }

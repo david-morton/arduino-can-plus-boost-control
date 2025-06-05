@@ -24,7 +24,7 @@ typedef struct {
    ====================================================================== */
 bool          sendArduinoPingRequest();
 bool          sendPingResponseToRemoteArduino(int pingSeq);
-unsigned long getAveragePingRttMicros();
-void          processPingResponse(unsigned long timestamp, unsigned long sequenceNumber);
-void          updatePingRttBuffer(unsigned long rtt);
-void          checkPingTimeoutsAndLoss();
+unsigned long calculateAveragePingRttMicros();
+void          handlePingResponse(unsigned long timestamp, unsigned long sequenceNumber);
+void          handlePingRttBuffer(unsigned long rtt);
+void          handlePingTimeoutsAndLoss();

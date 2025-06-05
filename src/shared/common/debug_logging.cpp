@@ -9,7 +9,7 @@ unsigned long arduinoLoopExecutionPreviousExecutionMillis;
    FUNCTION DEFINITIONS - FUNCTIONAL
    ====================================================================== */
 // This function reads an analogue pin multiple times and returns the average value.
-int getAveragedAnaloguePinReading(byte pin, int samples, int delayUs) {
+int readAveragedAnaloguePinReading(byte pin, int samples, int delayUs) {
   int totalReadings = 0;
 
   for (int i = 0; i < samples; i++) {

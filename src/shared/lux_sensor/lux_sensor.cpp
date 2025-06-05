@@ -42,7 +42,7 @@ void initialiseAmbientLightSensor() {
 }
 
 // Store a lux reading in the circular buffer
-void storeLuxReading(int lux) {
+void handleLuxReading(int lux) {
   lightSensorReadings[lightSensorReadingIndex] = lux;
   lightSensorReadingIndex                      = (lightSensorReadingIndex + 1) % LIGHT_SENSOR_READINGS_SIZE;
 }
@@ -50,7 +50,7 @@ void storeLuxReading(int lux) {
 // Read the ambient light sensor value and store it in circular buffer
 void readAmbientLightSensor() {
   if (!sensorAvailable) {
-    storeLuxReading(-1); // Store 0 if sensor is not available
+    handleLuxReading(-1); // Store 0 if sensor is not available
     DEBUG_ERROR("ERROR: Cannot read ambient light sensor, sensor not available.");
     return;
   }
@@ -58,16 +58,16 @@ void readAmbientLightSensor() {
   if (BH1750.hasValue()) {
     int lux = BH1750.getLux();
     BH1750.start(); // Trigger next measurement
-    storeLuxReading(lux);
+    handleLuxReading(lux);
     DEBUG_SENSOR_READINGS("INFO: Ambient light sensor reading: %d lux (stored at index %d)", lux, lightSensorReadingIndex);
   } else {
-    storeLuxReading(-1); // Store 0 if no valid reading
+    handleLuxReading(-1); // Store 0 if no valid reading
     DEBUG_ERROR("ERROR: No valid reading from ambient light sensor.");
   }
 }
 
 // Get the average lux value from the circular buffer
-int getAverageLux() {
+int calculateAverageLux() {
   readAmbientLightSensor(); // Ensure we have the latest reading before calculating average
 
   int sum = 0;

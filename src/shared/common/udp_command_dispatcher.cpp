@@ -29,44 +29,6 @@ bool handlePingRequestOrResponse(int cmdId, const char *payload, size_t payloadL
     return sendPingResponseToRemoteArduino(pingSeq);
   } else if (cmdId == 1) { // Ping response
     DEBUG_ETHERNET_PING("Received ping response with sequence number: %d", pingSeq);
-    processPingResponse(micros(), pingSeq);
+    handlePingResponse(micros(), pingSeq);
   }
 }
-
-// // Handle low frequency messages (command ID 2) from remote Arduino
-// void handleLowFrequencyMessages(const char *payloadStr, size_t payloadLength) {
-//   if (!payloadStr || payloadLength == 0) {
-//     DEBUG_ERROR("Low frequency payload is empty or null");
-//     return;
-//   }
-
-//   // Allocate +1 to append null terminator for strtok
-//   char *payloadCopy = (char *)malloc(payloadLength + 1);
-//   if (!payloadCopy) {
-//     DEBUG_ERROR("Failed to allocate memory for payload copy");
-//     return;
-//   }
-
-//   memcpy(payloadCopy, payloadStr, payloadLength);
-//   payloadCopy[payloadLength] = '\0'; // ensure null-terminated
-
-//   char *token      = strtok(payloadCopy, ",");
-//   int   fieldIndex = 0;
-
-//   while (token != nullptr) {
-//     switch (fieldIndex) {
-//       case 0:
-//         currentLuxReading = atoi(token);
-//         break;
-
-//       default:
-//         break;
-//     }
-//     fieldIndex++;
-//     token = strtok(nullptr, ",");
-//   }
-
-//   DEBUG_ETHERNET_MESSAGES("Updated variables from low-frequency message [lux=%d]", currentLuxReading);
-
-//   free(payloadCopy);
-// }

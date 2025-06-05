@@ -7,4 +7,4 @@
    ====================================================================== */
 
 void parseTelemetryPayload(const char *payload);
-bool consumeTelemetryFloat(TelemetryField field, float *outValue);
+bool handleTelemetryFloat(TelemetryField field, float *outValue);

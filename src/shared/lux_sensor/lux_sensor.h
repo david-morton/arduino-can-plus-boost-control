@@ -10,4 +10,4 @@
    ====================================================================== */
 void initialiseAmbientLightSensor();
 void readAmbientLightSensor();
-int  getAverageLux();
+int  calculateAverageLux();

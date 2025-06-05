@@ -59,7 +59,7 @@ int           currentLuxReading         = 0; // Variable to store the current lu
 // Medium frequency tasks (hundreds of milliseconds)
 
 // Low frequency tasks (seconds)
-ptScheduler ptReadAmbientLightReading        = ptScheduler(PT_TIME_2S);
+ptScheduler ptReadAmbientLightReading       = ptScheduler(PT_TIME_2S);
 ptScheduler ptReportArduinoPerformanceStats = ptScheduler(PT_TIME_5S);
 ptScheduler ptSendLowFrequencyMessages      = ptScheduler(PT_TIME_1S);
 
@@ -81,16 +81,16 @@ void setup() {
 void loop() {
 
   // Check for, and process any incoming UDP messages as fast as possible within the main loop
-  processIncomingUdpMessages();
+  handleIncomingUdpMessage();
 
   // Read ambient light sensor value at a defined interval and store for transmission
   if (ptReadAmbientLightReading.call()) {
-    addTelemetryItem(SENSOR_LUX, currentLuxReading = getAverageLux());
+    buildTelemetryItem(SENSOR_LUX, currentLuxReading = calculateAverageLux());
   }
 
   // Send low frequency messages at a defined interval (command ID 2)
   if (ptSendLowFrequencyMessages.call()) {
-    buildAndSendStagedTelemetry(MSG_SLAVE_LOW_FREQUENCY, CMD_LOW_FREQUENCY_MESSAGES);
+    sendStagedTelemetry(MSG_SLAVE_LOW_FREQUENCY, CMD_LOW_FREQUENCY_MESSAGES);
   }
 
   // Increment loop counter and report on performance stats if needed

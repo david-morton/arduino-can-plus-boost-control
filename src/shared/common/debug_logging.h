@@ -64,5 +64,5 @@ extern bool debugTelemetry;
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
-int  getAveragedAnaloguePinReading(byte, int, int);
+int  readAveragedAnaloguePinReading(byte, int, int);
 void reportArduinoLoopRate(unsigned long *);

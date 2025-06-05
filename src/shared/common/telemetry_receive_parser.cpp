@@ -9,7 +9,7 @@
    ====================================================================== */
 
 // This helper function retrieves the telemetry field for a given key if it is marked as valid
-bool consumeTelemetryFloat(TelemetryField field, float *outValue) {
+bool handleTelemetryFloat(TelemetryField field, float *outValue) {
   if (!telemetryStaging[field].valid)
     return false;
 

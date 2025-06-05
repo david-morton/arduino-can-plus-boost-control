@@ -88,11 +88,11 @@ void setup() {
 void loop() {
 
   // Check for, and process any incoming UDP messages as fast as possible within the main loop
-  processIncomingUdpMessages();
+  handleIncomingUdpMessage();
 
   // Report ping RTT stats (if needed) from buffer average
   if (ptReportArduinoPingStats.call()) {
-    checkPingTimeoutsAndLoss();
+    handlePingTimeoutsAndLoss();
   }
 
   // Issue ping request to remote Arduino
@@ -101,7 +101,7 @@ void loop() {
   }
 
   // Update the current lux reading from the remote Arduino
-  if (ptGetCurrentLuxReading.call() && consumeTelemetryFloat(SENSOR_LUX, &valueFromRemote)) {
+  if (ptGetCurrentLuxReading.call() && handleTelemetryFloat(SENSOR_LUX, &valueFromRemote)) {
     currentLuxReading = valueFromRemote;
   }
 

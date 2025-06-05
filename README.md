@@ -113,7 +113,7 @@ To ensure clarity and consistency across all modules in this project (master/sla
 | `process`    | Multi-step transformation or decision logic (routing, validation, storing)   | `processReceivedTelemetry()`, `processCommand()` |
 | `calculate`  | Mathematical operations with no side effects                                 | `calculateAFR()`, `calculateTargetBoost()`   |
 | `handle`     | Event-driven handlers (commands, interrupts, responses)                      | `handleCommand()`, `handlePingResponse()`    |
-| `build`      | Constructing structured data for output (e.g. message buffers)               | `buildAndSendStagedTelemetry()`              |
+| `build`      | Constructing structured data for output (e.g. message buffers)               | `sendStagedTelemetry()`              |
 | `parse`      | Breaking down structured input (strings, buffers) into usable fields         | `parseTelemetryPayload()`, `parseKeyValue()` |
 | `validate`   | Checking the correctness, range, or format of input or internal data         | `validateChecksum()`, `validateSensorKey()`  |
 
@@ -148,7 +148,7 @@ Use this table to help decide which prefix is appropriate for a new function or 
 | `updateSensorStaging()`            | Refreshes telemetry buffer |
 | `getLatestCoolantTemp()`           | Pure accessor          |
 | `calculateAFR()`                   | Computes from inputs   |
-| `buildAndSendStagedTelemetry()`    | Builds and transmits UDP message |
+| `sendStagedTelemetry()`    | Builds and transmits UDP message |
 | `handlePingResponse()`             | Handles event-driven reply |
 | `parseTelemetryPayload()`          | Decodes key=value string |
 | `validateSensorKey()`              | Confirms known key     |

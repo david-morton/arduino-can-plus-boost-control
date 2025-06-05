@@ -60,7 +60,7 @@ bool sendArduinoPingRequest() {
 }
 
 // Process a ping response from the remote Arduino
-void processPingResponse(unsigned long timestampMicros, unsigned long sequenceNumber) {
+void handlePingResponse(unsigned long timestampMicros, unsigned long sequenceNumber) {
   for (uint8_t i = 0; i < MAX_OUTSTANDING_PINGS; i++) {
     if (pingHistory[i].sequence == sequenceNumber && !pingHistory[i].responded) {
       unsigned long rtt              = timestampMicros - pingHistory[i].sentTimeMicros;
@@ -68,7 +68,7 @@ void processPingResponse(unsigned long timestampMicros, unsigned long sequenceNu
       pingHistory[i].roundTripMicros = rtt;
 
       if (rtt <= PING_TIMEOUT_MICROS) {
-        updatePingRttBuffer(rtt);
+        handlePingRttBuffer(rtt);
         DEBUG_ETHERNET_PING("Ping RTT: %.2f ms, seq: %lu", rtt / 1000.0f, sequenceNumber);
       } else {
         DEBUG_ERROR("Ping response too late: %.2f ms, seq: %lu", rtt / 1000.0f, sequenceNumber);
@@ -81,7 +81,7 @@ void processPingResponse(unsigned long timestampMicros, unsigned long sequenceNu
 }
 
 // Log the ping round trip time in a circular buffer
-void updatePingRttBuffer(unsigned long rtt) {
+void handlePingRttBuffer(unsigned long rtt) {
   rttBuffer[rttIndex++] = rtt;
   if (rttIndex >= RTT_BUFFER_SIZE) {
     rttIndex = 0; // Wrap around
@@ -89,7 +89,7 @@ void updatePingRttBuffer(unsigned long rtt) {
 }
 
 // Get the average round trip time (RTT) from the circular buffer
-unsigned long getAveragePingRttMicros() {
+unsigned long calculateAveragePingRttMicros() {
   uint8_t count = rttIndex == 0 ? RTT_BUFFER_SIZE : rttIndex;
 
   unsigned long total = 0;
@@ -100,7 +100,7 @@ unsigned long getAveragePingRttMicros() {
 }
 
 // Check for ping timeouts and calculate packet loss
-void checkPingTimeoutsAndLoss() {
+void handlePingTimeoutsAndLoss() {
   unsigned long now   = micros();
   uint8_t       count = 0;
   uint8_t       lost  = 0;
@@ -121,7 +121,7 @@ void checkPingTimeoutsAndLoss() {
   if (count == 0)
     return;
 
-  float avgRttMs    = getAveragePingRttMicros() / 1000.0f;
+  float avgRttMs    = calculateAveragePingRttMicros() / 1000.0f;
   float lossPercent = (lost * 100.0f) / count;
 
   if (lossPercent >= 25.0f) {

@@ -28,7 +28,7 @@ char udpReceiveBuffer[RECEIVE_PACKET_BUFFER_SIZE];
    ====================================================================== */
 
 // Get incoming UDP message, validate it and save payload to buffer for processing
-bool getIncomingUdpMessage(char *buffer, size_t bufferSize) {
+bool parseIncomingUdpMessage(char *buffer, size_t bufferSize) {
   int packetSize = ethUdpClient.parsePacket();
   if (packetSize <= 0)
     return false;
@@ -98,8 +98,8 @@ bool validateIncomingUdpMessageChecksum(const char *message) {
 }
 
 // Process incoming UDP messages
-void processIncomingUdpMessages() {
-  if (!getIncomingUdpMessage(udpReceiveBuffer, sizeof(udpReceiveBuffer))) {
+void handleIncomingUdpMessage() {
+  if (!parseIncomingUdpMessage(udpReceiveBuffer, sizeof(udpReceiveBuffer))) {
     return; // No packet received
   }
 
@@ -125,7 +125,7 @@ void processIncomingUdpMessages() {
 
     case CMD_LOW_FREQUENCY_MESSAGES:
       parseTelemetryPayload(payloadStr);
-      // handleLowFrequencyMessages(payloadStr, strlen(payloadStr));
+
       break;
 
     default:

@@ -22,7 +22,7 @@ unsigned long sendMalformedMessageCount = 0; // Detected but not sent
    ====================================================================== */
 
 // Validate the message to be sent will fit within the buffer
-bool validateSendMessage(const char *message) {
+bool validateMessageLength(const char *message) {
   // Check if the message is too long
   if (strlen(message) > SEND_PACKET_BUFFER_SIZE - 1) {
     DEBUG_ERROR("ERROR - Message too long, not sending: %s", message);
@@ -58,7 +58,7 @@ bool sendUdpMessage(const char *message) {
   buildUdpMessage(udpMessage, sizeof(udpMessage), message, sendSequenceNumber);
 
   // Validate the message length before sending
-  if (!validateSendMessage(udpMessage)) {
+  if (!validateMessageLength(udpMessage)) {
     sendMalformedMessageCount++;
     return false;
   }

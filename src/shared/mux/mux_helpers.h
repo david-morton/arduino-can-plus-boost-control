@@ -6,5 +6,5 @@
    FUNCTION PROTOTYPES
    ====================================================================== */
 
-int  getAveragedMuxAnalogueChannelReading(byte, int, int);
+int  readAveragedMuxAnalogueChannelReading(byte, int, int);
 void setupMux();
