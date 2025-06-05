@@ -3,6 +3,7 @@
 #include <ptScheduler.h> // The task scheduling library of choice
 
 #include "mqtt/mqtt_helpers.h"
+#include "rtc/rtc_helpers.h"
 #include "shared/command_ids.h"
 #include "shared/debug_logging.h"
 #include "shared/ethernet/ethernet_helpers.h"
@@ -80,6 +81,7 @@ void setup() {
 
   initialiseEthernetShield(ethConfigLocal);
   connectMqttClientToBroker();
+  initialiseRtc();
 }
 
 /* ======================================================================
