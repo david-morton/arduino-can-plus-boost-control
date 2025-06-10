@@ -6,7 +6,7 @@
 #include "../debug_logging.h"
 #include "../telemetry_receive_parser.h"
 #include "../udp_command_dispatcher.h"
-#include "../variables.h"
+#include "../variables_programmatic.h"
 #include "ethernet_receive_udp.h"
 
 /* ======================================================================

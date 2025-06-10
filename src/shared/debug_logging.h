@@ -12,6 +12,7 @@ extern bool debugEthernetPing;
 extern bool debugEthernetTraffic;
 extern bool debugGears;
 extern bool debugGeneral;
+extern bool debugMux;
 extern bool debugPerformance;
 extern bool debugSensorReadings;
 extern bool debugTelemetry;
@@ -52,6 +53,9 @@ extern bool debugTelemetry;
 #define DEBUG_GEARS(fmt, ...) \
   _DEBUG_PRINTF(debugGears, "GEARS", fmt, ##__VA_ARGS__)
 
+#define DEBUG_MUX(fmt, ...) \
+  _DEBUG_PRINTF(debugMux, "MUX", fmt, ##__VA_ARGS__)
+
 #define DEBUG_SENSOR_READINGS(fmt, ...) \
   _DEBUG_PRINTF(debugSensorReadings, "SENSOR READINGS", fmt, ##__VA_ARGS__)
 
@@ -64,5 +68,4 @@ extern bool debugTelemetry;
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
-int  readAveragedAnaloguePinReading(byte, int, int);
 void reportArduinoLoopRate(unsigned long *);

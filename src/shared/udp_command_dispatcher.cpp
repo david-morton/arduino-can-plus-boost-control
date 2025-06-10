@@ -3,7 +3,7 @@
 #include "../shared/ethernet/ethernet_send_udp.h"
 #include "debug_logging.h"
 #include "telemetry_receive_parser.h"
-#include "variables.h"
+#include "variables_programmatic.h"
 
 /* ======================================================================
    FUNCTION DEFINITIONS

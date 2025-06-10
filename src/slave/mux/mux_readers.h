@@ -1,11 +1,7 @@
 #pragma once
 
-#include <Arduino.h>
+#include "Arduino.h"
 
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
-
-void setupMux();
-int  readAveragedMuxAnalogueChannel(byte, int, int);
-bool readStableMuxDigitalChannelReading(byte channel, int samples, int delayUs);

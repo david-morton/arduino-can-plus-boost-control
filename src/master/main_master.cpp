@@ -3,7 +3,7 @@
 #include <ptScheduler.h> // The task scheduling library of choice
 
 #include "mqtt/mqtt_helpers.h"
-#include "rtc/rtc_helpers.h"
+#include "rtc/rtc_sensor.h"
 #include "shared/command_ids.h"
 #include "shared/debug_logging.h"
 #include "shared/ethernet/ethernet_helpers.h"
@@ -13,7 +13,8 @@
 #include "shared/telemetry_receive_parser.h"
 #include "shared/telemetry_send_staging.h"
 #include "shared/udp_command_dispatcher.h"
-#include "shared/variables.h"
+#include "shared/variables_programmatic.h"
+#include "shared/variables_vehicle_parameters.h"
 
 #define CAN_2515
 
@@ -71,6 +72,11 @@ ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
 ptScheduler ptGetCurrentLuxReading           = ptScheduler(PT_TIME_2S);
 ptScheduler ptReadElectronicsTemperature     = ptScheduler(PT_TIME_10S);
 
+// Send different message classes to remote Arduino
+ptScheduler ptSendLowFrequencyMessages    = ptScheduler(PT_TIME_1S);
+ptScheduler ptSendMediumFrequencyMessages = ptScheduler(PT_TIME_100MS);
+ptScheduler ptSendHighFrequencyMessages   = ptScheduler(PT_TIME_20MS);
+
 /* ======================================================================
    SETUP
    ====================================================================== */
@@ -109,6 +115,7 @@ void loop() {
 
   // Read the electronics temperature from the RTC sensor
   if (ptReadElectronicsTemperature.call()) {
+    currentElectronicsTemp = getRtcCurrentTemperature();
   }
 
   // Increment loop counter and report on performance stats if needed

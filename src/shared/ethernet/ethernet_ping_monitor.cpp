@@ -1,6 +1,6 @@
 #include "ethernet_ping_monitor.h"
 #include "../debug_logging.h"
-#include "../variables.h"
+#include "../variables_programmatic.h"
 #include "ethernet_send_udp.h"
 
 /* ======================================================================

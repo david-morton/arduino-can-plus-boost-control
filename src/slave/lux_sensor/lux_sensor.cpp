@@ -2,7 +2,7 @@
 #include <hp_BH1750.h> // Adafruit library for BH1750
 
 #include "../../shared/debug_logging.h"
-#include "../../shared/variables.h"
+#include "../../shared/variables_programmatic.h"
 #include "lux_sensor.h"
 
 /* ======================================================================

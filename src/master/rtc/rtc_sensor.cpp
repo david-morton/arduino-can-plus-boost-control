@@ -2,8 +2,7 @@
 #include "RTClib.h"
 
 #include "../../shared/debug_logging.h"
-#include "rtc_helpers.h"
-
+#include "rtc_sensor.h"
 
 RTC_DS3231 rtc;
 
@@ -46,5 +45,6 @@ float getRtcCurrentTemperature() {
     return -99; // Return an error value
   }
 
+  DEBUG_SENSOR_READINGS("RTC Temperature", tempC, "C");
   return tempC; // Return temperature in degrees Celsius
 }

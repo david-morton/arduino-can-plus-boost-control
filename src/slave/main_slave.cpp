@@ -2,6 +2,9 @@
 #include <ptScheduler.h> // The task scheduling library of choice
 
 #include "lux_sensor/lux_sensor.h"
+#include "mux/mux_helpers.h"
+#include "mux/mux_readers.h"
+#include "pin_assignments_slave.h"
 #include "shared/command_ids.h"
 #include "shared/debug_logging.h"
 #include "shared/ethernet/ethernet_helpers.h"
@@ -10,7 +13,8 @@
 #include "shared/ethernet/ethernet_send_udp.h"
 #include "shared/telemetry_send_staging.h"
 #include "shared/udp_command_dispatcher.h"
-#include "shared/variables.h"
+#include "shared/variables_programmatic.h"
+#include "shared/variables_vehicle_parameters.h"
 
 #define CAN_2515
 
@@ -28,6 +32,7 @@ bool debugEthernetTraffic  = false;
 bool debugEthernetPing     = false;
 bool debugGears            = false;
 bool debugGeneral          = false;
+bool debugMux              = true;
 bool debugPerformance      = false;
 bool debugSensorReadings   = false;
 bool debugTelemetry        = false;
@@ -49,7 +54,34 @@ const IPAddress remoteArduinoIp(192, 168, 10, 100);
    ====================================================================== */
 
 unsigned long arduinoLoopExecutionCount = 0;
-int           currentLuxReading         = 0; // Variable to store the current lux reading from ambient light sensor
+
+/* ======================================================================
+   VARIABLES: Physical sensor inputs from mux
+   ====================================================================== */
+
+bool currentSwitchStateClutch         = false;
+bool currentSwitchStateNeutral        = false;
+int  currentBrakePressureFrontKpa     = 0;
+int  currentBrakePressureRearKpa      = 0;
+int  currentCoolantTempCelsius        = 0;
+int  currentCrankCaseVacuumKpa        = 0;
+int  currentFuelPressureKpa           = 0;
+int  currentIntakeTempBank1Celsius    = 0;
+int  currentIntakeTempBank2Celsius    = 0;
+int  currentIntakeTempManifoldCelsius = 0;
+int  currentOilPressureKpa            = 0;
+int  currentOilTempCelsius            = 0;
+
+/* ======================================================================
+   VARIABLES: Physical sensor inputs direct to Arduino
+   ====================================================================== */
+
+int currentAmbientLux                = 0;
+int currentGear                      = 0;
+int currentIntakePressureBank1Kpa    = 0;
+int currentIntakePressureBank2Kpa    = 0;
+int currentIntakePressureManifoldKpa = 0;
+int currentRpm                       = 0;
 
 /* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
@@ -57,11 +89,17 @@ int           currentLuxReading         = 0; // Variable to store the current lu
 // High frequency tasks (tens of milliseconds)
 
 // Medium frequency tasks (hundreds of milliseconds)
+ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
+ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_100MS);
 
 // Low frequency tasks (seconds)
 ptScheduler ptReadAmbientLightReading       = ptScheduler(PT_TIME_2S);
 ptScheduler ptReportArduinoPerformanceStats = ptScheduler(PT_TIME_5S);
-ptScheduler ptSendLowFrequencyMessages      = ptScheduler(PT_TIME_1S);
+
+// Send different message classes to remote Arduino
+ptScheduler ptSendLowFrequencyMessages    = ptScheduler(PT_TIME_1S);
+ptScheduler ptSendMediumFrequencyMessages = ptScheduler(PT_TIME_100MS);
+ptScheduler ptSendHighFrequencyMessages   = ptScheduler(PT_TIME_20MS);
 
 /* ======================================================================
    SETUP
@@ -85,12 +123,21 @@ void loop() {
 
   // Read ambient light sensor value at a defined interval and store for transmission
   if (ptReadAmbientLightReading.call()) {
-    buildTelemetryItem(SENSOR_LUX, currentLuxReading = calculateAverageLux());
+    buildTelemetryItem(SENSOR_LUX, currentAmbientLux = calculateAverageLux());
   }
 
   // Send low frequency messages at a defined interval (command ID 2)
   if (ptSendLowFrequencyMessages.call()) {
     sendStagedTelemetry(MSG_SLAVE_LOW_FREQUENCY, CMD_LOW_FREQUENCY_MESSAGES);
+  }
+
+  // Read the state of clutch and neutral switches, and update current variables
+  if (ptReadSwitchStateClutch.call()) {
+    currentSwitchStateClutch = readStableMuxDigitalChannelReading(MUX_CHANNEL_CLUTCH_SWITCH, 3, 0);
+  }
+
+  if (ptReadSwitchStateNeutral.call()) {
+    currentSwitchStateNeutral = readStableMuxDigitalChannelReading(MUX_CHANNEL_NEUTRAL_SWITCH, 3, 0);
   }
 
   // Increment loop counter and report on performance stats if needed

@@ -3,7 +3,7 @@
 #include <SPI.h>
 
 #include "../debug_logging.h"
-#include "../variables.h"
+#include "../variables_programmatic.h"
 #include "ethernet_helpers.h"
 
 /* ======================================================================
