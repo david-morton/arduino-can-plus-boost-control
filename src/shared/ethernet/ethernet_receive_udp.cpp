@@ -125,7 +125,14 @@ void handleIncomingUdpMessage() {
 
     case CMD_LOW_FREQUENCY_MESSAGES:
       parseTelemetryPayload(payloadStr);
+      break;
 
+    case CMD_MED_FREQUENCY_MESSAGES:
+      parseTelemetryPayload(payloadStr);
+      break;
+
+    case CMD_HIGH_FREQUENCY_MESSAGES:
+      parseTelemetryPayload(payloadStr);
       break;
 
     default:

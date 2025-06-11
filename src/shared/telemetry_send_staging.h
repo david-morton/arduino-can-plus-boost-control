@@ -11,13 +11,19 @@
 typedef enum {
   SENSOR_LUX = 0,
   SENSOR_ELECTRONICS_TEMP,
+  SENSOR_CLUTCH,
+  SENSOR_NEUTRAL,
   NUM_TELEMETRY_FIELDS // Always last, this is used to count the number of fields
 } TelemetryField;
 
 // This enum defines the classes of telemetry messages that can be staged and sent
 typedef enum {
   MSG_SLAVE_LOW_FREQUENCY = 0,
+  MSG_SLAVE_MED_FREQUENCY,
+  MSG_SLAVE_HIGH_FREQUENCY,
   MSG_MASTER_LOW_FREQUENCY,
+  MSG_MASTER_MED_FREQUENCY,
+  MSG_MASTER_HIGH_FREQUENCY,
   NUM_MESSAGE_CLASSES // Always last, this is used to count the number of fields
 } TelemetryMessageClass;
 
@@ -51,7 +57,9 @@ extern TelemetrySlot telemetryStaging[NUM_TELEMETRY_FIELDS];
    ====================================================================== */
 static inline const TelemetryMessageClass keyToMessageClass[NUM_TELEMETRY_FIELDS] = {
     [SENSOR_LUX]              = MSG_SLAVE_LOW_FREQUENCY,
-    [SENSOR_ELECTRONICS_TEMP] = MSG_SLAVE_LOW_FREQUENCY};
+    [SENSOR_ELECTRONICS_TEMP] = MSG_SLAVE_LOW_FREQUENCY,
+    [SENSOR_CLUTCH]           = MSG_SLAVE_MED_FREQUENCY,
+    [SENSOR_NEUTRAL]          = MSG_SLAVE_MED_FREQUENCY};
 
 /* ======================================================================
     FUNCTION PROTOTYPES

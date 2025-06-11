@@ -28,6 +28,10 @@ DateTime getRtcCurrentDateTime() {
     DEBUG_ERROR("RTC returned an invalid date/time.");
     return DateTime(); // Return an invalid DateTime object
   }
+  // Format: YYYY-MM-DD HH:MM:SS
+  DEBUG_SENSOR_READINGS("RTC Date/Time: %04d-%02d-%02d %02d:%02d:%02d",
+                        now.year(), now.month(), now.day(),
+                        now.hour(), now.minute(), now.second());
   return now;
 }
 
@@ -45,6 +49,6 @@ float getRtcCurrentTemperature() {
     return -99; // Return an error value
   }
 
-  DEBUG_SENSOR_READINGS("RTC Temperature", tempC, "C");
+  DEBUG_SENSOR_READINGS("RTC Temperature %.1fC", tempC);
   return tempC; // Return temperature in degrees Celsius
 }

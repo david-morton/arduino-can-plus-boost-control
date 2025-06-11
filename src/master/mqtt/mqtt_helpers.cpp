@@ -2,6 +2,7 @@
 #include <Ethernet.h>
 #include <PubSubClient.h>
 
+#include "../../shared/debug_logging.h"
 #include "mqtt_helpers.h"
 
 /* ======================================================================
@@ -26,14 +27,15 @@ const int    mqtt_port = 1883;               // Grafana server port on Orange Pi
 // Connect MQTT client to broker
 void connectMqttClientToBroker() {
   if (!mqttClient.connected()) {
-    Serial.println("INFO - Connecting to MQTT broker");
+    DEBUG_GENERAL("Connecting to MQTT broker...");
     mqttClient.setServer(mqtt_server, mqtt_port);
     mqttClient.setKeepAlive(5);
+
     if (mqttClient.connect("arduino-client")) {
-      Serial.println("\tOK - MQTT Client connected");
+      DEBUG_GENERAL("OK - MQTT Client connected");
       mqttBrokerConnected = true;
     } else {
-      Serial.println("\tFATAL - MQTT Client not connected");
+      DEBUG_ERROR("FATAL - MQTT Client not connected");
       mqttBrokerConnected = false;
     }
   }

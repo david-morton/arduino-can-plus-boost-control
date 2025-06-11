@@ -64,6 +64,10 @@ float valueFromRemote; // Scratch variable to transport variable values from rem
 // High frequency tasks (tens of milliseconds)
 
 // Medium frequency tasks (hundreds of milliseconds)
+// ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
+// ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_100MS);
+ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_1S);
+ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_1S);
 
 // Low frequency tasks (seconds)
 ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_5S);
@@ -112,6 +116,23 @@ void loop() {
   if (ptGetCurrentLuxReading.call() && handleTelemetryFloat(SENSOR_LUX, &valueFromRemote)) {
     currentLuxReading = valueFromRemote;
   }
+
+  // Send low frequency messages
+  if (ptSendLowFrequencyMessages.call()) {
+    sendStagedTelemetry(MSG_MASTER_LOW_FREQUENCY, CMD_LOW_FREQUENCY_MESSAGES);
+  }
+
+  // Send medium frequency messages
+  if (ptSendMediumFrequencyMessages.call()) {
+    sendStagedTelemetry(MSG_MASTER_MED_FREQUENCY, CMD_MED_FREQUENCY_MESSAGES);
+  }
+
+  // Send high frequency messages
+  if (ptSendHighFrequencyMessages.call()) {
+    sendStagedTelemetry(MSG_MASTER_HIGH_FREQUENCY, CMD_HIGH_FREQUENCY_MESSAGES);
+  }
+
+  // Update the current clutch and neutral statuses from the remote Arduino
 
   // Read the electronics temperature from the RTC sensor
   if (ptReadElectronicsTemperature.call()) {

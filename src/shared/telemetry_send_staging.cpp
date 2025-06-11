@@ -11,7 +11,8 @@ TelemetrySlot telemetryStaging[NUM_TELEMETRY_FIELDS];
 /* ======================================================================
    FUNCTION DEFINITIONS
    ====================================================================== */
-// Add a telemetry item to the staging area
+// Add a telemetry item to the staging area ready to pickup and send
+// New sensor key value pais are defined in getTelemetryKeyForField and telemetry_send_staging.h
 void buildTelemetryItem(TelemetryField key, float value) {
   if (key >= NUM_TELEMETRY_FIELDS) {
     DEBUG_ERROR("Invalid telemetry key during staging: %d", key);
@@ -19,7 +20,7 @@ void buildTelemetryItem(TelemetryField key, float value) {
   }
   telemetryStaging[key].value = value;
   telemetryStaging[key].valid = true;
-  DEBUG_TELEMETRY("Staged telemetry: key=%d, value=%.2f", key, value);
+  DEBUG_TELEMETRY("Staged telemetry: key=%d (%s), value=%.2f", key, getTelemetryKeyForField((TelemetryField)key), value);
 }
 
 // Build and send staged telemetry for a specific message class
@@ -74,6 +75,10 @@ const char *getTelemetryKeyForField(TelemetryField field) {
   switch (field) {
     case SENSOR_LUX:
       return "lux";
+    case SENSOR_CLUTCH:
+      return "clutch";
+    case SENSOR_NEUTRAL:
+      return "neutral";
     case SENSOR_ELECTRONICS_TEMP:
       return "electronicsTemp";
     default:

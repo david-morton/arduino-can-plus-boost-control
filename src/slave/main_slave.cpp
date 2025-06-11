@@ -35,7 +35,7 @@ bool debugGeneral          = false;
 bool debugMux              = true;
 bool debugPerformance      = false;
 bool debugSensorReadings   = false;
-bool debugTelemetry        = false;
+bool debugTelemetry        = true;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related
@@ -89,8 +89,10 @@ int currentRpm                       = 0;
 // High frequency tasks (tens of milliseconds)
 
 // Medium frequency tasks (hundreds of milliseconds)
-ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
-ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_100MS);
+// ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
+// ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_100MS);
+ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_1S);
+ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_1S);
 
 // Low frequency tasks (seconds)
 ptScheduler ptReadAmbientLightReading       = ptScheduler(PT_TIME_2S);
@@ -126,18 +128,28 @@ void loop() {
     buildTelemetryItem(SENSOR_LUX, currentAmbientLux = calculateAverageLux());
   }
 
-  // Send low frequency messages at a defined interval (command ID 2)
+  // Read the state of clutch and neutral switches, and update current variables
+  if (ptReadSwitchStateClutch.call()) {
+    buildTelemetryItem(SENSOR_CLUTCH, currentSwitchStateClutch = readStableMuxDigitalChannelReading(MUX_CHANNEL_CLUTCH_SWITCH, 3, 0));
+  }
+
+  if (ptReadSwitchStateNeutral.call()) {
+    buildTelemetryItem(SENSOR_NEUTRAL, currentSwitchStateNeutral = readStableMuxDigitalChannelReading(MUX_CHANNEL_NEUTRAL_SWITCH, 3, 0));
+  }
+
+  // Send low frequency messages
   if (ptSendLowFrequencyMessages.call()) {
     sendStagedTelemetry(MSG_SLAVE_LOW_FREQUENCY, CMD_LOW_FREQUENCY_MESSAGES);
   }
 
-  // Read the state of clutch and neutral switches, and update current variables
-  if (ptReadSwitchStateClutch.call()) {
-    currentSwitchStateClutch = readStableMuxDigitalChannelReading(MUX_CHANNEL_CLUTCH_SWITCH, 3, 0);
+  // Send medium frequency messages
+  if (ptSendMediumFrequencyMessages.call()) {
+    sendStagedTelemetry(MSG_SLAVE_MED_FREQUENCY, CMD_MED_FREQUENCY_MESSAGES);
   }
 
-  if (ptReadSwitchStateNeutral.call()) {
-    currentSwitchStateNeutral = readStableMuxDigitalChannelReading(MUX_CHANNEL_NEUTRAL_SWITCH, 3, 0);
+  // Send high frequency messages
+  if (ptSendHighFrequencyMessages.call()) {
+    sendStagedTelemetry(MSG_SLAVE_HIGH_FREQUENCY, CMD_HIGH_FREQUENCY_MESSAGES);
   }
 
   // Increment loop counter and report on performance stats if needed
