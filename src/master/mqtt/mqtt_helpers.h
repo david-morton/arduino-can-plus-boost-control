@@ -7,5 +7,5 @@
    ====================================================================== */
 
 void connectMqttClientToBroker();
-void sendMqttMetric(String, String, int);
-void sendMqttMetric(String, String, String);
+void sendMqttMetric(String topic, String value, int qos);
+void sendMqttMetric(String topic, String value, String units);

@@ -6,6 +6,7 @@
 /* ======================================================================
    CONFIGURE THINGS
    ====================================================================== */
+
 extern EthernetClient ethClient;
 
 struct EthernetConfig {
@@ -16,4 +17,5 @@ struct EthernetConfig {
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
+
 void initialiseEthernetShield(EthernetConfig &config);

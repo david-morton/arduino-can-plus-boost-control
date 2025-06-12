@@ -11,6 +11,7 @@ extern char udpReceiveBuffer[RECEIVE_PACKET_BUFFER_SIZE];
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
+
 bool parseIncomingUdpMessage(char *buffer, size_t bufferSize);
 bool validateIncomingUdpMessageChecksum(const char *message);
 void handleIncomingUdpMessage();

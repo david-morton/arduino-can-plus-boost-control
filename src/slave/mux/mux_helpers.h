@@ -7,5 +7,5 @@
    ====================================================================== */
 
 void setupMux();
-int  readAveragedMuxAnalogueChannel(byte, int, int);
+int  readAveragedMuxAnalogueChannel(byte channel, int samples, int delayUs);
 bool readStableMuxDigitalChannelReading(byte channel, int samples, int delayUs);

@@ -30,6 +30,7 @@ typedef enum {
 /* ======================================================================
    STRUCTS
    ====================================================================== */
+
 // This struct is used to stage telemetry data before sending it.
 typedef struct {
   float value;
@@ -39,6 +40,7 @@ typedef struct {
 /* ======================================================================
    STATIC CONSTANTS
    ====================================================================== */
+
 #define MAX_CHARS_PER_KV_PAIR 20 // e.g., "engineTemp=-123.45,"
 #define SAFETY_MARGIN_BYTES 8    // Some slack for formatting
 #define TELEMETRY_MESSAGE_BUFFER_SIZE ((NUM_TELEMETRY_FIELDS * MAX_CHARS_PER_KV_PAIR) + SAFETY_MARGIN_BYTES)
@@ -50,11 +52,13 @@ static_assert(TELEMETRY_MESSAGE_BUFFER_SIZE <= 256, "Telemetry buffer too large!
 /* ======================================================================
    VARIABLES
    ====================================================================== */
+
 extern TelemetrySlot telemetryStaging[NUM_TELEMETRY_FIELDS];
 
 /* ======================================================================
    MAPPING TELEMETRY KEYS TO MESSAGE CLASSES
    ====================================================================== */
+
 static inline const TelemetryMessageClass keyToMessageClass[NUM_TELEMETRY_FIELDS] = {
     [SENSOR_LUX]              = MSG_SLAVE_LOW_FREQUENCY,
     [SENSOR_ELECTRONICS_TEMP] = MSG_SLAVE_LOW_FREQUENCY,

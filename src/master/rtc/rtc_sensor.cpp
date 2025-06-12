@@ -12,12 +12,12 @@ RTC_DS3231 rtc;
 
 // Initialise the RTC module
 void initialiseRtc() {
-  DEBUG_GENERAL("INFO - Initialising RTC ...");
+  DEBUG_GENERAL("Initialising RTC ...");
 
   if (!rtc.begin()) {
-    DEBUG_ERROR("RTC not found. Please check the wiring.");
+    DEBUG_ERROR("\tRTC not found. Please check the wiring.");
   } else {
-    DEBUG_GENERAL("\tOK - RTC initialised successfully");
+    DEBUG_GENERAL("\tRTC initialised successfully");
   }
 }
 

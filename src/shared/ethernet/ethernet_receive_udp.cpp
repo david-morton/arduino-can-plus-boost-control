@@ -136,7 +136,7 @@ void handleIncomingUdpMessage() {
       break;
 
     default:
-      DEBUG_ERROR("Unknown command ID: %d", commandId);
+      DEBUG_ERROR("Unknown command ID in UDP receive: %d", commandId);
       break;
   }
 }

@@ -5,12 +5,14 @@
 /* ======================================================================
    VARIABLES
    ====================================================================== */
+
 // Define the number of telemetry fields
 TelemetrySlot telemetryStaging[NUM_TELEMETRY_FIELDS];
 
 /* ======================================================================
    FUNCTION DEFINITIONS
    ====================================================================== */
+
 // Add a telemetry item to the staging area ready to pickup and send
 // New sensor key value pais are defined in getTelemetryKeyForField and telemetry_send_staging.h
 void buildTelemetryItem(TelemetryField key, float value) {

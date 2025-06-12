@@ -5,4 +5,5 @@
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
-int  readAveragedAnaloguePinReading(byte, int, int);
+
+int readAveragedAnaloguePinReading(byte pin, int samples, int delayUs);

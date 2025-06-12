@@ -27,17 +27,17 @@ int  defaultLuxValue                                 = 200;   // Default lux val
 
 // Initialise the BH1750 ambient light sensor
 void initialiseAmbientLightSensor() {
-  DEBUG_GENERAL("INFO: Initialising BH1750 light sensor ...");
+  DEBUG_GENERAL("Initialising BH1750 light sensor ...");
 
   bool avail = BH1750.begin(BH1750_TO_GROUND); // Sensor address pin tied to GND = 0x23
 
   if (avail) {
     sensorAvailable = true;
     BH1750.start(); // Start the first measurement in setup since we will be using continuous mode
-    DEBUG_GENERAL("INFO: BH1750 light sensor initialized successfully.");
+    DEBUG_GENERAL("\tBH1750 light sensor initialized successfully.");
   } else {
     sensorAvailable = false;
-    DEBUG_ERROR("ERROR: Failed to initialize BH1750 light sensor! Sensor unavailable.");
+    DEBUG_ERROR("\tFailed to initialize BH1750 light sensor! Sensor unavailable.");
   }
 }
 
@@ -51,7 +51,7 @@ void handleLuxReading(int lux) {
 void readAmbientLightSensor() {
   if (!sensorAvailable) {
     handleLuxReading(-1); // Store 0 if sensor is not available
-    DEBUG_ERROR("ERROR: Cannot read ambient light sensor, sensor not available.");
+    DEBUG_ERROR("Cannot read ambient light sensor, sensor not available.");
     return;
   }
 
@@ -59,10 +59,10 @@ void readAmbientLightSensor() {
     int lux = BH1750.getLux();
     BH1750.start(); // Trigger next measurement
     handleLuxReading(lux);
-    DEBUG_SENSOR_READINGS("INFO: Ambient light sensor reading: %d lux (stored at index %d)", lux, lightSensorReadingIndex);
+    DEBUG_SENSOR_READINGS("Ambient light sensor reading: %d lux (stored at index %d)", lux, lightSensorReadingIndex);
   } else {
     handleLuxReading(-1); // Store 0 if no valid reading
-    DEBUG_ERROR("ERROR: No valid reading from ambient light sensor.");
+    DEBUG_ERROR("No valid reading from ambient light sensor.");
   }
 }
 
@@ -78,10 +78,10 @@ int calculateAverageLux() {
 
   // Return a default value if average is negative else return the calculated average
   if (average < 0) {
-    DEBUG_ERROR("ERROR: Average lux value is negative, defaulting to %d.", defaultLuxValue);
+    DEBUG_ERROR("Average lux value is negative, defaulting to %d.", defaultLuxValue);
     return defaultLuxValue;
   } else {
-    DEBUG_SENSOR_READINGS("INFO: Average lux value calculated from %d readings: %d", LIGHT_SENSOR_READINGS_SIZE, average);
+    DEBUG_SENSOR_READINGS("Average lux value calculated from %d readings: %d", LIGHT_SENSOR_READINGS_SIZE, average);
     return average;
   }
 }

@@ -8,6 +8,7 @@
 /* ======================================================================
    VARIABLES: Pin constants
    ====================================================================== */
+
 const int  muxS0Pin     = ARDUINO_MUX_S0;
 const int  muxS1Pin     = ARDUINO_MUX_S1;
 const int  muxS2Pin     = ARDUINO_MUX_S2;
@@ -17,11 +18,13 @@ const byte muxSignalPin = ARDUINO_PIN_MUX_SIGNAL;
 /* ======================================================================
    OBJECT DECLARATIOS
    ====================================================================== */
+
 CD74HC4067 mux(muxS0Pin, muxS1Pin, muxS2Pin, muxS3Pin);
 
 /* ======================================================================
    FUNCTION DEFINITIONS
    ====================================================================== */
+
 // Setup the multiplexer board
 void setupMux() {
   DEBUG_GENERAL("Configuring mux board ...");

@@ -5,6 +5,7 @@
 /* ======================================================================
    HELPER: Global flags and functions for debugging
    ====================================================================== */
+
 extern bool debugError;
 extern bool debugEthernetGeneral;
 extern bool debugEthernetMessages;
@@ -18,13 +19,34 @@ extern bool debugSensorReadings;
 extern bool debugTelemetry;
 
 /* ======================================================================
+   HELPER FUNCTION: Print timestamps
+   ====================================================================== */
+
+inline void printDebugTimestamp() {
+  unsigned long ms    = millis();
+  unsigned long sec   = ms / 1000;
+  unsigned long milli = ms % 1000;
+  unsigned long mins  = sec / 60;
+  unsigned long hours = mins / 60;
+
+  sec  = sec % 60;
+  mins = mins % 60;
+
+  char buf[20];
+  snprintf(buf, sizeof(buf), "[%02lu:%02lu:%02lu.%03lu] ", hours, mins, sec, milli);
+  Serial.print(buf);
+}
+
+/* ======================================================================
    HELPERS: Debug output macros using snprintf (safe, no String)
    ====================================================================== */
+
 #define _DEBUG_PRINTF(enabled, tag, fmt, ...)           \
   do {                                                  \
     if (enabled) {                                      \
       char _buf[256];                                   \
       snprintf(_buf, sizeof(_buf), fmt, ##__VA_ARGS__); \
+      printDebugTimestamp();                            \
       Serial.print("[DEBUG ");                          \
       Serial.print(tag);                                \
       Serial.print("] ");                               \
@@ -68,4 +90,5 @@ extern bool debugTelemetry;
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
-void reportArduinoLoopRate(unsigned long *);
+
+void reportArduinoLoopRate(unsigned long *loopCounter);

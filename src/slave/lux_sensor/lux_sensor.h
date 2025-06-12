@@ -8,6 +8,7 @@
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
+
 void initialiseAmbientLightSensor();
 void readAmbientLightSensor();
 int  calculateAverageLux();

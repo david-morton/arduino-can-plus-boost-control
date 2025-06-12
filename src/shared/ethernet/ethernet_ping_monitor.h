@@ -12,6 +12,7 @@
 /* ======================================================================
    STRUCTURES
    ====================================================================== */
+
 typedef struct {
   unsigned long sequence;
   unsigned long sentTimeMicros;
@@ -22,6 +23,7 @@ typedef struct {
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
+
 bool          sendArduinoPingRequest();
 bool          sendPingResponseToRemoteArduino(int pingSeq);
 unsigned long calculateAveragePingRttMicros();

@@ -25,6 +25,7 @@
 /* ======================================================================
    VARIABLES: Debug and stat output
    ====================================================================== */
+
 bool debugError            = true;
 bool debugEthernetGeneral  = false;
 bool debugEthernetMessages = false;
@@ -86,6 +87,7 @@ int currentRpm                       = 0;
 /* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
    ====================================================================== */
+
 // High frequency tasks (tens of milliseconds)
 
 // Medium frequency tasks (hundreds of milliseconds)
@@ -106,10 +108,11 @@ ptScheduler ptSendHighFrequencyMessages   = ptScheduler(PT_TIME_20MS);
 /* ======================================================================
    SETUP
    ====================================================================== */
+
 void setup() {
   Serial.begin(500000); // Use a high baud rate for faster serial communication
 
-  DEBUG_GENERAL("INFO: Entering main setup phase ...");
+  DEBUG_GENERAL("Entering main setup phase ...");
 
   initialiseEthernetShield(ethConfigLocal);
   initialiseAmbientLightSensor();
@@ -118,6 +121,7 @@ void setup() {
 /* ======================================================================
    MAIN LOOP
    ====================================================================== */
+
 void loop() {
 
   // Check for, and process any incoming UDP messages as fast as possible within the main loop

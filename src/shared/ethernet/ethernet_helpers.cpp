@@ -19,16 +19,16 @@ EthernetUDP    ethUdpClient;
 
 // Initialise the ethernet shield ready for use
 void initialiseEthernetShield(EthernetConfig &config) {
-  DEBUG_ETHERNET_GENERAL("INFO - Initialising ethernet shield ...");
+  DEBUG_ETHERNET_GENERAL("Initialising ethernet shield ...");
   Ethernet.begin(config.mac, config.ip);
 
   int eth_status = Ethernet.hardwareStatus();
 
   if (eth_status == EthernetW5500) {
-    DEBUG_ETHERNET_GENERAL("\tOK - W5500 Ethernet controller detected");
+    DEBUG_ETHERNET_GENERAL("\tW5500 Ethernet controller detected");
     ethUdpClient.begin(localArduinoListenPort); // Start listening on the local port
-    DEBUG_ETHERNET_GENERAL("\tOK - Listening on local UDP port %u", localArduinoListenPort);
+    DEBUG_ETHERNET_GENERAL("\tListening on local UDP port %u", localArduinoListenPort);
   } else if (eth_status != EthernetW5500) { // hardwareStatus() is a macro or enum constant defined as an int ... apparently
-    DEBUG_ERROR("\tFATAL - Ethernet setup status is %s", eth_status);
+    DEBUG_ERROR("\tEthernet setup status is %s", eth_status);
   }
 }

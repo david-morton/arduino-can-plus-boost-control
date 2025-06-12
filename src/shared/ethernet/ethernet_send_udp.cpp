@@ -25,7 +25,7 @@ unsigned long sendMalformedMessageCount = 0; // Detected but not sent
 bool validateMessageLength(const char *message) {
   // Check if the message is too long
   if (strlen(message) > SEND_PACKET_BUFFER_SIZE - 1) {
-    DEBUG_ERROR("ERROR - Message too long, not sending: %s", message);
+    DEBUG_ERROR("UDP Message too long, not sending: %s", message);
     return false;
   }
   return true;
@@ -37,7 +37,7 @@ uint16_t calculateSendChecksum(const char *message) {
   for (size_t i = 0; i < strlen(message); i++) {
     checksum += message[i];
   }
-  DEBUG_ETHERNET_TRAFFIC("Calculated checksum: %u", checksum);
+  DEBUG_ETHERNET_TRAFFIC("Calculated UDP message checksum: %u", checksum);
   return checksum;
 }
 
