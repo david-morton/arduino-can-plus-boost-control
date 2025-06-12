@@ -20,8 +20,10 @@ void buildTelemetryItem(TelemetryField key, float value) {
     DEBUG_ERROR("Invalid telemetry key during staging: %d", key);
     return;
   }
+
   telemetryStaging[key].value = value;
   telemetryStaging[key].valid = true;
+
   DEBUG_TELEMETRY("Staged telemetry: key=%d (%s), value=%.2f", key, getTelemetryKeyForField((TelemetryField)key), value);
 }
 
@@ -38,10 +40,13 @@ void sendStagedTelemetry(TelemetryMessageClass msgClass, int commandId) {
 
   for (int key = 0; key < NUM_TELEMETRY_FIELDS; key++) {
     if (keyToMessageClass[key] != msgClass) {
-      continue;
+      continue; // Skip if the key does not match the requested message class
     }
-    if (telemetryStaging[key].valid == false) {
-      continue;
+    if (!telemetryStaging[key].valid) {
+      continue; // Skip if the telemetry item is not valid
+    }
+    if (telemetryStaging[key].value == telemetryStaging[key].lastSent) {
+      continue; // Skip if the value hasn't changed since last sent
     }
 
     int len = snprintf(messageBuffer + offset,
@@ -54,20 +59,20 @@ void sendStagedTelemetry(TelemetryMessageClass msgClass, int commandId) {
   }
 
   if (offset > 0) {
-    // Ensure the message is not filling our buffer beyond its size
     if (offset >= TELEMETRY_MESSAGE_BUFFER_SIZE - 1) {
       DEBUG_ERROR("Telemetry message exceeds buffer size! Size: %d / Max: %d", offset, TELEMETRY_MESSAGE_BUFFER_SIZE);
-      return; // Don't send incomplete or corrupted message
+      return;
     }
 
     sendUdpMessageWithCommand(commandId, messageBuffer);
     DEBUG_TELEMETRY("Submitted buffer to be sent via UDP: %s", messageBuffer);
   }
 
-  // Clear only the keys for this message class
+  // Clear and update sent values only for relevant fields
   for (int key = 0; key < NUM_TELEMETRY_FIELDS; key++) {
-    if (keyToMessageClass[key] == msgClass) {
-      telemetryStaging[key].valid = false;
+    if (keyToMessageClass[key] == msgClass && telemetryStaging[key].valid) {
+      telemetryStaging[key].lastSent = telemetryStaging[key].value;
+      telemetryStaging[key].valid    = false;
     }
   }
 }

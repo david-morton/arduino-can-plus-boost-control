@@ -91,10 +91,8 @@ int currentRpm                       = 0;
 // High frequency tasks (tens of milliseconds)
 
 // Medium frequency tasks (hundreds of milliseconds)
-// ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
-// ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_100MS);
-ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_1S);
-ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_1S);
+ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
+ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_100MS);
 
 // Low frequency tasks (seconds)
 ptScheduler ptReadAmbientLightReading       = ptScheduler(PT_TIME_2S);

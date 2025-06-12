@@ -33,8 +33,9 @@ typedef enum {
 
 // This struct is used to stage telemetry data before sending it.
 typedef struct {
-  float value;
-  bool  valid;
+  float value;    // The actual telemetry value, e.g., temperature, lux, etc.
+  float lastSent; // The last value sent, used to determine if the value has changed
+  bool  valid;    // True if value is valid (e.g., not NaN)
 } TelemetrySlot;
 
 /* ======================================================================
