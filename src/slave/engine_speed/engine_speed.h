@@ -1,9 +1,13 @@
 #pragma once
 
 #include <Arduino.h>
+#include <ptScheduler.h>
 
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
 
-int readAveragedAnaloguePinReading(byte pin, int samples, int delayUs);
+int  calculateRpm();
+int  getCurrentRpm();
+void updateRpmPulse();
+void updateRpmSchedulerFrequency(ptScheduler &scheduler, int currentRpm);

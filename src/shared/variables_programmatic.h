@@ -1,7 +1,7 @@
 #include <Ethernet.h>
 #include <EthernetUdp.h>
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 /* ======================================================================
    VARIABLES: These are used across both master and slave Arduinos

@@ -1,10 +1,12 @@
 #include <Arduino.h>
-#include <ptScheduler.h> // The task scheduling library of choice
+#include <ptScheduler.h>
 
+#include "engine_speed/engine_speed.h"
 #include "lux_sensor/lux_sensor.h"
 #include "mux/mux_helpers.h"
 #include "mux/mux_readers.h"
 #include "pin_assignments_slave.h"
+#include "pin_configuration_slave.h"
 #include "shared/command_ids.h"
 #include "shared/debug_logging.h"
 #include "shared/ethernet/ethernet_helpers.h"
@@ -93,6 +95,7 @@ int currentRpm                       = 0;
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
 ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_100MS);
+ptScheduler ptUpdateCurrentRpm       = ptScheduler(PT_TIME_200MS);
 
 // Low frequency tasks (seconds)
 ptScheduler ptReadAmbientLightReading       = ptScheduler(PT_TIME_2S);
@@ -112,6 +115,7 @@ void setup() {
 
   DEBUG_GENERAL("Entering main setup phase ...");
 
+  configureAllPins();
   initialiseEthernetShield(ethConfigLocal);
   initialiseAmbientLightSensor();
 }
@@ -137,6 +141,13 @@ void loop() {
 
   if (ptReadSwitchStateNeutral.call()) {
     buildTelemetryItem(SENSOR_NEUTRAL, currentSwitchStateNeutral = readStableMuxDigitalChannelReading(MUX_CHANNEL_NEUTRAL_SWITCH, 3, 0));
+  }
+
+  // Get the current RPM value, and stage for telemetry transmission. This will also update the RPM calculation frequency based on the current RPM
+  if (ptUpdateCurrentRpm.call()) {
+    currentRpm = getCurrentRpm();
+    updateRpmSchedulerFrequency(ptUpdateCurrentRpm, currentRpm);
+    // buildTelemetryItem(SENSOR_ELECTRONICS_TEMP, currentRpm);
   }
 
   // Send low frequency messages

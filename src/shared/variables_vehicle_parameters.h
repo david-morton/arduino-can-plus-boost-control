@@ -1,4 +1,4 @@
-#include "Arduino.h"
+#include <Arduino.h>
 
 /* ======================================================================
    VARIABLES: Physical sensor inputs read from mux on slave Arduino
