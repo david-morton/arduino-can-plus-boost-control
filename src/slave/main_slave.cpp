@@ -30,15 +30,15 @@
 
 bool debugError            = true;
 bool debugEthernetGeneral  = false;
-bool debugEthernetMessages = false;
+bool debugEthernetMessages = true;
 bool debugEthernetTraffic  = false;
 bool debugEthernetPing     = false;
 bool debugGears            = false;
-bool debugGeneral          = false;
-bool debugMux              = true;
+bool debugGeneral          = true;
+bool debugMux              = false;
 bool debugPerformance      = false;
 bool debugSensorReadings   = false;
-bool debugTelemetry        = true;
+bool debugTelemetry        = false;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related
@@ -76,7 +76,7 @@ int  currentOilPressureKpa            = 0;
 int  currentOilTempCelsius            = 0;
 
 /* ======================================================================
-   VARIABLES: Physical sensor inputs direct to Arduino
+   VARIABLES: Physical sensor inputs local to Arduino
    ====================================================================== */
 
 int currentAmbientLux                = 0;
@@ -84,7 +84,7 @@ int currentGear                      = 0;
 int currentIntakePressureBank1Kpa    = 0;
 int currentIntakePressureBank2Kpa    = 0;
 int currentIntakePressureManifoldKpa = 0;
-int currentRpm                       = 0;
+int currentEngineSpeedRpm            = 0;
 
 /* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
@@ -95,7 +95,7 @@ int currentRpm                       = 0;
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
 ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_100MS);
-ptScheduler ptUpdateCurrentRpm       = ptScheduler(PT_TIME_200MS);
+ptScheduler ptUpdateCurrentRpm       = ptScheduler(PT_TIME_200MS); // Initially set to 200ms, will be adjusted based on current RPM
 
 // Low frequency tasks (seconds)
 ptScheduler ptReadAmbientLightReading       = ptScheduler(PT_TIME_2S);
@@ -118,6 +118,9 @@ void setup() {
   configureAllPins();
   initialiseEthernetShield(ethConfigLocal);
   initialiseAmbientLightSensor();
+
+  unsigned long randomOffset = random(10, 50); // jitter between 10–50 ms
+  ptReadSwitchStateClutch.setInterval(100 + randomOffset);
 }
 
 /* ======================================================================
@@ -136,18 +139,18 @@ void loop() {
 
   // Read the state of clutch and neutral switches, and update current variables
   if (ptReadSwitchStateClutch.call()) {
-    buildTelemetryItem(SENSOR_CLUTCH, currentSwitchStateClutch = readStableMuxDigitalChannelReading(MUX_CHANNEL_CLUTCH_SWITCH, 3, 0));
+    buildTelemetryItem(SENSOR_CLUTCH, currentSwitchStateClutch = readStableMuxDigitalChannelReading(MUX_CHANNEL_CLUTCH_SWITCH, 1, 3));
   }
 
   if (ptReadSwitchStateNeutral.call()) {
-    buildTelemetryItem(SENSOR_NEUTRAL, currentSwitchStateNeutral = readStableMuxDigitalChannelReading(MUX_CHANNEL_NEUTRAL_SWITCH, 3, 0));
+    buildTelemetryItem(SENSOR_NEUTRAL, currentSwitchStateNeutral = readStableMuxDigitalChannelReading(MUX_CHANNEL_NEUTRAL_SWITCH, 1, 3));
   }
 
   // Get the current RPM value, and stage for telemetry transmission. This will also update the RPM calculation frequency based on the current RPM
   if (ptUpdateCurrentRpm.call()) {
-    currentRpm = getCurrentRpm();
-    updateRpmSchedulerFrequency(ptUpdateCurrentRpm, currentRpm);
-    // buildTelemetryItem(SENSOR_ELECTRONICS_TEMP, currentRpm);
+    buildTelemetryItem(SENSOR_RPM, currentEngineSpeedRpm = getCurrentRpm());
+    updateRpmSchedulerFrequency(ptUpdateCurrentRpm, currentEngineSpeedRpm);
+    // Serial.println(currentEngineSpeedRpm);
   }
 
   // Send low frequency messages
@@ -170,6 +173,7 @@ void loop() {
     arduinoLoopExecutionCount++;
     if (ptReportArduinoPerformanceStats.call()) {
       reportArduinoLoopRate(&arduinoLoopExecutionCount);
+      reportUdpMessageStats();
     }
   }
 }

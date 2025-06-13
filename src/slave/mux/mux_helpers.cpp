@@ -41,9 +41,9 @@ int readAveragedMuxAnalogueChannel(byte channel, int samples, int delayUs) {
 // Read a digital pin through the multiplexer and average over multiple samples
 bool readStableMuxDigitalChannelReading(byte channel, int samples, int delayUs) {
   mux.channel(channel);
-
   // Fast-path for low sample counts: single-shot read
   if (samples <= 2) {
+    delayMicroseconds(delayUs);
     bool result = digitalRead(muxSignalPin);
     DEBUG_MUX("MUX channel %d: FastRead Samples=%d Value=%s", channel, samples, result ? "HIGH" : "LOW");
     return result;

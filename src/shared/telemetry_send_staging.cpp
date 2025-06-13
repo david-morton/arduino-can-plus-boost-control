@@ -88,6 +88,8 @@ const char *getTelemetryKeyForField(TelemetryField field) {
       return "neutral";
     case SENSOR_ELECTRONICS_TEMP:
       return "electronicsTemp";
+    case SENSOR_RPM:
+      return "rpm";
     default:
       return nullptr;
   }

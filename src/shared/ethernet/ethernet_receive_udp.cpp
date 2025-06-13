@@ -20,7 +20,8 @@ const uint16_t localArduinoListenPort = 8888;
 unsigned long receiveOutOfSequenceCount    = 0;
 unsigned long receiveMalformedMessageCount = 0;
 
-unsigned long receiveLastSequenceNumber    = 0;
+unsigned long receiveLastSequenceNumber = 0;
+unsigned long receiveTotalMessageCount  = 0;
 
 // Define UDP receive buffer
 char udpReceiveBuffer[RECEIVE_PACKET_BUFFER_SIZE];
@@ -41,6 +42,7 @@ bool parseIncomingUdpMessage(char *buffer, size_t bufferSize) {
     return false;
 
   buffer[len] = '\0'; // Null-terminate the received string
+  receiveTotalMessageCount++;
   DEBUG_ETHERNET_TRAFFIC("Received UDP packet: %s", buffer);
 
   // Validate checksum using the full message string
@@ -75,7 +77,7 @@ bool parseIncomingUdpMessage(char *buffer, size_t bufferSize) {
   DEBUG_ETHERNET_TRAFFIC("Received valid UDP packet: seq=%lu, payload=%s", seq, buffer);
 
   // Check if message was out of sequence
-  if (receiveLastSequenceNumber + 1 != seq) {
+  if (receiveLastSequenceNumber + 1 != seq && receiveLastSequenceNumber != 0) {
     receiveOutOfSequenceCount++;
     DEBUG_ERROR("Received out-of-sequence UDP packet: expected %lu, got %lu", receiveLastSequenceNumber + 1, seq);
   }
@@ -153,11 +155,10 @@ void handleIncomingUdpMessage() {
 
 // Report on UDP received message statistics
 void reportUdpMessageStats() {
-  unsigned long totalMessages = receiveLastSequenceNumber + 1;
-  float         malformedPercentage = (totalMessages > 0) ? (receiveMalformedMessageCount * 100.0f / totalMessages) : 0.0f;
-  float         outOfSequencePercentage = (totalMessages > 0) ? (receiveOutOfSequenceCount * 100.0f / totalMessages) : 0.0f;
+  float malformedPercentage     = (receiveTotalMessageCount > 0) ? (receiveMalformedMessageCount * 100.0f / receiveTotalMessageCount) : 0.0f;
+  float outOfSequencePercentage = (receiveTotalMessageCount > 0) ? (receiveOutOfSequenceCount * 100.0f / receiveTotalMessageCount) : 0.0f;
 
   DEBUG_PERFORMANCE("UDP messages received: %lu, Malformed: %.2f%% (%lu), Out of sequence: %.2f%% (%lu)",
-             totalMessages, malformedPercentage, receiveMalformedMessageCount,
-             outOfSequencePercentage, receiveOutOfSequenceCount);
+                    receiveTotalMessageCount, malformedPercentage, receiveMalformedMessageCount,
+                    outOfSequencePercentage, receiveOutOfSequenceCount);
 }

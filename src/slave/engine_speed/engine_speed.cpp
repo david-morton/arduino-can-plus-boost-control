@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ptScheduler.h>
 
+#include "../../shared/debug_logging.h"
 #include "../pin_assignments_slave.h"
 #include "engine_speed.h"
 
@@ -31,6 +32,11 @@ void updateRpmPulse() {
 
 // Get the current RPM value
 int getCurrentRpm() {
+  if (latestRpmPulseCounter == 0) {
+    DEBUG_ERROR("No RPM pulses detected yet, returning 0 RPM");
+    return 0; // No pulses detected yet
+  }
+
   detachInterrupt(digitalPinToInterrupt(ARDUINO_PIN_TACH_SIGNAL));
   int currentRpm = calculateRpm();
   attachInterrupt(digitalPinToInterrupt(ARDUINO_PIN_TACH_SIGNAL), updateRpmPulse, RISING);
@@ -52,6 +58,7 @@ int calculateRpm() {
 
   // Do the calcultion and return
   int currentRpm = pulsesPerMinute / rpmPulsesPerRevolution;
+  // DEBUG_GENERAL("Current RPM: %d (pulses: %lu, micros: %lu)", currentRpm, latestRpmPulseCounter, latestRpmPulseTime);
   return currentRpm;
 }
 

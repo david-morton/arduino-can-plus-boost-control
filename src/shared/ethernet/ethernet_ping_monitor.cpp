@@ -127,5 +127,5 @@ void handlePingTimeoutsAndLoss() {
   if (lossPercent >= 25.0f) {
     DEBUG_ERROR("ERROR: High ping loss detected: %.1f%%", lossPercent);
   } else
-    DEBUG_ETHERNET_GENERAL("Ping RTT: %.2f ms | Loss: %.1f%%", avgRttMs, lossPercent);
+    DEBUG_PERFORMANCE("Ping RTT: %.2f ms | Loss: %.1f%%", avgRttMs, lossPercent);
 }

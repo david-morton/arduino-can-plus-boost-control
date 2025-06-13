@@ -19,10 +19,6 @@
 #define CAN_2515
 
 /* ======================================================================
-   VARIABLES: Major functional area toggles
-   ====================================================================== */
-
-/* ======================================================================
    VARIABLES: Debug and stat output
    ====================================================================== */
 
@@ -33,7 +29,7 @@ bool debugEthernetPing     = false;
 bool debugEthernetTraffic  = false;
 bool debugGears            = false;
 bool debugGeneral          = true;
-bool debugPerformance      = false;
+bool debugPerformance      = true;
 bool debugSensorReadings   = true;
 bool debugTelemetry        = true;
 
@@ -54,29 +50,40 @@ const IPAddress remoteArduinoIp(192, 168, 10, 101);
    ====================================================================== */
 
 unsigned long arduinoLoopExecutionCount = 0;
-int           currentLuxReading         = 0; // Variable to store the current lux reading from remote Arduino
-int           currentElectronicsTemp    = 0; // Variable to store the current electronics temperature reading from RTC
+float         valueFromRemote; // Scratch variable to transport variable values from remote Arduino
 
-float valueFromRemote; // Scratch variable to transport variable values from remote Arduino
+/* ======================================================================
+   VARIABLES: Physical sensor inputs local to Arduino
+   ====================================================================== */
+
+int currentLuxReading      = 0; // Variable to store the current lux reading from remote Arduino
+int currentElectronicsTemp = 0; // Variable to store the current electronics temperature reading from RTC
+
+/* ======================================================================
+   VARIABLES: Read from slave Arduino
+   ====================================================================== */
+
+bool currentSwitchStateClutch;
+bool currentSwitchStateNeutral;
+int  currentEngineSpeedRpm = 0;
 
 /* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
    ====================================================================== */
 
 // High frequency tasks (tens of milliseconds)
+ptScheduler ptUpdateCurrentRpm = ptScheduler(PT_TIME_50MS);
 
 // Medium frequency tasks (hundreds of milliseconds)
-// ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
-// ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_100MS);
-ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_1S);
-ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_1S);
+ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
+ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_100MS);
 
 // Low frequency tasks (seconds)
-ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_5S);
-ptScheduler ptReportArduinoPingStats         = ptScheduler(PT_TIME_5S);
-ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
+ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_1MIN);
+ptScheduler ptReportArduinoPingStats         = ptScheduler(PT_TIME_1MIN);
+ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1MS);
 ptScheduler ptGetCurrentLuxReading           = ptScheduler(PT_TIME_2S);
-ptScheduler ptReadElectronicsTemperature     = ptScheduler(PT_TIME_10S);
+ptScheduler ptReadElectronicsTemperature     = ptScheduler(PT_TIME_1MIN);
 
 // Send different message classes to remote Arduino
 ptScheduler ptSendLowFrequencyMessages    = ptScheduler(PT_TIME_1S);
@@ -121,6 +128,20 @@ void loop() {
     currentLuxReading = valueFromRemote;
   }
 
+  // Update the current clutch and neutral statuses from the remote Arduino
+  if (ptReadSwitchStateClutch.call() && handleTelemetryFloat(SENSOR_CLUTCH, &valueFromRemote)) {
+    currentSwitchStateClutch = valueFromRemote;
+  }
+
+  if (ptReadSwitchStateNeutral.call() && handleTelemetryFloat(SENSOR_NEUTRAL, &valueFromRemote)) {
+    currentSwitchStateNeutral = valueFromRemote;
+  }
+
+  // Update the current RPM reading from the remote Arduino
+  if (ptUpdateCurrentRpm.call() && handleTelemetryFloat(SENSOR_RPM, &valueFromRemote)) {
+    currentEngineSpeedRpm = valueFromRemote;
+  }
+
   // Send low frequency messages
   if (ptSendLowFrequencyMessages.call()) {
     sendStagedTelemetry(MSG_MASTER_LOW_FREQUENCY, CMD_LOW_FREQUENCY_MESSAGES);
@@ -135,8 +156,6 @@ void loop() {
   if (ptSendHighFrequencyMessages.call()) {
     sendStagedTelemetry(MSG_MASTER_HIGH_FREQUENCY, CMD_HIGH_FREQUENCY_MESSAGES);
   }
-
-  // Update the current clutch and neutral statuses from the remote Arduino
 
   // Read the electronics temperature from the RTC sensor
   if (ptReadElectronicsTemperature.call()) {

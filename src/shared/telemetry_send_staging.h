@@ -13,6 +13,7 @@ typedef enum {
   SENSOR_ELECTRONICS_TEMP,
   SENSOR_CLUTCH,
   SENSOR_NEUTRAL,
+  SENSOR_RPM,
   NUM_TELEMETRY_FIELDS // Always last, this is used to count the number of fields
 } TelemetryField;
 
@@ -64,7 +65,8 @@ static inline const TelemetryMessageClass keyToMessageClass[NUM_TELEMETRY_FIELDS
     [SENSOR_LUX]              = MSG_SLAVE_LOW_FREQUENCY,
     [SENSOR_ELECTRONICS_TEMP] = MSG_SLAVE_LOW_FREQUENCY,
     [SENSOR_CLUTCH]           = MSG_SLAVE_MED_FREQUENCY,
-    [SENSOR_NEUTRAL]          = MSG_SLAVE_MED_FREQUENCY};
+    [SENSOR_NEUTRAL]          = MSG_SLAVE_MED_FREQUENCY,
+    [SENSOR_RPM]              = MSG_SLAVE_HIGH_FREQUENCY};
 
 /* ======================================================================
     FUNCTION PROTOTYPES
