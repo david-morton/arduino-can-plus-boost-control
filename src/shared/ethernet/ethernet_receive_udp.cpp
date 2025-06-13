@@ -17,8 +17,10 @@
 const uint16_t localArduinoListenPort = 8888;
 
 // Define message sequence tracking and quality stats
-unsigned long receiveSequenceNumber        = 0;
-unsigned long receiveMalformedMessageCount = 0; // Detected and discarded
+unsigned long receiveOutOfSequenceCount    = 0;
+unsigned long receiveMalformedMessageCount = 0;
+
+unsigned long receiveLastSequenceNumber    = 0;
 
 // Define UDP receive buffer
 char udpReceiveBuffer[RECEIVE_PACKET_BUFFER_SIZE];
@@ -70,9 +72,17 @@ bool parseIncomingUdpMessage(char *buffer, size_t bufferSize) {
   // Copy payload back into caller's buffer
   strncpy(buffer, payload, bufferSize - 1);
   buffer[bufferSize - 1] = '\0'; // Safety null-termination
-  // Update sequence counter
-  receiveSequenceNumber = seq;
   DEBUG_ETHERNET_TRAFFIC("Received valid UDP packet: seq=%lu, payload=%s", seq, buffer);
+
+  // Check if message was out of sequence
+  if (receiveLastSequenceNumber + 1 != seq) {
+    receiveOutOfSequenceCount++;
+    DEBUG_ERROR("Received out-of-sequence UDP packet: expected %lu, got %lu", receiveLastSequenceNumber + 1, seq);
+  }
+
+  // Update last sequence number for next comparison
+  receiveLastSequenceNumber = seq;
+
   return true;
 }
 
@@ -139,4 +149,15 @@ void handleIncomingUdpMessage() {
       DEBUG_ERROR("Unknown command ID in UDP receive: %d", commandId);
       break;
   }
+}
+
+// Report on UDP received message statistics
+void reportUdpMessageStats() {
+  unsigned long totalMessages = receiveLastSequenceNumber + 1;
+  float         malformedPercentage = (totalMessages > 0) ? (receiveMalformedMessageCount * 100.0f / totalMessages) : 0.0f;
+  float         outOfSequencePercentage = (totalMessages > 0) ? (receiveOutOfSequenceCount * 100.0f / totalMessages) : 0.0f;
+
+  DEBUG_PERFORMANCE("UDP messages received: %lu, Malformed: %.2f%% (%lu), Out of sequence: %.2f%% (%lu)",
+             totalMessages, malformedPercentage, receiveMalformedMessageCount,
+             outOfSequencePercentage, receiveOutOfSequenceCount);
 }

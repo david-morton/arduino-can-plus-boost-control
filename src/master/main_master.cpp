@@ -148,6 +148,7 @@ void loop() {
     arduinoLoopExecutionCount++;
     if (ptReportArduinoPerformanceStats.call()) {
       reportArduinoLoopRate(&arduinoLoopExecutionCount);
+      reportUdpMessageStats();
     }
   }
 }
