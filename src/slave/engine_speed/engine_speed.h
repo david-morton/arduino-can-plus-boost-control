@@ -8,6 +8,6 @@
    ====================================================================== */
 
 int  calculateRpm();
-int  getCurrentRpm();
+int  getCurrentEngineSpeedRpm();
 void updateRpmPulse();
-void updateRpmSchedulerFrequency(ptScheduler &scheduler, int currentRpm);
+void updateRpmSchedulerFrequency(ptScheduler &scheduler, int currentEngineSpeedRpm);

@@ -82,7 +82,7 @@ Command ID's in use are as below. The master is the 'main' car module which driv
 | 0           | Both            | Nil                                                             | Ping request                                      |
 | 1           | Both            | Nil                                                             | Ping response                                     |
 | 2           | Slave to master | currentLuxReading                                               | Send low frequency messages                       |
-| x           | Master to slave | currentRpm,currentSpeed,currentGear,clutchPressed               | Push current data from master to boost controller |
+| x           | Master to slave | currentEngineSpeedRpm,currentSpeed,currentGear,clutchPressed               | Push current data from master to boost controller |
 | x           | Slave to master | errorStatus,currentBoost,currentTemp,currentValveOpenPercentage | Response to command ID 0                          |
 
 # Technical Notes

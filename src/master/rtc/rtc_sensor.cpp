@@ -1,7 +1,6 @@
 #include "RTClib.h"
 #include <Arduino.h>
 
-
 #include "../../shared/debug_logging.h"
 #include "rtc_sensor.h"
 
@@ -16,9 +15,9 @@ void initialiseRtc() {
   DEBUG_GENERAL("Initialising RTC ...");
 
   if (!rtc.begin()) {
-    DEBUG_ERROR("\tRTC not found. Please check the wiring.");
+    DEBUG_ERROR("\t\tRTC not found. Please check the wiring.");
   } else {
-    DEBUG_GENERAL("\tRTC initialised successfully");
+    DEBUG_GENERAL("\t\tRTC initialised successfully");
   }
 }
 

@@ -6,6 +6,7 @@
    HELPER: Global flags and functions for debugging
    ====================================================================== */
 
+extern bool debugCanBus;
 extern bool debugError;
 extern bool debugEthernetGeneral;
 extern bool debugEthernetMessages;
@@ -53,6 +54,9 @@ inline void printDebugTimestamp() {
       Serial.println(_buf);                             \
     }                                                   \
   } while (0)
+
+#define DEBUG_CAN_BUS(fmt, ...) \
+  _DEBUG_PRINTF(debugCanBus, "CAN BUS", fmt, ##__VA_ARGS__)
 
 #define DEBUG_ERROR(fmt, ...) \
   _DEBUG_PRINTF(debugError, "ERROR", fmt, ##__VA_ARGS__)

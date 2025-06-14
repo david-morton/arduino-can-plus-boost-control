@@ -31,16 +31,16 @@ void updateRpmPulse() {
    ====================================================================== */
 
 // Get the current RPM value
-int getCurrentRpm() {
+int getCurrentEngineSpeedRpm() {
   if (latestRpmPulseCounter == 0) {
     DEBUG_ERROR("No RPM pulses detected yet, returning 0 RPM");
     return 0; // No pulses detected yet
   }
 
   detachInterrupt(digitalPinToInterrupt(ARDUINO_PIN_TACH_SIGNAL));
-  int currentRpm = calculateRpm();
+  int currentEngineSpeedRpm = calculateRpm();
   attachInterrupt(digitalPinToInterrupt(ARDUINO_PIN_TACH_SIGNAL), updateRpmPulse, RISING);
-  return currentRpm;
+  return currentEngineSpeedRpm;
 }
 
 // Calculate RPM based on the latest pulse count and time
@@ -57,16 +57,16 @@ int calculateRpm() {
   previousRpmPulseTime    = latestRpmPulseTime;
 
   // Do the calcultion and return
-  int currentRpm = pulsesPerMinute / rpmPulsesPerRevolution;
-  // DEBUG_GENERAL("Current RPM: %d (pulses: %lu, micros: %lu)", currentRpm, latestRpmPulseCounter, latestRpmPulseTime);
-  return currentRpm;
+  int currentEngineSpeedRpm = pulsesPerMinute / rpmPulsesPerRevolution;
+  // DEBUG_GENERAL("Current RPM: %d (pulses: %lu, micros: %lu)", currentEngineSpeedRpm, latestRpmPulseCounter, latestRpmPulseTime);
+  return currentEngineSpeedRpm;
 }
 
 // Update the RPM scheduler frequency based on the current RPM
-void updateRpmSchedulerFrequency(ptScheduler &scheduler, int currentRpm) {
-  if (currentRpm >= rpmCalculationFrequencyThreshold && scheduler.sequenceList[0] != PT_TIME_50MS) {
+void updateRpmSchedulerFrequency(ptScheduler &scheduler, int currentEngineSpeedRpm) {
+  if (currentEngineSpeedRpm >= rpmCalculationFrequencyThreshold && scheduler.sequenceList[0] != PT_TIME_50MS) {
     scheduler.sequenceList[0] = PT_TIME_50MS;
-  } else if (currentRpm < rpmCalculationFrequencyThreshold && scheduler.sequenceList[0] != PT_TIME_200MS) {
+  } else if (currentEngineSpeedRpm < rpmCalculationFrequencyThreshold && scheduler.sequenceList[0] != PT_TIME_200MS) {
     scheduler.sequenceList[0] = PT_TIME_200MS;
   }
 }

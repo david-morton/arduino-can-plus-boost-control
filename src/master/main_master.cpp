@@ -1,7 +1,10 @@
 #include <Arduino.h>
-#include <mcp2515_can.h> // Used for CAN shields
+#include <mcp2515_can.h> // Used for CAN modules
+#include <mcp2515_can.h> // Used for MCP2515 CAN modules
 #include <ptScheduler.h> // The task scheduling library of choice
 
+#include "can/can_helpers.h"
+#include "can/can_receive.h"
 #include "mqtt/mqtt_helpers.h"
 #include "rtc/rtc_sensor.h"
 #include "shared/command_ids.h"
@@ -68,22 +71,29 @@ bool currentSwitchStateNeutral;
 int  currentEngineSpeedRpm = 0;
 
 /* ======================================================================
+   VARIABLES: Read from CAN buses
+   ====================================================================== */
+
+float currentVehicleSpeedFrontKph = 0; // Vehicle speed from front wheels
+float currentVehicleSpeedRearKph  = 0; // Vehicle speed from rear wheels
+
+/* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
    ====================================================================== */
 
 // High frequency tasks (tens of milliseconds)
-ptScheduler ptUpdateCurrentRpm = ptScheduler(PT_TIME_50MS);
+ptScheduler ptReadCurrentEngineSpeedRpm = ptScheduler(PT_TIME_50MS);
 
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
 ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_100MS);
 
 // Low frequency tasks (seconds)
+ptScheduler ptGetCurrentLuxReading           = ptScheduler(PT_TIME_2S);
+ptScheduler ptGetElectronicsTemperature      = ptScheduler(PT_TIME_1MIN);
 ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_1MIN);
 ptScheduler ptReportArduinoPingStats         = ptScheduler(PT_TIME_1MIN);
-ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1MS);
-ptScheduler ptGetCurrentLuxReading           = ptScheduler(PT_TIME_2S);
-ptScheduler ptReadElectronicsTemperature     = ptScheduler(PT_TIME_1MIN);
+ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
 
 // Send different message classes to remote Arduino
 ptScheduler ptSendLowFrequencyMessages    = ptScheduler(PT_TIME_1S);
@@ -99,6 +109,7 @@ void setup() {
 
   DEBUG_GENERAL("Entering main setup phase ...");
 
+  initialiseCanModules();
   initialiseEthernetShield(ethConfigLocal);
   connectMqttClientToBroker();
   initialiseRtc();
@@ -109,6 +120,9 @@ void setup() {
    ====================================================================== */
 
 void loop() {
+
+  // Check for, and process any incoming CAN messages as fast as possible within the main loop
+  checkAndProcessCanMessages();
 
   // Check for, and process any incoming UDP messages as fast as possible within the main loop
   handleIncomingUdpMessage();
@@ -138,7 +152,8 @@ void loop() {
   }
 
   // Update the current RPM reading from the remote Arduino
-  if (ptUpdateCurrentRpm.call() && handleTelemetryFloat(SENSOR_RPM, &valueFromRemote)) {
+  // If the remote Arduino is not sending new RPM data, this will not update
+  if (ptReadCurrentEngineSpeedRpm.call() && handleTelemetryFloat(SENSOR_RPM, &valueFromRemote)) {
     currentEngineSpeedRpm = valueFromRemote;
   }
 
@@ -158,7 +173,7 @@ void loop() {
   }
 
   // Read the electronics temperature from the RTC sensor
-  if (ptReadElectronicsTemperature.call()) {
+  if (ptGetElectronicsTemperature.call()) {
     currentElectronicsTemp = getRtcCurrentTemperature();
   }
 

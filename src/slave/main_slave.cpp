@@ -36,7 +36,7 @@ bool debugEthernetPing     = false;
 bool debugGears            = false;
 bool debugGeneral          = true;
 bool debugMux              = false;
-bool debugPerformance      = false;
+bool debugPerformance      = true;
 bool debugSensorReadings   = false;
 bool debugTelemetry        = false;
 
@@ -93,13 +93,15 @@ int currentEngineSpeedRpm            = 0;
 // High frequency tasks (tens of milliseconds)
 
 // Medium frequency tasks (hundreds of milliseconds)
-ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
-ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_100MS);
-ptScheduler ptUpdateCurrentRpm       = ptScheduler(PT_TIME_200MS); // Initially set to 200ms, will be adjusted based on current RPM
+ptScheduler ptReadSwitchStateClutch       = ptScheduler(PT_TIME_100MS);
+ptScheduler ptReadSwitchStateNeutral      = ptScheduler(PT_TIME_100MS);
+ptScheduler ptUpdateCurrentEngineSpeedRpm = ptScheduler(PT_TIME_200MS); // Initially set to 200ms, will be adjusted based on current RPM
 
 // Low frequency tasks (seconds)
-ptScheduler ptReadAmbientLightReading       = ptScheduler(PT_TIME_2S);
-ptScheduler ptReportArduinoPerformanceStats = ptScheduler(PT_TIME_5S);
+ptScheduler ptReadCurrentLuxReading          = ptScheduler(PT_TIME_2S);
+ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_5S);
+ptScheduler ptReportArduinoPingStats         = ptScheduler(PT_TIME_1MIN);
+ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
 
 // Send different message classes to remote Arduino
 ptScheduler ptSendLowFrequencyMessages    = ptScheduler(PT_TIME_1S);
@@ -132,8 +134,18 @@ void loop() {
   // Check for, and process any incoming UDP messages as fast as possible within the main loop
   handleIncomingUdpMessage();
 
+  // Report ping RTT stats (if needed) from buffer average
+  if (ptReportArduinoPingStats.call()) {
+    handlePingTimeoutsAndLoss();
+  }
+
+  // Issue ping request to remote Arduino
+  if (ptSendPingRequestToRemoteArduino.call()) {
+    sendArduinoPingRequest();
+  }
+
   // Read ambient light sensor value at a defined interval and store for transmission
-  if (ptReadAmbientLightReading.call()) {
+  if (ptReadCurrentLuxReading.call()) {
     buildTelemetryItem(SENSOR_LUX, currentAmbientLux = calculateAverageLux());
   }
 
@@ -147,10 +159,9 @@ void loop() {
   }
 
   // Get the current RPM value, and stage for telemetry transmission. This will also update the RPM calculation frequency based on the current RPM
-  if (ptUpdateCurrentRpm.call()) {
-    buildTelemetryItem(SENSOR_RPM, currentEngineSpeedRpm = getCurrentRpm());
-    updateRpmSchedulerFrequency(ptUpdateCurrentRpm, currentEngineSpeedRpm);
-    // Serial.println(currentEngineSpeedRpm);
+  if (ptUpdateCurrentEngineSpeedRpm.call()) {
+    buildTelemetryItem(SENSOR_RPM, currentEngineSpeedRpm = getCurrentEngineSpeedRpm());
+    updateRpmSchedulerFrequency(ptUpdateCurrentEngineSpeedRpm, currentEngineSpeedRpm);
   }
 
   // Send low frequency messages
