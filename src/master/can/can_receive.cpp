@@ -1,5 +1,6 @@
 #include "can_receive.h"
 #include "../../shared/debug_logging.h"
+#include "../../shared/variables_vehicle_parameters.h"
 #include "can_helpers.h"
 
 /* ======================================================================
@@ -16,7 +17,9 @@ const float speedScaleFactor = 1.06;
 void checkAndProcessCanMessages() {
   if (canBmwMsgRecv) {
     canBmwMsgRecv = false;
-    readBmwDataFromCan(CAN_BMW);
+    bmwCanValues result = readBmwDataFromCan(CAN_BMW);
+    currentVehicleSpeedFrontKph = result.vehicleSpeedFront;
+    currentVehicleSpeedRearKph  = result.vehicleSpeedRear;
   }
 }
 
