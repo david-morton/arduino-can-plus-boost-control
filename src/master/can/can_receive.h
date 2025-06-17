@@ -18,4 +18,4 @@ typedef struct {
    ====================================================================== */
 
 void         checkAndProcessCanMessages();
-bmwCanValues readBmwDataFromCan(mcp2515_can &can);
+bool         readBmwDataFromCan(mcp2515_can &can, bmwCanValues &bmwCanData);
