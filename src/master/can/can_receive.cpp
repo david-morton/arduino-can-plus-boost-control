@@ -20,6 +20,7 @@ void checkAndProcessCanMessages() {
 
     bmwCanValues result;
     if (readBmwDataFromCan(CAN_BMW, result)) {
+      updateReceiveCanTotalMessageCount();
       currentVehicleSpeedFrontKph = result.vehicleSpeedFront;
       currentVehicleSpeedRearKph  = result.vehicleSpeedRear;
     }

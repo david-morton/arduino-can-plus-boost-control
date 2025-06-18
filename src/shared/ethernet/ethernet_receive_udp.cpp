@@ -20,8 +20,8 @@ const uint16_t localArduinoListenPort = 8888;
 unsigned long receiveOutOfSequenceCount    = 0;
 unsigned long receiveMalformedMessageCount = 0;
 
-unsigned long receiveLastSequenceNumber = 0;
-unsigned long receiveTotalMessageCount  = 0;
+unsigned long receiveLastSequenceNumber   = 0;
+unsigned long receiveUdpTotalMessageCount = 0;
 
 // Define UDP receive buffer
 char udpReceiveBuffer[RECEIVE_PACKET_BUFFER_SIZE];
@@ -42,7 +42,7 @@ bool parseIncomingUdpMessage(char *buffer, size_t bufferSize) {
     return false;
 
   buffer[len] = '\0'; // Null-terminate the received string
-  receiveTotalMessageCount++;
+  receiveUdpTotalMessageCount++;
   DEBUG_ETHERNET_TRAFFIC("Received UDP packet: %s", buffer);
 
   // Validate checksum using the full message string
@@ -155,10 +155,10 @@ void handleIncomingUdpMessage() {
 
 // Report on UDP received message statistics
 void reportUdpMessageStats() {
-  float malformedPercentage     = (receiveTotalMessageCount > 0) ? (receiveMalformedMessageCount * 100.0f / receiveTotalMessageCount) : 0.0f;
-  float outOfSequencePercentage = (receiveTotalMessageCount > 0) ? (receiveOutOfSequenceCount * 100.0f / receiveTotalMessageCount) : 0.0f;
+  float malformedPercentage     = (receiveUdpTotalMessageCount > 0) ? (receiveMalformedMessageCount * 100.0f / receiveUdpTotalMessageCount) : 0.0f;
+  float outOfSequencePercentage = (receiveUdpTotalMessageCount > 0) ? (receiveOutOfSequenceCount * 100.0f / receiveUdpTotalMessageCount) : 0.0f;
 
   DEBUG_PERFORMANCE("UDP messages received: %lu, Malformed: %.2f%% (%lu), Out of sequence: %.2f%% (%lu)",
-                    receiveTotalMessageCount, malformedPercentage, receiveMalformedMessageCount,
+                    receiveUdpTotalMessageCount, malformedPercentage, receiveMalformedMessageCount,
                     outOfSequencePercentage, receiveOutOfSequenceCount);
 }

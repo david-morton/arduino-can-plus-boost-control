@@ -1,28 +1,26 @@
 #pragma once
 
-#include <Arduino.h>
-#include <mcp2515_can.h> // Used for MCP2515 CAN modules
-
 /* ======================================================================
-   OBJECTS
+   STRUCTURES
    ====================================================================== */
 
-extern mcp2515_can CAN_BMW;
-extern mcp2515_can CAN_NISSAN;
+// Structure to hold the alarm thresholds
+struct AlarmThresholds {
+  int ambientLuxMin;
+  int engineRpmMax;
+};
 
 /* ======================================================================
    VARIABLES
    ====================================================================== */
 
-extern volatile bool canBmwMsgRecv;
-extern volatile bool canNissanMsgRecv;
+// Default alarm thresholds
+const AlarmThresholds alarmThresholds = {
+    .ambientLuxMin = 20,
+    .engineRpmMax  = 7500};
 
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
 
-void configureCanInterrupts();
-void configureCanMasksAndFilters();
-void initialiseCanModule(mcp2515_can &canModule, const char *label);
-void initialiseCanModules();
-void updateReceiveCanTotalMessageCount();
+void checkAndUpdateAlarmState();

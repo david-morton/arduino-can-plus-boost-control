@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <ptScheduler.h>
 
+#include "alarm/alarm_helpers.h"
+#include "alarm/alarms.h"
 #include "engine_speed/engine_speed.h"
 #include "lux_sensor/lux_sensor.h"
 #include "mux/mux_helpers.h"
@@ -96,6 +98,7 @@ int currentEngineSpeedRpm            = 0;
 ptScheduler ptReadSwitchStateClutch       = ptScheduler(PT_TIME_100MS);
 ptScheduler ptReadSwitchStateNeutral      = ptScheduler(PT_TIME_100MS);
 ptScheduler ptUpdateCurrentEngineSpeedRpm = ptScheduler(PT_TIME_200MS); // Initially set to 200ms, will be adjusted based on current RPM
+ptScheduler ptUpdateAlarmState            = ptScheduler(PT_TIME_500MS);
 
 // Low frequency tasks (seconds)
 ptScheduler ptReadCurrentLuxReading          = ptScheduler(PT_TIME_2S);
@@ -120,9 +123,7 @@ void setup() {
   configureAllPins();
   initialiseEthernetShield(ethConfigLocal);
   initialiseAmbientLightSensor();
-
-  unsigned long randomOffset = random(10, 50); // jitter between 10–50 ms
-  ptReadSwitchStateClutch.setInterval(100 + randomOffset);
+  performAlarmBuzzerStartupBeep();
 }
 
 /* ======================================================================
@@ -177,6 +178,11 @@ void loop() {
   // Send high frequency messages
   if (ptSendHighFrequencyMessages.call()) {
     sendStagedTelemetry(MSG_SLAVE_HIGH_FREQUENCY, CMD_HIGH_FREQUENCY_MESSAGES);
+  }
+
+  // Update the alarm state based on a range of error conditions
+  if (ptUpdateAlarmState.call()) {
+    checkAndUpdateAlarmState();
   }
 
   // Increment loop counter and report on performance stats if needed

@@ -16,9 +16,13 @@ mcp2515_can CAN_NISSAN(CAN_SPI_CS_PIN_NISSAN);
    VARIABLES
    ====================================================================== */
 
-int  setupRetriesMax  = 5;     // Maximum number of retries for initialising CAN modules
-volatile bool canBmwMsgRecv    = false; // Flag to indicate if a message has been received on the BMW CAN bus
-volatile bool canNissanMsgRecv = false; // Flag to indicate if a message has been received on the Nissan CAN bus
+int           setupRetriesMax  = 5;     // Maximum number of retries for initialising CAN modules
+volatile bool canBmwMsgRecv    = false; // Interrupt flag to indicate if a message has been received on the BMW CAN bus
+volatile bool canNissanMsgRecv = false; // Interrupt flag to indicate if a message has been received on the Nissan CAN bus
+
+unsigned long receiveCanTotalMessageCount = 0;
+unsigned long receiveCanRateMessageCount  = 0;
+unsigned long receiveCanRateLasttimestamp = millis();
 
 /* ======================================================================
    ISRs: Set flags when interrupts are triggered
@@ -37,6 +41,28 @@ void setCanNissanMessageReceivedFlag() {
 /* ======================================================================
    FUNCTION DEFINITIONS
    ====================================================================== */
+
+// Increment the total message count received on the CAN bus
+void updateReceiveCanTotalMessageCount() {
+  receiveCanTotalMessageCount++;
+}
+
+// Output total CAN messages received as a rate since boot and rate since last report, expressed in messages per second
+void reportReceiveCanMessageRate() {
+  unsigned long currentTime = millis();
+
+  if (currentTime - receiveCanRateLasttimestamp >= 1000) {
+    unsigned long elapsedMs = currentTime - receiveCanRateLasttimestamp;
+
+    // Integer rate in messages per second (rounded)
+    unsigned long rate = (elapsedMs > 0) ? ((receiveCanRateMessageCount * 1000UL) / elapsedMs) : 0;
+
+    receiveCanRateLasttimestamp = currentTime;
+    receiveCanRateMessageCount  = 0;
+
+    DEBUG_PERFORMANCE("CAN messages received: total %lu, rate %lu msg/s", receiveCanTotalMessageCount, rate);
+  }
+}
 
 // Initialise both CAN modules (BMW and Nissan)
 void initialiseCanModules() {
