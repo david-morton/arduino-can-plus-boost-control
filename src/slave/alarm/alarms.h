@@ -8,6 +8,7 @@
 struct AlarmThresholds {
   int ambientLuxMin;
   int engineRpmMax;
+  int pingLossPercent;
 };
 
 /* ======================================================================
@@ -16,8 +17,9 @@ struct AlarmThresholds {
 
 // Default alarm thresholds
 const AlarmThresholds alarmThresholds = {
-    .ambientLuxMin = 20,
-    .engineRpmMax  = 7500};
+    .ambientLuxMin   = 20,
+    .engineRpmMax    = 7500,
+    .pingLossPercent = 25};
 
 /* ======================================================================
    FUNCTION PROTOTYPES

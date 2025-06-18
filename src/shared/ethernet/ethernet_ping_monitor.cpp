@@ -10,6 +10,7 @@
 // Define ping tracking variables
 unsigned long pingLastSequenceNumber;
 unsigned long pingLastSentTimeMicros;
+float         pingLossPercent = 0;
 
 // Define the buffer and index for round trip time (RTT) measurements
 unsigned long rttBuffer[RTT_BUFFER_SIZE];
@@ -121,11 +122,11 @@ void handlePingTimeoutsAndLoss() {
   if (count == 0)
     return;
 
-  float avgRttMs    = calculateAveragePingRttMicros() / 1000.0f;
-  float lossPercent = (lost * 100.0f) / count;
+  float avgRttMs  = calculateAveragePingRttMicros() / 1000.0f;
+  pingLossPercent = (lost * 100.0f) / count;
 
-  if (lossPercent >= 25.0f) {
-    DEBUG_ERROR("ERROR: High ping loss detected: %.1f%%", lossPercent);
+  if (pingLossPercent >= 25.0f) {
+    DEBUG_ERROR("ERROR: High ping loss detected: %.1f%%", pingLossPercent);
   } else
-    DEBUG_PERFORMANCE("Ping RTT: %.2f ms | Loss: %.1f%%", avgRttMs, lossPercent);
+    DEBUG_PERFORMANCE("Ping RTT: %.2f ms | Loss: %.1f%%", avgRttMs, pingLossPercent);
 }

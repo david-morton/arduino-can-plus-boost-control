@@ -11,6 +11,7 @@
 extern bool            remoteArduinoResponding;
 extern const IPAddress remoteArduinoIp;
 extern const uint16_t  localArduinoListenPort;
+extern float           pingLossPercent;
 
 // General use variables
 extern unsigned long sendSequenceNumber;
