@@ -52,8 +52,7 @@ const IPAddress remoteArduinoIp(192, 168, 10, 101);
    VARIABLES: General use / functional
    ====================================================================== */
 
-unsigned long arduinoLoopExecutionCount = 0;
-float         valueFromRemote; // Scratch variable to transport variable values from remote Arduino
+float valueFromRemote; // Scratch variable to transport variable values from remote Arduino
 
 /* ======================================================================
    VARIABLES: Physical sensor inputs local to Arduino
@@ -178,6 +177,8 @@ void loop() {
   }
 
   // Increment loop counter and report on performance stats if needed
+  static unsigned long arduinoLoopExecutionCount = 0;
+
   if (debugPerformance && millis() > 10000) {
     arduinoLoopExecutionCount++;
     if (ptReportArduinoPerformanceStats.call()) {

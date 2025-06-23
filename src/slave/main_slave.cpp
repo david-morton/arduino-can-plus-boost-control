@@ -1,8 +1,9 @@
 #include <Arduino.h>
 #include <ptScheduler.h>
 
-#include "alarm/alarm_helpers.h"
-#include "alarm/alarms.h"
+#include "../shared/alarm/alarm_helpers.h"
+#include "alarm/alarm_buzzer.h"
+#include "alarm/alarms_slave.h"
 #include "engine_speed/engine_speed.h"
 #include "lux_sensor/lux_sensor.h"
 #include "mux/mux_helpers.h"
@@ -21,10 +22,6 @@
 #include "shared/variables_vehicle_parameters.h"
 
 #define CAN_2515
-
-/* ======================================================================
-   VARIABLES: Major functional area toggles
-   ====================================================================== */
 
 /* ======================================================================
    VARIABLES: Debug and stat output
@@ -53,12 +50,6 @@ EthernetConfig ethConfigLocal = {
 
 // Define remote IP address for peer Arduino native messeging
 const IPAddress remoteArduinoIp(192, 168, 10, 100);
-
-/* ======================================================================
-   VARIABLES: General use / functional
-   ====================================================================== */
-
-unsigned long arduinoLoopExecutionCount = 0;
 
 /* ======================================================================
    VARIABLES: Physical sensor inputs from mux
@@ -98,7 +89,7 @@ int currentEngineSpeedRpm            = 0;
 ptScheduler ptReadSwitchStateClutch       = ptScheduler(PT_TIME_100MS);
 ptScheduler ptReadSwitchStateNeutral      = ptScheduler(PT_TIME_100MS);
 ptScheduler ptUpdateCurrentEngineSpeedRpm = ptScheduler(PT_TIME_200MS); // Initially set to 200ms, will be adjusted based on current RPM
-ptScheduler ptUpdateAlarmState            = ptScheduler(PT_TIME_500MS);
+ptScheduler ptUpdateAlarmStates           = ptScheduler(PT_TIME_200MS);
 
 // Low frequency tasks (seconds)
 ptScheduler ptReadCurrentLuxReading          = ptScheduler(PT_TIME_2S);
@@ -180,12 +171,14 @@ void loop() {
     sendStagedTelemetry(MSG_SLAVE_HIGH_FREQUENCY, CMD_HIGH_FREQUENCY_MESSAGES);
   }
 
-  // Update the alarm state based on a range of error conditions
-  if (ptUpdateAlarmState.call()) {
-    checkAndUpdateAlarmState();
+  // Update the alarm states based on a range of error conditions and take necessary actions
+  if (ptUpdateAlarmStates.call()) {
+    handleGlobalAlarmStates();
   }
 
   // Increment loop counter and report on performance stats if needed
+  static unsigned long arduinoLoopExecutionCount = 0;
+
   if (debugPerformance && millis() > 10000) {
     arduinoLoopExecutionCount++;
     if (ptReportArduinoPerformanceStats.call()) {

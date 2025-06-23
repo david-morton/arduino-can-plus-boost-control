@@ -4,25 +4,34 @@
    STRUCTURES
    ====================================================================== */
 
-// Structure to hold the alarm thresholds
-struct AlarmThresholds {
+// Structure to hold the critical alarm thresholds
+typedef struct {
   int ambientLuxMin;
   int engineRpmMax;
+} AlarmThresholdsCritical;
+
+// Structure to hold the non-critical alarm thresholds
+typedef struct {
   int pingLossPercent;
-};
+} AlarmThresholdsWarning;
 
 /* ======================================================================
    VARIABLES
    ====================================================================== */
 
-// Default alarm thresholds
-const AlarmThresholds alarmThresholds = {
-    .ambientLuxMin   = 20,
-    .engineRpmMax    = 7500,
+// Critical alarm thresholds
+const AlarmThresholdsCritical alarmThresholdsCritical = {
+    .ambientLuxMin = 20,
+    .engineRpmMax  = 7500};
+
+// Warning alarm thresholds
+const AlarmThresholdsWarning alarmThresholdsWarning = {
     .pingLossPercent = 25};
 
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
 
-void checkAndUpdateAlarmState();
+void updateLocalCriticalAlarmState();
+void updateLocalWarningAlarmState();
+void handleGlobalAlarmStates();
