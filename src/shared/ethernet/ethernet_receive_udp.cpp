@@ -154,7 +154,7 @@ void handleIncomingUdpMessage() {
 }
 
 // Report on UDP received message statistics
-void reportUdpMessageStats() {
+void reportUdpMessageReceiveStats() {
   float malformedPercentage     = (receiveUdpTotalMessageCount > 0) ? (receiveMalformedMessageCount * 100.0f / receiveUdpTotalMessageCount) : 0.0f;
   float outOfSequencePercentage = (receiveUdpTotalMessageCount > 0) ? (receiveOutOfSequenceCount * 100.0f / receiveUdpTotalMessageCount) : 0.0f;
 

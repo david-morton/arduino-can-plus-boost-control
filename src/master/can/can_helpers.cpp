@@ -16,51 +16,31 @@ mcp2515_can CAN_NISSAN(CAN_SPI_CS_PIN_NISSAN);
    VARIABLES
    ====================================================================== */
 
-int           setupRetriesMax  = 5;     // Maximum number of retries for initialising CAN modules
-volatile bool canBmwMsgRecv    = false; // Interrupt flag to indicate if a message has been received on the BMW CAN bus
-volatile bool canNissanMsgRecv = false; // Interrupt flag to indicate if a message has been received on the Nissan CAN bus
-
-unsigned long receiveCanTotalMessageCount = 0;
+int           setupRetriesMax             = 5; // Maximum number of retries for initialising CAN modules
 unsigned long receiveCanRateMessageCount  = 0;
 unsigned long receiveCanRateLasttimestamp = millis();
-
-/* ======================================================================
-   ISRs: Set flags when interrupts are triggered
-   ====================================================================== */
-
-// Set the flag to indicate that a message has been received on the BMW CAN bus
-void setCanBmwMessageReceivedFlag() {
-  canBmwMsgRecv = true;
-}
-
-// Set the flag to indicate that a message has been received on the Nissan CAN bus
-void setCanNissanMessageReceivedFlag() {
-  canNissanMsgRecv = true;
-}
 
 /* ======================================================================
    FUNCTION DEFINITIONS
    ====================================================================== */
 
-// Increment the total message count received on the CAN bus
-void updateReceiveCanTotalMessageCount() {
-  receiveCanTotalMessageCount++;
+// Update the total number of received CAN messages
+void updateReceiveCanMessageCount() {
+  receiveCanRateMessageCount++;
 }
 
-// Output total CAN messages received as a rate since boot and rate since last report, expressed in messages per second
+// Output CAN message rate (msgs/sec) since last call
 void reportReceiveCanMessageRate() {
   unsigned long currentTime = millis();
 
-  if (currentTime - receiveCanRateLasttimestamp >= 1000) {
-    unsigned long elapsedMs = currentTime - receiveCanRateLasttimestamp;
-
-    // Integer rate in messages per second (rounded)
+  unsigned long elapsedMs = currentTime - receiveCanRateLasttimestamp;
+  if (elapsedMs >= 1000) {
     unsigned long rate = (elapsedMs > 0) ? ((receiveCanRateMessageCount * 1000UL) / elapsedMs) : 0;
+
+    DEBUG_PERFORMANCE("CAN message rate: %lu msg/s", rate);
 
     receiveCanRateLasttimestamp = currentTime;
     receiveCanRateMessageCount  = 0;
-
-    DEBUG_PERFORMANCE("CAN messages received: total %lu, rate %lu msg/s", receiveCanTotalMessageCount, rate);
   }
 }
 
@@ -70,10 +50,9 @@ void initialiseCanModules() {
   initialiseCanModule(CAN_BMW, "BMW");
   initialiseCanModule(CAN_NISSAN, "NISSAN");
   configureCanMasksAndFilters();
-  configureCanInterrupts();
 }
 
-// Initialise the CAN modules for BMW and Nissan CAN buses
+// Initialise a single CAN module
 void initialiseCanModule(mcp2515_can &canModule, const char *label) {
   for (int i = 0; i < setupRetriesMax; i++) {
     bool result = canModule.begin(CAN_500KBPS);
@@ -89,11 +68,11 @@ void initialiseCanModule(mcp2515_can &canModule, const char *label) {
   DEBUG_ERROR("\t\t%s CAN module init failed after maximum retries", label);
 }
 
-// Configure masks and filters for shields to reduce noise. There are two masks in the mcp2515 which both need to be
-// set. Mask 0 has 2 filters and mask 1 has 4 so we set them all as needed.
-// 0x551 is where coolant temperature is located and 0x7E8 is for results of queried CAN parameters.
+// Configure CAN masks and filters for both buses
 void configureCanMasksAndFilters() {
-  DEBUG_GENERAL("Configuring CAN masks and filters ...");
+  DEBUG_GENERAL("\t\tConfiguring CAN masks and filters ...");
+
+  // Nissan (0x551 = coolant temp, 0x7E8 = OBD-II response)
   CAN_NISSAN.init_Mask(0, 0, 0xFFF);
   CAN_NISSAN.init_Filt(0, 0, 0x551);
   CAN_NISSAN.init_Filt(1, 0, 0x7E8);
@@ -104,8 +83,7 @@ void configureCanMasksAndFilters() {
   CAN_NISSAN.init_Filt(4, 0, 0x551);
   CAN_NISSAN.init_Filt(5, 0, 0x7E8);
 
-  // 0x1F0 is where the individual wheel speeds are
-  // https://www.bimmerforums.com/forum/showthread.php?1887229-E46-Can-bus-project
+  // BMW (0x1F0 = wheel speeds)
   CAN_BMW.init_Mask(0, 0, 0xFFF);
   CAN_BMW.init_Filt(0, 0, 0x1F0);
   CAN_BMW.init_Filt(1, 0, 0x1F0);
@@ -115,11 +93,4 @@ void configureCanMasksAndFilters() {
   CAN_BMW.init_Filt(3, 0, 0x1F0);
   CAN_BMW.init_Filt(4, 0, 0x1F0);
   CAN_BMW.init_Filt(5, 0, 0x1F0);
-}
-
-// Configure interrupts for the CAN modules
-void configureCanInterrupts() {
-  DEBUG_GENERAL("Configuring CAN interrupts ...");
-  attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT_PIN_BMW), setCanBmwMessageReceivedFlag, FALLING);
-  attachInterrupt(digitalPinToInterrupt(CAN_INTERRUPT_PIN_NISSAN), setCanNissanMessageReceivedFlag, FALLING);
 }

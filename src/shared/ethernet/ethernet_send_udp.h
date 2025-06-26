@@ -12,3 +12,4 @@
 
 bool sendUdpMessage(const char *message);
 void sendUdpMessageWithCommand(int commandId, const char *payload);
+void reportUdpMessageSendStats();

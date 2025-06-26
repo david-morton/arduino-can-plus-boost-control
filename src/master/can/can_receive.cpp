@@ -4,35 +4,29 @@
 #include "can_helpers.h"
 
 /* ======================================================================
-   VARIABLES
-   ====================================================================== */
-
-const float speedScaleFactor = 1.06; // Scale factor to correct wheel speed to real world speed values
-
-/* ======================================================================
    FUNCTION DEFINITIONS
    ====================================================================== */
 
 // Check flags and process messages accordingly
 void checkAndProcessCanMessages() {
-  if (canBmwMsgRecv) {
-    canBmwMsgRecv = false;
+  bmwCanValues result;
 
-    bmwCanValues result;
-    if (readBmwDataFromCan(CAN_BMW, result)) {
-      updateReceiveCanTotalMessageCount();
-      currentVehicleSpeedFrontKph = result.vehicleSpeedFront;
-      currentVehicleSpeedRearKph  = result.vehicleSpeedRear;
-    }
+  if (readBmwDataFromCan(CAN_BMW, result)) {
+    currentVehicleSpeedFrontKph = result.vehicleSpeedFront;
+    currentVehicleSpeedRearKph  = result.vehicleSpeedRear;
+    DEBUG_CAN_BMW("Received BMW CAN message: Front Speed: %.2f kph, Rear Speed: %.2f kph", currentVehicleSpeedFrontKph, currentVehicleSpeedRearKph);
+    updateReceiveCanMessageCount();
   }
 }
 
 // Read data from the BMW CAN bus and calculate vehicle speed values
 bool readBmwDataFromCan(mcp2515_can &can, bmwCanValues &bmwCanData) {
-  float wheelSpeedFl = 0;
-  float wheelSpeedFr = 0;
-  float wheelSpeedRl = 0;
-  float wheelSpeedRr = 0;
+  static const float speedScaleFactor = 1.06; // Scale factor to correct wheel speed to real world speed values
+
+  int wheelSpeedFl = 0;
+  int wheelSpeedFr = 0;
+  int wheelSpeedRl = 0;
+  int wheelSpeedRr = 0;
 
   unsigned char len = 0;
   unsigned char buf[8];

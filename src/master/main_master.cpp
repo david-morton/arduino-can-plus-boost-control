@@ -25,6 +25,8 @@
    VARIABLES: Debug and stat output
    ====================================================================== */
 
+bool debugCanBmw           = false;
+bool debugCanNissan        = true;
 bool debugError            = true;
 bool debugEthernetGeneral  = false;
 bool debugEthernetMessages = false;
@@ -183,7 +185,9 @@ void loop() {
     arduinoLoopExecutionCount++;
     if (ptReportArduinoPerformanceStats.call()) {
       reportArduinoLoopRate(&arduinoLoopExecutionCount);
-      reportUdpMessageStats();
+      reportUdpMessageSendStats();
+      reportUdpMessageReceiveStats();
+      reportReceiveCanMessageRate();
     }
   }
 }

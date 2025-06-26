@@ -17,7 +17,10 @@ void initialiseRtc() {
   if (!rtc.begin()) {
     DEBUG_ERROR("\t\tRTC not found. Please check the wiring.");
   } else {
-    DEBUG_GENERAL("\t\tRTC initialised successfully");
+    DateTime now = getRtcCurrentDateTime();
+    DEBUG_GENERAL("\t\tRTC initialised successfully. Current RTC time: %04d-%02d-%02d %02d:%02d:%02d",
+                  now.year(), now.month(), now.day(),
+                  now.hour(), now.minute(), now.second());
   }
 }
 

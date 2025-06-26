@@ -81,3 +81,8 @@ void sendUdpMessageWithCommand(int commandId, const char *payload) {
   sendUdpMessage(udpMessage);
   DEBUG_ETHERNET_MESSAGES("Sent UDP message with command ID %d: %s", commandId, udpMessage);
 }
+
+// Report the statistics of sent UDP messages
+void reportUdpMessageSendStats() {
+  DEBUG_PERFORMANCE("UDP messages sent: %lu, Malformed: %lu", sendSequenceNumber, sendMalformedMessageCount);
+}

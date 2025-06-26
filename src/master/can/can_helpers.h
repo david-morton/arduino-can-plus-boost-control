@@ -11,18 +11,12 @@ extern mcp2515_can CAN_BMW;
 extern mcp2515_can CAN_NISSAN;
 
 /* ======================================================================
-   VARIABLES
-   ====================================================================== */
-
-extern volatile bool canBmwMsgRecv;
-extern volatile bool canNissanMsgRecv;
-
-/* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
 
-void configureCanInterrupts();
+void checkAndProcessCanMessages();
 void configureCanMasksAndFilters();
 void initialiseCanModule(mcp2515_can &canModule, const char *label);
 void initialiseCanModules();
-void updateReceiveCanTotalMessageCount();
+void reportReceiveCanMessageRate();
+void updateReceiveCanMessageCount();
