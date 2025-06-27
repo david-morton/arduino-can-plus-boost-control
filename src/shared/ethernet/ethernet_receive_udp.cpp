@@ -4,6 +4,7 @@
 
 #include "../command_ids.h"
 #include "../debug_logging.h"
+#include "../system_data_receive.h"
 #include "../telemetry_receive_parser.h"
 #include "../udp_command_dispatcher.h"
 #include "../variables_programmatic.h"
@@ -145,6 +146,10 @@ void handleIncomingUdpMessage() {
 
     case CMD_HIGH_FREQUENCY_MESSAGES:
       parseTelemetryPayload(payloadStr);
+      break;
+
+    case CMD_SYSTEM_DATA:
+      parseSystemDataPayload(payloadStr);
       break;
 
     default:

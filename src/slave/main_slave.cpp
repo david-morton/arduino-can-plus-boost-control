@@ -16,6 +16,7 @@
 #include "shared/ethernet/ethernet_ping_monitor.h"
 #include "shared/ethernet/ethernet_receive_udp.h"
 #include "shared/ethernet/ethernet_send_udp.h"
+#include "shared/system_data_send.h"
 #include "shared/telemetry_send_staging.h"
 #include "shared/udp_command_dispatcher.h"
 #include "shared/variables_programmatic.h"
@@ -88,13 +89,14 @@ int currentEngineSpeedRpm            = 0;
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptReadSwitchStateClutch       = ptScheduler(PT_TIME_100MS);
 ptScheduler ptReadSwitchStateNeutral      = ptScheduler(PT_TIME_100MS);
-ptScheduler ptUpdateCurrentEngineSpeedRpm = ptScheduler(PT_TIME_200MS); // Initially set to 200ms, will be adjusted based on current RPM
+ptScheduler ptSendDataStateToRemote       = ptScheduler(PT_TIME_200MS);
 ptScheduler ptUpdateAlarmStates           = ptScheduler(PT_TIME_200MS);
+ptScheduler ptUpdateCurrentEngineSpeedRpm = ptScheduler(PT_TIME_200MS); // Initially set to 200ms, will be adjusted based on current RPM
 
 // Low frequency tasks (seconds)
 ptScheduler ptReadCurrentLuxReading          = ptScheduler(PT_TIME_2S);
 ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_5S);
-ptScheduler ptReportArduinoPingStats         = ptScheduler(PT_TIME_1MIN);
+ptScheduler ptHandlePingTimeoutsAndLoss      = ptScheduler(PT_TIME_1MIN);
 ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
 
 // Send different message classes to remote Arduino
@@ -127,7 +129,7 @@ void loop() {
   handleIncomingUdpMessage();
 
   // Report ping RTT stats (if needed) from buffer average
-  if (ptReportArduinoPingStats.call()) {
+  if (ptHandlePingTimeoutsAndLoss.call()) {
     handlePingTimeoutsAndLoss();
   }
 
@@ -169,6 +171,11 @@ void loop() {
   // Send high frequency messages
   if (ptSendHighFrequencyMessages.call()) {
     sendStagedTelemetry(MSG_SLAVE_HIGH_FREQUENCY, CMD_HIGH_FREQUENCY_MESSAGES);
+  }
+
+  // Send shared system data state to remote Arduino
+  if (ptSendDataStateToRemote.call()) {
+    sendDataStateToRemote();
   }
 
   // Update the alarm states based on a range of error conditions and take necessary actions

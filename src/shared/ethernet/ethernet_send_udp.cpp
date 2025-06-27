@@ -1,6 +1,6 @@
 #include <Ethernet.h>
 #include <EthernetUdp.h>
-#include <SPI.h>
+#include <SPI.h> // TODO: Evaluate if we need this, as it is not used in this file ?
 
 #include "../debug_logging.h"
 #include "../variables_programmatic.h"

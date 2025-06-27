@@ -103,20 +103,21 @@ unsigned long calculateAveragePingRttMicros() {
 // Check for ping timeouts and calculate packet loss
 void handlePingTimeoutsAndLoss() {
   unsigned long now   = micros();
-  uint8_t       count = 0;
-  uint8_t       lost  = 0;
+  uint8_t       count = 0; // Number of pings that are finished (either responded or timed out)
+  uint8_t       lost  = 0; // Number of timed-out pings
 
   for (uint8_t i = 0; i < MAX_OUTSTANDING_PINGS; i++) {
     if (pingHistory[i].sequence == 0)
-      continue; // skip unused entries
+      continue; // Skip unused entries
 
-    count++;
+    unsigned long age = now - pingHistory[i].sentTimeMicros;
 
-    unsigned long age     = now - pingHistory[i].sentTimeMicros;
-    bool          expired = !pingHistory[i].responded && age > PING_TIMEOUT_MICROS;
-
-    if (expired)
+    if (pingHistory[i].responded) {
+      count++;
+    } else if (age > PING_TIMEOUT_MICROS) {
+      count++;
       lost++;
+    }
   }
 
   if (count == 0)
@@ -127,6 +128,7 @@ void handlePingTimeoutsAndLoss() {
 
   if (pingLossPercent >= 25.0f) {
     DEBUG_ERROR("ERROR: High ping loss detected: %.1f%%", pingLossPercent);
-  } else
+  } else {
     DEBUG_PERFORMANCE("Ping RTT: %.2f ms | Loss: %.1f%%", avgRttMs, pingLossPercent);
+  }
 }

@@ -7,28 +7,16 @@
    VARIABLES
    ====================================================================== */
 
-bool globalAlarmCriticalState = false;
-bool globalAlarmWarningState  = false;
-bool localAlarmCriticalState  = false;
-bool localAlarmWarningState   = false;
-bool remoteAlarmCriticalState = false;
-bool remoteAlarmWarningState  = false;
+bool globalAlarmCriticalState = false; // Global critical alarm state, true if any local or remote critical alarm is active
+bool globalAlarmWarningState  = false; // Global warning alarm state, true if any local or remote warning alarm is active
+bool localAlarmCriticalState  = false; // Local critical alarm state, true if any local critical alarm is active
+bool localAlarmWarningState   = false; // Local warning alarm state, true if any local warning alarm is active
+bool remoteAlarmCriticalState = false; // Remote critical alarm state, true if any remote critical alarm is active
+bool remoteAlarmWarningState  = false; // Remote warning alarm state, true if any remote warning alarm is active
 
 /* ======================================================================
    FUNCTION DEFINITIONS
    ====================================================================== */
-
-// Send alarm status message to remote Arduino
-// void sendAlarmStatusMessage() {
-//   DEBUG_GENERAL("Sending alarm status message to remote Arduino ...");
-
-//   // Build the telemetry item with the current alarm states
-//   buildTelemetryItem(SENSOR_ALARM_CRITICAL, localAlarmCriticalState);
-//   buildTelemetryItem(SENSOR_ALARM_WARNING, localAlarmWarningState);
-
-//   // Send the staged telemetry data
-//   sendStagedTelemetry(MSG_SLAVE_ALARM_STATUS, CMD_ALARM_STATUS);
-// }
 
 // Evaluate the current alarm states and update global states
 void evaluateGlobalAlarmStates() {
@@ -36,6 +24,6 @@ void evaluateGlobalAlarmStates() {
   globalAlarmWarningState  = localAlarmWarningState || remoteAlarmWarningState;
 
   DEBUG_ERROR("Global Alarm States: Critical: %s, Warning: %s",
-                globalAlarmCriticalState ? "ON" : "OFF",
-                globalAlarmWarningState ? "ON" : "OFF");
+              globalAlarmCriticalState ? "ON" : "OFF",
+              globalAlarmWarningState ? "ON" : "OFF");
 }

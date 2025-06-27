@@ -45,7 +45,7 @@ void handleGlobalAlarmStates() {
 
   // If the global critical alarm state is active, enable the buzzer
   if (globalAlarmCriticalState) {
-    // TAKE ACTIONS FOR CRITICAL ON SLAVE HERE
+    alarmBuzzerEnable();
   } else if (globalAlarmWarningState) {
     // TAKE ACTIONS FOR WARNING ON SLAVE HERE
   } else {

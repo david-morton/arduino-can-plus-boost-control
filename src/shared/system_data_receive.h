@@ -1,7 +1,7 @@
-#include "../pin_assignments_slave.h"
-#include "mux_helpers.h"
-#include <Arduino.h>
+#pragma once
 
 /* ======================================================================
-   FUNCTION DEFINITIONS
+   FUNCTION PROTOTYPES
    ====================================================================== */
+
+   void parseSystemDataPayload(const char *payload);

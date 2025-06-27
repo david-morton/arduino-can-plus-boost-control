@@ -42,6 +42,10 @@ void alarmBuzzerDisable() {
 
 // Sound the buzzer if the engine is running, and after a delay
 void alarmBuzzerEnable() {
+  if (alarmBuzzerIsSounding) {
+    return; // Return quickly if the buzzer is already sounding
+  }
+
   if (firstAlarmCallTime == 0) {
     firstAlarmCallTime = millis();
   }

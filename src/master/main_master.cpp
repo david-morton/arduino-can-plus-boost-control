@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <mcp2515_can.h> // Used for CAN modules
 #include <mcp2515_can.h> // Used for MCP2515 CAN modules
 #include <ptScheduler.h> // The task scheduling library of choice
 
@@ -7,12 +6,14 @@
 #include "can/can_receive.h"
 #include "mqtt/mqtt_helpers.h"
 #include "rtc/rtc_sensor.h"
+#include "shared/alarm/alarm_helpers.h"
 #include "shared/command_ids.h"
 #include "shared/debug_logging.h"
 #include "shared/ethernet/ethernet_helpers.h"
 #include "shared/ethernet/ethernet_ping_monitor.h"
 #include "shared/ethernet/ethernet_receive_udp.h"
 #include "shared/ethernet/ethernet_send_udp.h"
+#include "shared/system_data_send.h"
 #include "shared/telemetry_receive_parser.h"
 #include "shared/telemetry_send_staging.h"
 #include "shared/udp_command_dispatcher.h"
@@ -88,12 +89,14 @@ ptScheduler ptReadCurrentEngineSpeedRpm = ptScheduler(PT_TIME_50MS);
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
 ptScheduler ptReadSwitchStateNeutral = ptScheduler(PT_TIME_100MS);
+ptScheduler ptSendDataStateToRemote  = ptScheduler(PT_TIME_200MS);
+ptScheduler ptUpdateAlarmStates      = ptScheduler(PT_TIME_200MS);
 
 // Low frequency tasks (seconds)
 ptScheduler ptGetCurrentLuxReading           = ptScheduler(PT_TIME_2S);
 ptScheduler ptGetElectronicsTemperature      = ptScheduler(PT_TIME_1MIN);
 ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_1MIN);
-ptScheduler ptReportArduinoPingStats         = ptScheduler(PT_TIME_1MIN);
+ptScheduler ptHandlePingTimeoutsAndLoss      = ptScheduler(PT_TIME_1MIN);
 ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
 
 // Send different message classes to remote Arduino
@@ -129,7 +132,7 @@ void loop() {
   handleIncomingUdpMessage();
 
   // Report ping RTT stats (if needed) from buffer average
-  if (ptReportArduinoPingStats.call()) {
+  if (ptHandlePingTimeoutsAndLoss.call()) {
     handlePingTimeoutsAndLoss();
   }
 
@@ -177,6 +180,16 @@ void loop() {
   if (ptGetElectronicsTemperature.call()) {
     currentElectronicsTemp = getRtcCurrentTemperature();
   }
+
+  // Send shared system data state to remote Arduino
+  if (ptSendDataStateToRemote.call()) {
+    sendDataStateToRemote();
+  }
+
+  // Update the alarm states based on a range of error conditions and take necessary actions
+  // if (ptUpdateAlarmStates.call()) {
+  //   handleGlobalAlarmStates();
+  // }
 
   // Increment loop counter and report on performance stats if needed
   static unsigned long arduinoLoopExecutionCount = 0;
