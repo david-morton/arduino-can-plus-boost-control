@@ -2,6 +2,7 @@
 #include <mcp2515_can.h> // Used for MCP2515 CAN modules
 #include <ptScheduler.h> // The task scheduling library of choice
 
+#include "alarm/alarms_master.h"
 #include "can/can_helpers.h"
 #include "can/can_receive.h"
 #include "mqtt/mqtt_helpers.h"
@@ -13,9 +14,9 @@
 #include "shared/ethernet/ethernet_ping_monitor.h"
 #include "shared/ethernet/ethernet_receive_udp.h"
 #include "shared/ethernet/ethernet_send_udp.h"
-#include "shared/system_data_send.h"
-#include "shared/telemetry_receive_parser.h"
-#include "shared/telemetry_send_staging.h"
+#include "shared/system_data/system_data_send.h"
+#include "shared/telemetry/telemetry_receive_parser.h"
+#include "shared/telemetry/telemetry_send_staging.h"
 #include "shared/udp_command_dispatcher.h"
 #include "shared/variables_programmatic.h"
 #include "shared/variables_vehicle_parameters.h"
@@ -50,6 +51,12 @@ EthernetConfig ethConfigLocal = {
 
 // Define remote IP address for peer Arduino native messeging
 const IPAddress remoteArduinoIp(192, 168, 10, 101);
+
+/* ======================================================================
+   VARIABLES: Engine parameters from CAN or remote Arduino
+   ====================================================================== */
+
+int currentEngineTempCelcius = 0; // Read from Nissan CAN
 
 /* ======================================================================
    VARIABLES: General use / functional
@@ -187,9 +194,9 @@ void loop() {
   }
 
   // Update the alarm states based on a range of error conditions and take necessary actions
-  // if (ptUpdateAlarmStates.call()) {
-  //   handleGlobalAlarmStates();
-  // }
+  if (ptUpdateAlarmStates.call()) {
+    handleAllAlarmStatesMaster();
+  }
 
   // Increment loop counter and report on performance stats if needed
   static unsigned long arduinoLoopExecutionCount = 0;

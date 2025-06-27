@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#include "debug_logging.h"
+#include "../debug_logging.h"
 #include "telemetry_receive_parser.h"
 #include "telemetry_send_staging.h"
 

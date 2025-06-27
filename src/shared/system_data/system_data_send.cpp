@@ -1,9 +1,9 @@
 #include <Arduino.h>
 
-#include "../shared/alarm/alarm_helpers.h"
-#include "../shared/debug_logging.h"
-#include "../shared/ethernet/ethernet_send_udp.h"
-#include "command_ids.h"
+#include "../alarm/alarm_helpers.h"
+#include "../command_ids.h"
+#include "../debug_logging.h"
+#include "../ethernet/ethernet_send_udp.h"
 #include "system_data_send.h"
 
 /* ======================================================================

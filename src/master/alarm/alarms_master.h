@@ -6,8 +6,7 @@
 
 // Structure to hold the critical alarm thresholds
 typedef struct {
-  int ambientLuxMin;
-  int engineRpmMax;
+  int engineTemperature;
 } AlarmThresholdsCritical;
 
 // Structure to hold the non-critical alarm thresholds
@@ -21,8 +20,7 @@ typedef struct {
 
 // Critical alarm thresholds
 const AlarmThresholdsCritical alarmThresholdsCritical = {
-    .ambientLuxMin = 20,
-    .engineRpmMax  = 7500};
+    .engineTemperature = 115};
 
 // Warning alarm thresholds
 const AlarmThresholdsWarning alarmThresholdsWarning = {
@@ -34,4 +32,4 @@ const AlarmThresholdsWarning alarmThresholdsWarning = {
 
 void updateLocalCriticalAlarmState();
 void updateLocalWarningAlarmState();
-void handleAllAlarmStatesSlave();
+void handleAllAlarmStatesMaster();

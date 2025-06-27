@@ -2,7 +2,7 @@
 #include "../shared/ethernet/ethernet_ping_monitor.h"
 #include "../shared/ethernet/ethernet_send_udp.h"
 #include "debug_logging.h"
-#include "telemetry_receive_parser.h"
+#include "telemetry/telemetry_receive_parser.h"
 #include "variables_programmatic.h"
 
 /* ======================================================================

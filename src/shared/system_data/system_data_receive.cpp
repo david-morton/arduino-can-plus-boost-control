@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
-#include "alarm/alarm_helpers.h"
-#include "debug_logging.h"
+#include "../alarm/alarm_helpers.h"
+#include "../debug_logging.h"
 
 /* ======================================================================
    FUNCTION DEFINITIONS

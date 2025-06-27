@@ -16,8 +16,8 @@
 #include "shared/ethernet/ethernet_ping_monitor.h"
 #include "shared/ethernet/ethernet_receive_udp.h"
 #include "shared/ethernet/ethernet_send_udp.h"
-#include "shared/system_data_send.h"
-#include "shared/telemetry_send_staging.h"
+#include "shared/system_data/system_data_send.h"
+#include "shared/telemetry/telemetry_send_staging.h"
 #include "shared/udp_command_dispatcher.h"
 #include "shared/variables_programmatic.h"
 #include "shared/variables_vehicle_parameters.h"
@@ -180,7 +180,7 @@ void loop() {
 
   // Update the alarm states based on a range of error conditions and take necessary actions
   if (ptUpdateAlarmStates.call()) {
-    handleGlobalAlarmStates();
+    handleAllAlarmStatesSlave();
   }
 
   // Increment loop counter and report on performance stats if needed
