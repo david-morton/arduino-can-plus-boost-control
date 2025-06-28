@@ -25,7 +25,7 @@ static unsigned long firstAlarmCallTime    = 0;
 // Perform short alarm buzzer beep to ensure its working
 void performAlarmBuzzerStartupBeep() {
   DEBUG_GENERAL("Performing alarm buzzer startup beep ...");
-  tone(alarmBuzzerPin, 4000, 1500); // 4kHz for 1.5 seconds
+  tone(alarmBuzzerPin, ALARM_BUZZER_FREQUENCY_HZ, 1500); // 4kHz for 1.5 seconds
 }
 
 // Disable the buzzer
@@ -53,7 +53,7 @@ void alarmBuzzerEnable() {
   inAlarmDuration = millis() - firstAlarmCallTime;
 
   if (inAlarmDuration > ALARM_BUZZER_ERROR_DELAY_MS && !alarmBuzzerIsSounding) {
-    tone(alarmBuzzerPin, 4000); // 4kHz tone
+    tone(alarmBuzzerPin, ALARM_BUZZER_FREQUENCY_HZ); // 4kHz tone
     alarmBuzzerIsSounding = true;
     DEBUG_ERROR("Alarm buzzer enabled for critical condition, in alarm duration is: %lu ms", inAlarmDuration);
   }

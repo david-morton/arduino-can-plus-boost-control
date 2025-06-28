@@ -34,7 +34,7 @@ void initialiseAmbientLightSensor() {
   if (avail) {
     sensorAvailable = true;
     BH1750.start(); // Start the first measurement in setup since we will be using continuous mode
-    DEBUG_GENERAL("\tBH1750 light sensor initialized successfully.");
+    DEBUG_GENERAL("\t\tBH1750 light sensor initialized successfully.");
   } else {
     sensorAvailable = false;
     DEBUG_ERROR("\tFailed to initialize BH1750 light sensor! Sensor unavailable.");

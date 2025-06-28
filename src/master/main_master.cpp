@@ -38,7 +38,7 @@ bool debugGears            = false;
 bool debugGeneral          = true;
 bool debugPerformance      = true;
 bool debugSensorReadings   = true;
-bool debugTelemetry        = true;
+bool debugTelemetry        = false;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related

@@ -23,7 +23,9 @@ void evaluateGlobalAlarmStates() {
   globalAlarmCriticalState = localAlarmCriticalState || remoteAlarmCriticalState;
   globalAlarmWarningState  = localAlarmWarningState || remoteAlarmWarningState;
 
-  DEBUG_ERROR("Global Alarm States: Critical: %s, Warning: %s",
-              globalAlarmCriticalState ? "ON" : "OFF",
-              globalAlarmWarningState ? "ON" : "OFF");
+  if (globalAlarmWarningState || globalAlarmCriticalState) {
+    DEBUG_ERROR("Global Alarm States: Critical: %s, Warning: %s",
+                globalAlarmCriticalState ? "ON" : "OFF",
+                globalAlarmWarningState ? "ON" : "OFF");
+  }
 }

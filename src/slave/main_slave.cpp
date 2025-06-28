@@ -30,7 +30,7 @@
 
 bool debugError            = true;
 bool debugEthernetGeneral  = false;
-bool debugEthernetMessages = true;
+bool debugEthernetMessages = false;
 bool debugEthernetTraffic  = false;
 bool debugEthernetPing     = false;
 bool debugGears            = false;
@@ -95,7 +95,7 @@ ptScheduler ptUpdateCurrentEngineSpeedRpm = ptScheduler(PT_TIME_200MS); // Initi
 
 // Low frequency tasks (seconds)
 ptScheduler ptReadCurrentLuxReading          = ptScheduler(PT_TIME_2S);
-ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_5S);
+ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_1MIN);
 ptScheduler ptHandlePingTimeoutsAndLoss      = ptScheduler(PT_TIME_1MIN);
 ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
 
@@ -115,7 +115,7 @@ void setup() {
 
   configureAllPins();
   initialiseEthernetShield(ethConfigLocal);
-  initialiseAmbientLightSensor();
+  // initialiseAmbientLightSensor();
   performAlarmBuzzerStartupBeep();
 }
 
@@ -140,7 +140,7 @@ void loop() {
 
   // Read ambient light sensor value at a defined interval and store for transmission
   if (ptReadCurrentLuxReading.call()) {
-    buildTelemetryItem(SENSOR_LUX, currentAmbientLux = calculateAverageLux());
+    // buildTelemetryItem(SENSOR_LUX, currentAmbientLux = calculateAverageLux());
   }
 
   // Read the state of clutch and neutral switches, and update current variables

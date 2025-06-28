@@ -6,7 +6,6 @@
 
 // Structure to hold the critical alarm thresholds
 typedef struct {
-  int ambientLuxMin;
   int engineRpmMax;
 } AlarmThresholdsCritical;
 
@@ -21,8 +20,7 @@ typedef struct {
 
 // Critical alarm thresholds
 const AlarmThresholdsCritical alarmThresholdsCritical = {
-    .ambientLuxMin = 20,
-    .engineRpmMax  = 7500};
+    .engineRpmMax = 5000};
 
 // Warning alarm thresholds
 const AlarmThresholdsWarning alarmThresholdsWarning = {

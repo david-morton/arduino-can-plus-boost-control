@@ -20,7 +20,7 @@ typedef struct {
 
 // Critical alarm thresholds
 const AlarmThresholdsCritical alarmThresholdsCritical = {
-    .engineTemperature = 115};
+    .engineTemperature = -10};
 
 // Warning alarm thresholds
 const AlarmThresholdsWarning alarmThresholdsWarning = {

@@ -13,8 +13,7 @@
 
 // Check all current critical alarm conditions, and update the alarm state accordingly
 void updateLocalCriticalAlarmState() {
-  if (currentAmbientLux < alarmThresholdsCritical.ambientLuxMin ||
-      currentEngineSpeedRpm > alarmThresholdsCritical.engineRpmMax) {
+  if (currentEngineSpeedRpm > alarmThresholdsCritical.engineRpmMax) {
     localAlarmCriticalState = true;
   } else {
     localAlarmCriticalState = false;

@@ -33,7 +33,6 @@ void updateRpmPulse() {
 // Get the current RPM value
 int getCurrentEngineSpeedRpm() {
   if (latestRpmPulseCounter == 0) {
-    DEBUG_ERROR("No RPM pulses detected yet, returning 0 RPM");
     return 0; // No pulses detected yet
   }
 

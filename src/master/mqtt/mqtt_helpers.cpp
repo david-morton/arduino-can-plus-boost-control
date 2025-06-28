@@ -32,10 +32,10 @@ void connectMqttClientToBroker() {
     mqttClient.setKeepAlive(5);
 
     if (mqttClient.connect("arduino-client")) {
-      DEBUG_GENERAL("\tMQTT Client connected");
+      DEBUG_GENERAL("\t\tMQTT Client connected");
       mqttBrokerConnected = true;
     } else {
-      DEBUG_ERROR("\tMQTT Client NOT connected");
+      DEBUG_ERROR("\t\tMQTT Client NOT connected");
       mqttBrokerConnected = false;
     }
   }
