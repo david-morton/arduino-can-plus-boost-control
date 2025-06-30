@@ -32,7 +32,7 @@ void updateLocalWarningAlarmState() {
 // Take the necessary actions based on the current global alarm states
 void handleAllAlarmStatesSlave() {
   if (currentEngineSpeedRpm < 100) {
-    if (alarmBuzzerIsSounding) {
+    if (alarmBuzzerCriticalIsSounding) {
       alarmBuzzerDisable();
     }
     return; // Do not process alarms if the engine is not running
@@ -44,9 +44,9 @@ void handleAllAlarmStatesSlave() {
 
   // If the global critical alarm state is active, enable the buzzer
   if (globalAlarmCriticalState) {
-    alarmBuzzerEnable();
+    alarmBuzzerCriticalEnable();
   } else if (globalAlarmWarningState) {
-    // TAKE ACTIONS FOR WARNING ON SLAVE HERE
+    alarmBuzzerWarningEnable();
   } else {
     // If no alarms are active, disable the buzzer
     alarmBuzzerDisable();

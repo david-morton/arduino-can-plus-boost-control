@@ -158,12 +158,27 @@ void handleIncomingUdpMessage() {
   }
 }
 
-// Report on UDP received message statistics
+// Report on UDP received message statistics, including messages per second
 void reportUdpMessageReceiveStats() {
+  static unsigned long lastStatsReportTime = 0;
+  static unsigned long lastMessageCount = 0;
+
+  unsigned long currentTime = millis();
+  unsigned long elapsedTime = currentTime - lastStatsReportTime;
+  unsigned long messagesThisPeriod = receiveUdpTotalMessageCount - lastMessageCount;
+  float messagesPerSecond = 0.0f;
+
+  if (elapsedTime > 0) {
+    messagesPerSecond = (messagesThisPeriod * 1000.0f) / elapsedTime;
+  }
+
   float malformedPercentage     = (receiveUdpTotalMessageCount > 0) ? (receiveMalformedMessageCount * 100.0f / receiveUdpTotalMessageCount) : 0.0f;
   float outOfSequencePercentage = (receiveUdpTotalMessageCount > 0) ? (receiveOutOfSequenceCount * 100.0f / receiveUdpTotalMessageCount) : 0.0f;
 
-  DEBUG_PERFORMANCE("UDP messages received: %lu, Malformed: %.2f%% (%lu), Out of sequence: %.2f%% (%lu)",
+  DEBUG_PERFORMANCE("UDP messages received: %lu, Malformed: %.2f%% (%lu), Out of sequence: %.2f%% (%lu), Rate: %.2f msg/sec",
                     receiveUdpTotalMessageCount, malformedPercentage, receiveMalformedMessageCount,
-                    outOfSequencePercentage, receiveOutOfSequenceCount);
+                    outOfSequencePercentage, receiveOutOfSequenceCount, messagesPerSecond);
+
+  lastStatsReportTime = currentTime;
+  lastMessageCount = receiveUdpTotalMessageCount;
 }

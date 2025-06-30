@@ -82,7 +82,23 @@ void sendUdpMessageWithCommand(int commandId, const char *payload) {
   DEBUG_ETHERNET_MESSAGES("Sent UDP message with command ID %d: %s", commandId, udpMessage);
 }
 
-// Report the statistics of sent UDP messages
+// Track the time and count for messages per second calculation
+static unsigned long lastStatsReportTime = 0;
+static unsigned long lastSequenceNumber = 0;
+
 void reportUdpMessageSendStats() {
-  DEBUG_PERFORMANCE("UDP messages sent: %lu, Malformed: %lu", sendSequenceNumber, sendMalformedMessageCount);
+  unsigned long currentTime = millis();
+  unsigned long elapsed = currentTime - lastStatsReportTime;
+  unsigned long sentSinceLast = sendSequenceNumber - lastSequenceNumber;
+  float messagesPerSecond = 0.0f;
+
+  if (elapsed > 0) {
+    messagesPerSecond = (sentSinceLast * 1000.0f) / elapsed;
+  }
+
+  DEBUG_PERFORMANCE("UDP messages sent: %lu, Malformed: %lu, Rate: %.2f msg/s",
+                    sendSequenceNumber, sendMalformedMessageCount, messagesPerSecond);
+
+  lastStatsReportTime = currentTime;
+  lastSequenceNumber = sendSequenceNumber;
 }

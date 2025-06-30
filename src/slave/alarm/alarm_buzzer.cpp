@@ -14,9 +14,10 @@ const byte alarmBuzzerPin = ARDUINO_PIN_BUZZER;
    VARIABLES
    ====================================================================== */
 
-bool                 alarmBuzzerIsSounding = false;
-static unsigned long inAlarmDuration       = 0;
-static unsigned long firstAlarmCallTime    = 0;
+bool                 alarmBuzzerWarningIsSounding  = false;
+bool                 alarmBuzzerCriticalIsSounding = false;
+static unsigned long inAlarmDuration               = 0;
+static unsigned long firstAlarmCallTimeCritical    = 0;
 
 /* ======================================================================
    FUNCTION DEFINITIONS
@@ -25,36 +26,59 @@ static unsigned long firstAlarmCallTime    = 0;
 // Perform short alarm buzzer beep to ensure its working
 void performAlarmBuzzerStartupBeep() {
   DEBUG_GENERAL("Performing alarm buzzer startup beep ...");
-  tone(alarmBuzzerPin, ALARM_BUZZER_FREQUENCY_HZ, 1500); // 4kHz for 1.5 seconds
+  tone(alarmBuzzerPin, ALARM_BUZZER_FREQUENCY_HZ, 1500);
 }
 
 // Disable the buzzer
 void alarmBuzzerDisable() {
   // Return quickly if alarm is not sounding
-  if (!alarmBuzzerIsSounding) {
+  if (!alarmBuzzerCriticalIsSounding && !alarmBuzzerWarningIsSounding) {
     return;
   }
   noTone(alarmBuzzerPin);
-  firstAlarmCallTime    = 0;
-  alarmBuzzerIsSounding = false;
-  DEBUG_ERROR("Alarm buzzer disabled for critical condition, in alarm duration was: %lu ms", inAlarmDuration);
+  firstAlarmCallTimeCritical    = 0;
+  alarmBuzzerCriticalIsSounding = false;
+  alarmBuzzerWarningIsSounding  = false;
+  DEBUG_ERROR("Alarm buzzer disabled, in alarm duration was: %lu ms", inAlarmDuration);
 }
 
-// Sound the buzzer if the engine is running, and after a delay
-void alarmBuzzerEnable() {
-  if (alarmBuzzerIsSounding) {
+// Sound the critical buzzer after a delay
+void alarmBuzzerCriticalEnable() {
+  if (alarmBuzzerCriticalIsSounding) {
     return; // Return quickly if the buzzer is already sounding
   }
 
-  if (firstAlarmCallTime == 0) {
-    firstAlarmCallTime = millis();
+  if (firstAlarmCallTimeCritical == 0) {
+    firstAlarmCallTimeCritical = millis();
   }
 
-  inAlarmDuration = millis() - firstAlarmCallTime;
+  inAlarmDuration = millis() - firstAlarmCallTimeCritical;
 
-  if (inAlarmDuration > ALARM_BUZZER_ERROR_DELAY_MS && !alarmBuzzerIsSounding) {
+  if (inAlarmDuration > ALARM_BUZZER_ERROR_DELAY_MS && !alarmBuzzerCriticalIsSounding) {
     tone(alarmBuzzerPin, ALARM_BUZZER_FREQUENCY_HZ); // 4kHz tone
-    alarmBuzzerIsSounding = true;
+    alarmBuzzerCriticalIsSounding = true;
     DEBUG_ERROR("Alarm buzzer enabled for critical condition, in alarm duration is: %lu ms", inAlarmDuration);
+  }
+}
+
+// Sound the warning buzzer
+static unsigned long firstAlarmCallTimeWarning;
+static unsigned long lastAlarmCallTimeWarning;
+
+void alarmBuzzerWarningEnable() {
+  if (!alarmBuzzerWarningIsSounding) {
+    tone(alarmBuzzerPin, ALARM_BUZZER_FREQUENCY_HZ, ALARM_BUZZER_WARNING_ON_DURATION_MS);
+    alarmBuzzerWarningIsSounding = true;
+    firstAlarmCallTimeWarning    = millis();
+    lastAlarmCallTimeWarning     = millis();
+    DEBUG_ERROR("Alarm buzzer enabled for warning condition");
+    return;
+  }
+
+  if (alarmBuzzerWarningIsSounding && millis() > (lastAlarmCallTimeWarning + ALARM_BUZZER_WARNING_OFF_DURATION_MS)) {
+    tone(alarmBuzzerPin, ALARM_BUZZER_FREQUENCY_HZ, ALARM_BUZZER_WARNING_ON_DURATION_MS);
+    lastAlarmCallTimeWarning = millis();
+    DEBUG_ERROR("Alarm buzzer still sounding for warning condition, in alarm duration is: %lu ms",
+                millis() - firstAlarmCallTimeWarning);
   }
 }
