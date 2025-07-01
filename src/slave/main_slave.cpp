@@ -11,6 +11,7 @@
 #include "pin_assignments_slave.h"
 #include "pin_configuration_slave.h"
 #include "shared/command_ids.h"
+#include "shared/common_task_scheduling.h"
 #include "shared/debug_logging.h"
 #include "shared/ethernet/ethernet_helpers.h"
 #include "shared/ethernet/ethernet_ping_monitor.h"
@@ -85,6 +86,7 @@ int currentEngineSpeedRpm            = 0;
    ====================================================================== */
 
 // High frequency tasks (tens of milliseconds)
+ptScheduler ptHandleCommonTasks = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
 
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptReadSwitchStateClutch       = ptScheduler(PT_TIME_100MS);
@@ -95,7 +97,6 @@ ptScheduler ptUpdateCurrentEngineSpeedRpm = ptScheduler(PT_TIME_200MS); // Initi
 
 // Low frequency tasks (seconds)
 ptScheduler ptReadCurrentLuxReading          = ptScheduler(PT_TIME_2S);
-ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_1MIN);
 ptScheduler ptHandlePingTimeoutsAndLoss      = ptScheduler(PT_TIME_10S);
 ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
 
@@ -115,7 +116,7 @@ void setup() {
 
   configureAllPins();
   initialiseEthernetShield(ethConfigLocal);
-  // initialiseAmbientLightSensor();
+  initialiseAmbientLightSensor();
   performAlarmBuzzerStartupBeep();
 }
 
@@ -124,9 +125,16 @@ void setup() {
    ====================================================================== */
 
 void loop() {
+  // Increment loop counter so it's up to date when we report performance stats
+  arduinoLoopExecutionCount++;
 
   // Check for, and process any incoming UDP messages as fast as possible within the main loop
   handleIncomingUdpMessage();
+
+  // Handle shared scheduled tasks. Most of these are common tasks that are run on both master and slave Arduinos
+  if (ptHandleCommonTasks.call()) {
+    handleCommonScheduledTasks();
+  }
 
   // Report ping RTT stats (if needed) from buffer average
   if (ptHandlePingTimeoutsAndLoss.call()) {
@@ -140,7 +148,7 @@ void loop() {
 
   // Read ambient light sensor value at a defined interval and store for transmission
   if (ptReadCurrentLuxReading.call()) {
-    // buildTelemetryItem(SENSOR_LUX, currentAmbientLux = calculateAverageLux());
+    buildTelemetryItem(SENSOR_LUX, currentAmbientLux = calculateAverageLux());
   }
 
   // Read the state of clutch and neutral switches, and update current variables
@@ -181,17 +189,5 @@ void loop() {
   // Update the alarm states based on a range of error conditions and take necessary actions
   if (ptUpdateAlarmStates.call()) {
     handleAllAlarmStatesSlave();
-  }
-
-  // Increment loop counter and report on performance stats if needed
-  static unsigned long arduinoLoopExecutionCount = 0;
-
-  if (debugPerformance && millis() > 10000) {
-    arduinoLoopExecutionCount++;
-    if (ptReportArduinoPerformanceStats.call()) {
-      reportArduinoLoopRate(&arduinoLoopExecutionCount);
-      reportUdpMessageSendStats();
-      reportUdpMessageReceiveStats();
-    }
   }
 }

@@ -9,6 +9,7 @@
 #include "rtc/rtc_sensor.h"
 #include "shared/alarm/alarm_helpers.h"
 #include "shared/command_ids.h"
+#include "shared/common_task_scheduling.h"
 #include "shared/debug_logging.h"
 #include "shared/ethernet/ethernet_helpers.h"
 #include "shared/ethernet/ethernet_ping_monitor.h"
@@ -92,6 +93,7 @@ float currentVehicleSpeedRearKph  = 0; // Vehicle speed from rear wheels
 
 // High frequency tasks (tens of milliseconds)
 ptScheduler ptReadCurrentEngineSpeedRpm = ptScheduler(PT_TIME_50MS);
+ptScheduler ptHandleCommonTasks         = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
 
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptReadSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
@@ -102,7 +104,6 @@ ptScheduler ptUpdateAlarmStates      = ptScheduler(PT_TIME_200MS);
 // Low frequency tasks (seconds)
 ptScheduler ptGetCurrentLuxReading           = ptScheduler(PT_TIME_2S);
 ptScheduler ptGetElectronicsTemperature      = ptScheduler(PT_TIME_1MIN);
-ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_1MIN);
 ptScheduler ptHandlePingTimeoutsAndLoss      = ptScheduler(PT_TIME_10S);
 ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
 
@@ -131,12 +132,19 @@ void setup() {
    ====================================================================== */
 
 void loop() {
+  // Increment loop counter so it's up to date when we report performance stats
+  arduinoLoopExecutionCount++;
 
   // Check for, and process any incoming CAN messages as fast as possible within the main loop
   checkAndProcessCanMessages();
 
   // Check for, and process any incoming UDP messages as fast as possible within the main loop
   handleIncomingUdpMessage();
+
+  // Handle shared scheduled tasks. Most of these are common tasks that are run on both master and slave Arduinos
+  if (ptHandleCommonTasks.call()) {
+    handleCommonScheduledTasks();
+  }
 
   // Report ping RTT stats (if needed) from buffer average
   if (ptHandlePingTimeoutsAndLoss.call()) {
@@ -196,18 +204,5 @@ void loop() {
   // Update the alarm states based on a range of error conditions and take necessary actions
   if (ptUpdateAlarmStates.call()) {
     handleAllAlarmStatesMaster();
-  }
-
-  // Increment loop counter and report on performance stats if needed
-  static unsigned long arduinoLoopExecutionCount = 0;
-
-  if (debugPerformance && millis() > 10000) {
-    arduinoLoopExecutionCount++;
-    if (ptReportArduinoPerformanceStats.call()) {
-      reportArduinoLoopRate(&arduinoLoopExecutionCount);
-      reportUdpMessageSendStats();
-      reportUdpMessageReceiveStats();
-      reportReceiveCanMessageRate();
-    }
   }
 }
