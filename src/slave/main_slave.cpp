@@ -37,7 +37,7 @@ bool debugGears            = false;
 bool debugGeneral          = true;
 bool debugMux              = false;
 bool debugPerformance      = true;
-bool debugSensorReadings   = false;
+bool debugSensorReadings   = true;
 bool debugTelemetry        = false;
 
 /* ======================================================================
@@ -96,7 +96,7 @@ ptScheduler ptUpdateCurrentEngineSpeedRpm = ptScheduler(PT_TIME_200MS); // Initi
 // Low frequency tasks (seconds)
 ptScheduler ptReadCurrentLuxReading          = ptScheduler(PT_TIME_2S);
 ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_1MIN);
-ptScheduler ptHandlePingTimeoutsAndLoss      = ptScheduler(PT_TIME_1MIN);
+ptScheduler ptHandlePingTimeoutsAndLoss      = ptScheduler(PT_TIME_10S);
 ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
 
 // Send different message classes to remote Arduino

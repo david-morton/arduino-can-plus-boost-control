@@ -3,11 +3,13 @@
 #include <Arduino.h>
 #include <Ethernet.h>
 
-// Define the moving window array size for ping response times
-#define RTT_BUFFER_SIZE 50
+// Define the moving window array size for ping response times.
+// This should be set relative to the ping frequency and sensitivity of setting an alarm condition.
+#define RTT_BUFFER_SIZE 20
 
+// Define the maximum number of outstanding pings that can be tracked and the timeout period for a ping response.
 #define MAX_OUTSTANDING_PINGS 20
-#define PING_TIMEOUT_MICROS 1000000UL // 5 seconds
+#define PING_TIMEOUT_MICROS 2000000UL // 2 seconds
 
 /* ======================================================================
    STRUCTURES

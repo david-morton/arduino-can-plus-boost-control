@@ -20,12 +20,17 @@ bool remoteAlarmWarningState  = false; // Remote warning alarm state, true if an
 
 // Evaluate the current alarm states and update global states
 void evaluateGlobalAlarmStates() {
+  static bool lastCriticalState = false;
+  static bool lastWarningState  = false;
+
   globalAlarmCriticalState = localAlarmCriticalState || remoteAlarmCriticalState;
   globalAlarmWarningState  = localAlarmWarningState || remoteAlarmWarningState;
 
-  if (globalAlarmWarningState || globalAlarmCriticalState) {
-    DEBUG_ERROR("Global Alarm States: Critical: %s, Warning: %s",
+  if (globalAlarmCriticalState != lastCriticalState || globalAlarmWarningState != lastWarningState) {
+    DEBUG_ERROR("Global alarm state change detected: Critical: %s, Warning: %s",
                 globalAlarmCriticalState ? "ON" : "OFF",
                 globalAlarmWarningState ? "ON" : "OFF");
+    lastCriticalState = globalAlarmCriticalState;
+    lastWarningState  = globalAlarmWarningState;
   }
 }

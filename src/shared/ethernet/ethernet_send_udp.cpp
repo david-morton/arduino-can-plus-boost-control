@@ -90,13 +90,13 @@ void reportUdpMessageSendStats() {
   unsigned long currentTime = millis();
   unsigned long elapsed = currentTime - lastStatsReportTime;
   unsigned long sentSinceLast = sendSequenceNumber - lastSequenceNumber;
-  float messagesPerSecond = 0.0f;
+  unsigned int messagesPerSecond = 0;
 
   if (elapsed > 0) {
-    messagesPerSecond = (sentSinceLast * 1000.0f) / elapsed;
+    messagesPerSecond = (sentSinceLast * 1000) / elapsed;
   }
 
-  DEBUG_PERFORMANCE("UDP messages sent: %lu, Malformed: %lu, Rate: %.2f msg/s",
+  DEBUG_PERFORMANCE("UDP messages sent: %lu, Malformed: %lu, Rate: %u msg/s",
                     sendSequenceNumber, sendMalformedMessageCount, messagesPerSecond);
 
   lastStatsReportTime = currentTime;

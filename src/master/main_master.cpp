@@ -38,7 +38,7 @@ bool debugGears            = false;
 bool debugGeneral          = true;
 bool debugPerformance      = true;
 bool debugSensorReadings   = true;
-bool debugTelemetry        = false;
+bool debugTelemetry        = true;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related
@@ -103,7 +103,7 @@ ptScheduler ptUpdateAlarmStates      = ptScheduler(PT_TIME_200MS);
 ptScheduler ptGetCurrentLuxReading           = ptScheduler(PT_TIME_2S);
 ptScheduler ptGetElectronicsTemperature      = ptScheduler(PT_TIME_1MIN);
 ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_1MIN);
-ptScheduler ptHandlePingTimeoutsAndLoss      = ptScheduler(PT_TIME_1MIN);
+ptScheduler ptHandlePingTimeoutsAndLoss      = ptScheduler(PT_TIME_10S);
 ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
 
 // Send different message classes to remote Arduino
