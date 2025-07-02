@@ -15,7 +15,7 @@ void checkAndProcessCanMessages() {
     currentVehicleSpeedFrontKph = result.vehicleSpeedFront;
     currentVehicleSpeedRearKph  = result.vehicleSpeedRear;
     DEBUG_CAN_BMW("Received BMW CAN message: Front Speed: %.2f kph, Rear Speed: %.2f kph", currentVehicleSpeedFrontKph, currentVehicleSpeedRearKph);
-    updateReceiveCanMessageCount();
+    updateReceiveCanMessageCountBmw();
   }
 }
 

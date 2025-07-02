@@ -32,7 +32,7 @@ void updateLocalWarningAlarmState() {
 // Take the necessary actions based on the current global alarm states
 void handleAllAlarmStatesSlave() {
   if (currentEngineSpeedRpm < 100) {
-    if (alarmBuzzerCriticalIsSounding) {
+    if (alarmBuzzerCriticalIsSounding || alarmBuzzerWarningIsSounding) {
       alarmBuzzerDisable();
     }
     return; // Do not process alarms if the engine is not running

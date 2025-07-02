@@ -38,7 +38,7 @@ bool debugGears            = false;
 bool debugGeneral          = true;
 bool debugMux              = false;
 bool debugPerformance      = true;
-bool debugSensorReadings   = true;
+bool debugSensorReadings   = false;
 bool debugTelemetry        = false;
 
 /* ======================================================================

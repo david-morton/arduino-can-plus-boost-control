@@ -1,5 +1,6 @@
 #include <Arduino.h>
 
+#include "../../shared/alarm/alarm_helpers.h"
 #include "../../shared/debug_logging.h"
 #include "../pin_assignments_slave.h"
 #include "alarm_buzzer.h"
@@ -83,6 +84,14 @@ void alarmBuzzerCriticalEnable() {
 
 // Sound the warning buzzer
 void alarmBuzzerWarningEnable() {
+  // Cater for transition from critical to warning state directly
+  if (!globalAlarmCriticalState) {
+    noTone(alarmBuzzerPin);
+    alarmBuzzerCriticalIsSounding = false;
+    firstAlarmCallTimeCritical    = 0;
+  }
+
+  // Initiate the buzzer warning sound if not already sounding
   if (!alarmBuzzerWarningIsSounding) {
     tone(alarmBuzzerPin, ALARM_BUZZER_FREQUENCY_HZ, ALARM_BUZZER_WARNING_ON_DURATION_MS);
     alarmBuzzerWarningIsSounding = true;
@@ -91,7 +100,7 @@ void alarmBuzzerWarningEnable() {
     DEBUG_ERROR("Alarm buzzer enabled for warning condition");
     return;
   }
-
+  // If the buzzer is already sounding, check if it needs to be re-triggered
   if (alarmBuzzerWarningIsSounding && millis() > (lastAlarmCallTimeWarning + ALARM_BUZZER_WARNING_OFF_DURATION_MS)) {
     tone(alarmBuzzerPin, ALARM_BUZZER_FREQUENCY_HZ, ALARM_BUZZER_WARNING_ON_DURATION_MS);
     lastAlarmCallTimeWarning = millis();

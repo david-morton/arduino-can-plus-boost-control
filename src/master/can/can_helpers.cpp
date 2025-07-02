@@ -16,17 +16,17 @@ mcp2515_can CAN_NISSAN(CAN_SPI_CS_PIN_NISSAN);
    VARIABLES
    ====================================================================== */
 
-int           setupRetriesMax             = 5; // Maximum number of retries for initialising CAN modules
-unsigned long receiveCanRateMessageCount  = 0;
-unsigned long receiveCanRateLasttimestamp = millis();
+int           setupRetriesMax               = 5; // Maximum number of retries for initialising CAN modules
+unsigned long receiveCanRateMessageCountBmw = 0;
+unsigned long receiveCanRateLasttimestamp   = millis();
 
 /* ======================================================================
    FUNCTION DEFINITIONS
    ====================================================================== */
 
 // Update the total number of received CAN messages
-void updateReceiveCanMessageCount() {
-  receiveCanRateMessageCount++;
+void updateReceiveCanMessageCountBmw() {
+  receiveCanRateMessageCountBmw++;
 }
 
 // Output CAN message rate (msgs/sec) since last call
@@ -35,12 +35,12 @@ void reportReceiveCanMessageRate() {
 
   unsigned long elapsedMs = currentTime - receiveCanRateLasttimestamp;
   if (elapsedMs >= 1000) {
-    unsigned long rate = (elapsedMs > 0) ? ((receiveCanRateMessageCount * 1000UL) / elapsedMs) : 0;
+    unsigned long rate = (elapsedMs > 0) ? ((receiveCanRateMessageCountBmw * 1000UL) / elapsedMs) : 0;
 
-    DEBUG_PERFORMANCE("CAN message rate: %lu msg/s", rate);
+    DEBUG_PERFORMANCE("CAN message processing rate BMW: %lu msg/s", rate);
 
-    receiveCanRateLasttimestamp = currentTime;
-    receiveCanRateMessageCount  = 0;
+    receiveCanRateLasttimestamp   = currentTime;
+    receiveCanRateMessageCountBmw = 0;
   }
 }
 
