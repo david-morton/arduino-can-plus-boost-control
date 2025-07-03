@@ -13,9 +13,15 @@ typedef struct {
   unsigned long timestamp;
 } bmwCanValues;
 
+// Struct to hold the values read from the Nissan CAN bus
+typedef struct {
+  int engineTempCelsius;
+} nissanCanValues;
+
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
 
-void         checkAndProcessCanMessages();
-bool         readBmwDataFromCan(mcp2515_can &can, bmwCanValues &bmwCanData);
+void checkAndProcessCanMessages();
+bool readBmwDataFromCan(mcp2515_can &can, bmwCanValues &bmwCanData);
+bool readNissanDataFromCan(mcp2515_can &can, nissanCanValues &nissanCanData);

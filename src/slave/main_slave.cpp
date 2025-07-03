@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <ptScheduler.h>
 
-#include "../shared/alarm/alarm_helpers.h"
 #include "alarm/alarm_buzzer.h"
 #include "alarm/alarms_slave.h"
 #include "engine_speed/engine_speed.h"
@@ -10,14 +9,13 @@
 #include "mux/mux_readers.h"
 #include "pin_assignments_slave.h"
 #include "pin_configuration_slave.h"
+#include "shared/alarm/alarm_helpers.h"
 #include "shared/command_ids.h"
 #include "shared/common_task_scheduling.h"
 #include "shared/debug_logging.h"
 #include "shared/ethernet/ethernet_helpers.h"
-// #include "shared/ethernet/ethernet_ping_monitor.h"
 #include "shared/ethernet/ethernet_receive_udp.h"
 #include "shared/ethernet/ethernet_send_udp.h"
-// #include "shared/system_data/system_data_send.h"
 #include "shared/telemetry/telemetry_send_staging.h"
 #include "shared/udp_command_dispatcher.h"
 #include "shared/variables_programmatic.h"
@@ -95,7 +93,7 @@ ptScheduler ptUpdateAlarmStatesSlave      = ptScheduler(PT_TIME_200MS);
 ptScheduler ptUpdateCurrentEngineSpeedRpm = ptScheduler(PT_TIME_200MS); // Initially set to 200ms, will be adjusted based on current RPM
 
 // Low frequency tasks (seconds)
-ptScheduler ptReadCurrentLuxReading          = ptScheduler(PT_TIME_2S);
+ptScheduler ptReadCurrentLuxReading = ptScheduler(PT_TIME_2S);
 
 /* ======================================================================
    SETUP

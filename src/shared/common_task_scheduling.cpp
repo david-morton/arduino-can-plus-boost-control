@@ -2,14 +2,13 @@
 #include <ptScheduler.h>
 
 #include "../shared/common_task_scheduling.h"
+#include "shared/command_ids.h"
 #include "shared/debug_logging.h"
+#include "shared/ethernet/ethernet_ping_monitor.h"
 #include "shared/ethernet/ethernet_receive_udp.h"
 #include "shared/ethernet/ethernet_send_udp.h"
 #include "shared/system_data/system_data_send.h"
 #include "shared/telemetry/telemetry_send_staging.h"
-#include "shared/command_ids.h"
-#include "shared/ethernet/ethernet_ping_monitor.h"
-
 
 #ifdef ARDUINO_MASTER
 #include "../master/can/can_helpers.h"
@@ -28,7 +27,7 @@ unsigned long arduinoLoopExecutionCount = 0;
 // High frequency tasks (tens of milliseconds)
 
 // Medium frequency tasks (hundreds of milliseconds)
-ptScheduler ptSendDataStateToRemote  = ptScheduler(PT_TIME_200MS);
+ptScheduler ptSendDataStateToRemote = ptScheduler(PT_TIME_200MS);
 
 // Low frequency tasks (seconds)
 ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_1MIN);
@@ -75,7 +74,7 @@ void handleCommonScheduledTasks() {
     sendArduinoPingRequest();
   }
 
-   // Update and output loop rate if needed
+  // Update and output loop rate if needed
   if (debugPerformance && millis() > 10000) {
     arduinoLoopExecutionCount++;
     if (ptReportArduinoPerformanceStats.call()) {

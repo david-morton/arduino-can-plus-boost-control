@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#include <mcp2515_can.h> // Used for MCP2515 CAN modules
-#include <ptScheduler.h> // The task scheduling library of choice
+#include <mcp2515_can.h>
+#include <ptScheduler.h>
 
 #include "alarm/alarms_master.h"
 #include "can/can_helpers.h"
@@ -12,10 +12,8 @@
 #include "shared/common_task_scheduling.h"
 #include "shared/debug_logging.h"
 #include "shared/ethernet/ethernet_helpers.h"
-// #include "shared/ethernet/ethernet_ping_monitor.h"
 #include "shared/ethernet/ethernet_receive_udp.h"
 #include "shared/ethernet/ethernet_send_udp.h"
-// #include "shared/system_data/system_data_send.h"
 #include "shared/telemetry/telemetry_receive_parser.h"
 #include "shared/telemetry/telemetry_send_staging.h"
 #include "shared/udp_command_dispatcher.h"
@@ -101,8 +99,8 @@ ptScheduler ptReadSwitchStateNeutral  = ptScheduler(PT_TIME_100MS);
 ptScheduler ptUpdateAlarmStatesMaster = ptScheduler(PT_TIME_200MS);
 
 // Low frequency tasks (seconds)
-ptScheduler ptGetCurrentLuxReading           = ptScheduler(PT_TIME_2S);
-ptScheduler ptGetElectronicsTemperature      = ptScheduler(PT_TIME_1MIN);
+ptScheduler ptGetCurrentLuxReading      = ptScheduler(PT_TIME_2S);
+ptScheduler ptGetElectronicsTemperature = ptScheduler(PT_TIME_1MIN);
 
 /* ======================================================================
    SETUP

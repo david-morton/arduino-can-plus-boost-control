@@ -20,3 +20,4 @@ void initialiseCanModule(mcp2515_can &canModule, const char *label);
 void initialiseCanModules();
 void reportReceiveCanMessageRate();
 void updateReceiveCanMessageCountBmw();
+void updateReceiveCanMessageCountNissan();

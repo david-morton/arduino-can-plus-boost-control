@@ -9,13 +9,20 @@
 
 // Check flags and process messages accordingly
 void checkAndProcessCanMessages() {
-  bmwCanValues result;
+  bmwCanValues    bmwResults;
+  nissanCanValues nissanResults;
 
-  if (readBmwDataFromCan(CAN_BMW, result)) {
-    currentVehicleSpeedFrontKph = result.vehicleSpeedFront;
-    currentVehicleSpeedRearKph  = result.vehicleSpeedRear;
+  if (readBmwDataFromCan(CAN_BMW, bmwResults)) {
+    currentVehicleSpeedFrontKph = bmwResults.vehicleSpeedFront;
+    currentVehicleSpeedRearKph  = bmwResults.vehicleSpeedRear;
     DEBUG_CAN_BMW("Received BMW CAN message: Front Speed: %.2f kph, Rear Speed: %.2f kph", currentVehicleSpeedFrontKph, currentVehicleSpeedRearKph);
     updateReceiveCanMessageCountBmw();
+  }
+
+  if (readNissanDataFromCan(CAN_NISSAN, nissanResults)) {
+    currentEngineTempCelcius = nissanResults.engineTempCelsius;
+    DEBUG_CAN_BMW("Received Nissan CAN message: Engine temperature: %d°C", currentEngineTempCelcius);
+    updateReceiveCanMessageCountNissan();
   }
 }
 
@@ -51,4 +58,23 @@ bool readBmwDataFromCan(mcp2515_can &can, bmwCanValues &bmwCanData) {
   }
 
   return false; // No matching 0x1F0 message found
+}
+
+// Read data from the Nissan CAN bus and calculate engine temperature
+bool readNissanDataFromCan(mcp2515_can &can, nissanCanValues &nissanCanData) {
+  unsigned char len = 0;
+  unsigned char buf[8];
+
+  while (CAN_MSGAVAIL == can.checkReceive()) {
+    can.readMsgBuf(&len, buf);
+    unsigned long canId = can.getCanId();
+
+    // Get the current engine temperature from data sent by Nissan on ID 0x551
+    if (canId == 0x551) {
+      nissanCanData.engineTempCelsius = (buf[0] - 40); // Convert to Celsius
+      return true;
+    }
+  }
+
+  return false; // No matching 0x551 message found
 }

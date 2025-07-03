@@ -10,4 +10,4 @@ extern unsigned long arduinoLoopExecutionCount;
    FUNCTION PROTOTYPES
    ====================================================================== */
 
-   void handleCommonScheduledTasks();
+void handleCommonScheduledTasks();
