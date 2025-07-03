@@ -14,10 +14,10 @@
 #include "shared/common_task_scheduling.h"
 #include "shared/debug_logging.h"
 #include "shared/ethernet/ethernet_helpers.h"
-#include "shared/ethernet/ethernet_ping_monitor.h"
+// #include "shared/ethernet/ethernet_ping_monitor.h"
 #include "shared/ethernet/ethernet_receive_udp.h"
 #include "shared/ethernet/ethernet_send_udp.h"
-#include "shared/system_data/system_data_send.h"
+// #include "shared/system_data/system_data_send.h"
 #include "shared/telemetry/telemetry_send_staging.h"
 #include "shared/udp_command_dispatcher.h"
 #include "shared/variables_programmatic.h"
@@ -91,19 +91,11 @@ ptScheduler ptHandleCommonTasks = ptScheduler(PT_TIME_10MS); // Common tasks tha
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptReadSwitchStateClutch       = ptScheduler(PT_TIME_100MS);
 ptScheduler ptReadSwitchStateNeutral      = ptScheduler(PT_TIME_100MS);
-ptScheduler ptSendDataStateToRemote       = ptScheduler(PT_TIME_200MS);
-ptScheduler ptUpdateAlarmStates           = ptScheduler(PT_TIME_200MS);
+ptScheduler ptUpdateAlarmStatesSlave      = ptScheduler(PT_TIME_200MS);
 ptScheduler ptUpdateCurrentEngineSpeedRpm = ptScheduler(PT_TIME_200MS); // Initially set to 200ms, will be adjusted based on current RPM
 
 // Low frequency tasks (seconds)
 ptScheduler ptReadCurrentLuxReading          = ptScheduler(PT_TIME_2S);
-ptScheduler ptHandlePingTimeoutsAndLoss      = ptScheduler(PT_TIME_10S);
-ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
-
-// Send different message classes to remote Arduino
-ptScheduler ptSendLowFrequencyMessages    = ptScheduler(PT_TIME_1S);
-ptScheduler ptSendMediumFrequencyMessages = ptScheduler(PT_TIME_100MS);
-ptScheduler ptSendHighFrequencyMessages   = ptScheduler(PT_TIME_20MS);
 
 /* ======================================================================
    SETUP
@@ -136,16 +128,6 @@ void loop() {
     handleCommonScheduledTasks();
   }
 
-  // Report ping RTT stats (if needed) from buffer average
-  if (ptHandlePingTimeoutsAndLoss.call()) {
-    handlePingTimeoutsAndLoss();
-  }
-
-  // Issue ping request to remote Arduino
-  if (ptSendPingRequestToRemoteArduino.call()) {
-    sendArduinoPingRequest();
-  }
-
   // Read ambient light sensor value at a defined interval and store for transmission
   if (ptReadCurrentLuxReading.call()) {
     buildTelemetryItem(SENSOR_LUX, currentAmbientLux = calculateAverageLux());
@@ -166,28 +148,8 @@ void loop() {
     updateRpmSchedulerFrequency(ptUpdateCurrentEngineSpeedRpm, currentEngineSpeedRpm);
   }
 
-  // Send low frequency messages
-  if (ptSendLowFrequencyMessages.call()) {
-    sendStagedTelemetry(MSG_SLAVE_LOW_FREQUENCY, CMD_LOW_FREQUENCY_MESSAGES);
-  }
-
-  // Send medium frequency messages
-  if (ptSendMediumFrequencyMessages.call()) {
-    sendStagedTelemetry(MSG_SLAVE_MED_FREQUENCY, CMD_MED_FREQUENCY_MESSAGES);
-  }
-
-  // Send high frequency messages
-  if (ptSendHighFrequencyMessages.call()) {
-    sendStagedTelemetry(MSG_SLAVE_HIGH_FREQUENCY, CMD_HIGH_FREQUENCY_MESSAGES);
-  }
-
-  // Send shared system data state to remote Arduino
-  if (ptSendDataStateToRemote.call()) {
-    sendDataStateToRemote();
-  }
-
   // Update the alarm states based on a range of error conditions and take necessary actions
-  if (ptUpdateAlarmStates.call()) {
+  if (ptUpdateAlarmStatesSlave.call()) {
     handleAllAlarmStatesSlave();
   }
 }
