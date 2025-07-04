@@ -21,7 +21,7 @@
 unsigned long arduinoLoopExecutionCount = 0;
 
 /* ======================================================================
-   OBJECTS: Pretty tiny scheduler objects / tasks
+   SCHEDULER OBJECTS
    ====================================================================== */
 
 // High frequency tasks (tens of milliseconds)

@@ -1,7 +1,7 @@
 #pragma once
 
 /* ======================================================================
-   ENUMS
+   ENUM DEFINITIONS
    ====================================================================== */
 
 // Mapping of command IDs to their respective commands

@@ -5,6 +5,8 @@
 #include "alarm/alarms_master.h"
 #include "can/can_helpers.h"
 #include "can/can_receive.h"
+#include "can/can_send.h"
+#include "check_light/check_light.h"
 #include "mqtt/mqtt_helpers.h"
 #include "rtc/rtc_sensor.h"
 #include "shared/alarm/alarm_helpers.h"
@@ -92,6 +94,7 @@ float currentVehicleSpeedRearKph  = 0; // Vehicle speed from rear wheels
 // High frequency tasks (tens of milliseconds)
 ptScheduler ptReadCurrentEngineSpeedRpm = ptScheduler(PT_TIME_50MS);
 ptScheduler ptHandleCommonTasks         = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
+ptScheduler ptSendCanMessages           = ptScheduler(PT_TIME_10MS); // Send CAN messages to BMW network
 
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptReadSwitchStateClutch   = ptScheduler(PT_TIME_100MS);
@@ -99,6 +102,7 @@ ptScheduler ptReadSwitchStateNeutral  = ptScheduler(PT_TIME_100MS);
 ptScheduler ptUpdateAlarmStatesMaster = ptScheduler(PT_TIME_200MS);
 
 // Low frequency tasks (seconds)
+ptScheduler ptUpdateCheckLightStatus    = ptScheduler(PT_TIME_1S);
 ptScheduler ptGetCurrentLuxReading      = ptScheduler(PT_TIME_2S);
 ptScheduler ptGetElectronicsTemperature = ptScheduler(PT_TIME_1MIN);
 
@@ -159,6 +163,16 @@ void loop() {
   // Read the electronics temperature from the RTC sensor
   if (ptGetElectronicsTemperature.call()) {
     currentElectronicsTemp = getRtcCurrentTemperature();
+  }
+
+  // Update the status of the check light
+  if (ptUpdateCheckLightStatus.call()) {
+    updateCheckLightStatus();
+  }
+
+  // Send required CAN messages to the BMW network
+  if (ptSendCanMessages.call()) {
+    sendCanMessages();
   }
 
   // Update the alarm states based on a range of error conditions and take necessary actions

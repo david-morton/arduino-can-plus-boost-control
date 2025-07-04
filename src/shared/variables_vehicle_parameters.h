@@ -44,3 +44,4 @@ extern int   currentEngineTempCelcius;
 extern int currentBoostTargetKpa;
 extern int currentGear;
 extern int currentRadiatorFanDutyPercentage;
+extern int currentCheckEngineLightState;

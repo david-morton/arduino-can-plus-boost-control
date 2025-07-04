@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 /* ======================================================================
-   ENUMS
+   ENUM DEFINITIONS
    ====================================================================== */
 
 // This enum defines the telemetry fields we can use across message classes.
