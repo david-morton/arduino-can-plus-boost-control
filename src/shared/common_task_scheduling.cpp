@@ -51,17 +51,17 @@ void handleCommonScheduledTasks() {
 
   // Send low frequency messages
   if (ptSendLowFrequencyMessages.call()) {
-    sendStagedTelemetry(MSG_MASTER_LOW_FREQUENCY, CMD_LOW_FREQUENCY_MESSAGES);
+    sendStagedTelemetry(TELEMETRY_CLASS_LOW, CMD_LOW_FREQUENCY_MESSAGES);
   }
 
   // Send medium frequency messages
   if (ptSendMediumFrequencyMessages.call()) {
-    sendStagedTelemetry(MSG_MASTER_MED_FREQUENCY, CMD_MED_FREQUENCY_MESSAGES);
+    sendStagedTelemetry(TELEMETRY_CLASS_MED, CMD_MED_FREQUENCY_MESSAGES);
   }
 
   // Send high frequency messages
   if (ptSendHighFrequencyMessages.call()) {
-    sendStagedTelemetry(MSG_MASTER_HIGH_FREQUENCY, CMD_HIGH_FREQUENCY_MESSAGES);
+    sendStagedTelemetry(TELEMETRY_CLASS_HIGH, CMD_HIGH_FREQUENCY_MESSAGES);
   }
 
   // Report ping RTT stats (if needed) from buffer average

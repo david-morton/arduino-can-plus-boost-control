@@ -21,7 +21,7 @@ void checkAndProcessCanMessages() {
 
   if (readNissanDataFromCan(CAN_NISSAN, nissanResults)) {
     currentEngineTempCelcius = nissanResults.engineTempCelsius;
-    DEBUG_CAN_BMW("Received Nissan CAN message: Engine temperature: %d°C", currentEngineTempCelcius);
+    DEBUG_CAN_NISSAN("Received Nissan CAN message: Engine temperature: %d°C", currentEngineTempCelcius);
     updateReceiveCanMessageCountNissan();
   }
 }

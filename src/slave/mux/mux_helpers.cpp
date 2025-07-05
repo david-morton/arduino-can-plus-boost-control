@@ -4,6 +4,7 @@
 #include "../../shared/debug_logging.h"
 #include "../../shared/read_sensors.h"
 #include "../pin_assignments_slave.h"
+#include "mux_helpers.h"
 
 /* ======================================================================
    VARIABLES: Pin constants
@@ -41,18 +42,22 @@ int readAveragedMuxAnalogueChannel(byte channel, int samples, int delayUs) {
 // Read a digital pin through the multiplexer and average over multiple samples
 bool readStableMuxDigitalChannelReading(byte channel, int samples, int delayUs) {
   mux.channel(channel);
-  // Fast-path for low sample counts: single-shot read
+
+  // Fast-path for low sample counts: single-shot read via analog threshold
   if (samples <= 2) {
     delayMicroseconds(delayUs);
-    bool result = digitalRead(muxSignalPin);
-    DEBUG_MUX("MUX channel %d: FastRead Samples=%d Value=%s", channel, samples, result ? "HIGH" : "LOW");
+    int  analogValue = analogRead(muxSignalPin);
+    bool result      = analogValue > DIGITAL_VOLTAGE_THRESHOLD;
+    DEBUG_MUX("MUX channel %d: FastRead Samples=%d Analog=%d Value=%s", channel, samples, analogValue, result ? "HIGH" : "LOW");
     return result;
   }
 
-  // Averaged digital logic (majority vote)
-  int highCount = 0;
+  // Averaged digital logic using analog threshold
+  const int threshold = DIGITAL_VOLTAGE_THRESHOLD;
+  int       highCount = 0;
   for (int i = 0; i < samples; i++) {
-    if (digitalRead(muxSignalPin)) {
+    int analogValue = analogRead(muxSignalPin);
+    if (analogValue > threshold) {
       highCount++;
     }
     delayMicroseconds(delayUs);
@@ -60,5 +65,6 @@ bool readStableMuxDigitalChannelReading(byte channel, int samples, int delayUs) 
 
   bool result = (highCount > samples / 2);
   DEBUG_MUX("MUX channel %d: Samples=%d HIGH=%d Result=%s", channel, samples, highCount, result ? "HIGH" : "LOW");
+
   return result;
 }

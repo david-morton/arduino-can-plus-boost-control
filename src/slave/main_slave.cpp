@@ -35,7 +35,7 @@ bool debugEthernetPing     = false;
 bool debugGears            = false;
 bool debugGeneral          = true;
 bool debugMux              = false;
-bool debugPerformance      = true;
+bool debugPerformance      = false;
 bool debugSensorReadings   = false;
 bool debugTelemetry        = false;
 
@@ -133,11 +133,11 @@ void loop() {
 
   // Read the state of clutch and neutral switches, and update current variables
   if (ptReadSwitchStateClutch.call()) {
-    buildTelemetryItem(SENSOR_CLUTCH, currentSwitchStateClutch = readStableMuxDigitalChannelReading(MUX_CHANNEL_CLUTCH_SWITCH, 1, 3));
+    buildTelemetryItem(SENSOR_CLUTCH, currentSwitchStateClutch = readStableMuxDigitalChannelReading(MUX_CHANNEL_CLUTCH_SWITCH, 3, 2));
   }
 
   if (ptReadSwitchStateNeutral.call()) {
-    buildTelemetryItem(SENSOR_NEUTRAL, currentSwitchStateNeutral = readStableMuxDigitalChannelReading(MUX_CHANNEL_NEUTRAL_SWITCH, 1, 3));
+    buildTelemetryItem(SENSOR_NEUTRAL, currentSwitchStateNeutral = readStableMuxDigitalChannelReading(MUX_CHANNEL_NEUTRAL_SWITCH, 3, 2));
   }
 
   // Get the current RPM value, and stage for telemetry transmission. This will also update the RPM calculation frequency based on the current RPM

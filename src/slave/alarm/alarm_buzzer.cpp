@@ -67,9 +67,8 @@ void alarmBuzzerDisable() {
 void alarmBuzzerCriticalEnable() {
   if (alarmBuzzerCriticalIsSounding) {
     return;
-  }
-
-  if (firstAlarmCallTimeCritical == 0) {
+  } else if (firstAlarmCallTimeCritical == 0) {
+    DEBUG_ERROR("Alarm buzzer is not sounding for critical condition, enabling it now");
     firstAlarmCallTimeCritical = millis();
   }
 
@@ -87,6 +86,12 @@ void alarmBuzzerWarningEnable() {
   // Cater for transition from critical to warning state directly
   if (!globalAlarmCriticalState) {
     noTone(alarmBuzzerPin);
+
+    if (alarmBuzzerCriticalIsSounding && firstAlarmCallTimeCritical != 0) {
+      inAlarmDurationCritical = millis() - firstAlarmCallTimeCritical;
+      DEBUG_ERROR("Critical alarm downgraded to warning. Duration: %lu ms", inAlarmDurationCritical);
+    }
+
     alarmBuzzerCriticalIsSounding = false;
     firstAlarmCallTimeCritical    = 0;
   }

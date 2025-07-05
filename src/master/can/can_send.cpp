@@ -68,7 +68,6 @@ void sendEngineRpmToBmwCan() {
     multipliedRpm    = currentEngineSpeedRpm * rpmHexConversionMultipler;
     canPayloadRpm[2] = multipliedRpm;        // LSB
     canPayloadRpm[3] = (multipliedRpm >> 8); // MSB
-
     CAN_BMW.sendMsgBuf(0x316, 0, 8, canPayloadRpm);
   }
   previousEngineSpeedRpm = currentEngineSpeedRpm;

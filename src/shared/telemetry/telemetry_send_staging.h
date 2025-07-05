@@ -74,5 +74,3 @@ static inline const TelemetryMessageClass keyToMessageClass[NUM_TELEMETRY_FIELDS
 
 void           buildTelemetryItem(TelemetryField key, float value);
 void           sendStagedTelemetry(TelemetryMessageClass msgClass, int commandId);
-TelemetryField getTelemetryFieldForKey(const char *key);
-const char    *getTelemetryKeyForField(TelemetryField field);
