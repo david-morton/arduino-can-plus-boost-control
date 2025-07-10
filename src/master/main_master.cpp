@@ -7,6 +7,7 @@
 #include "can/can_receive.h"
 #include "can/can_send.h"
 #include "check_light/check_light.h"
+#include "gear/gear.h"
 #include "mqtt/mqtt_helpers.h"
 #include "rtc/rtc_sensor.h"
 #include "shared/alarm/alarm_helpers.h"
@@ -29,16 +30,16 @@
    ====================================================================== */
 
 bool debugCanBmw           = false;
-bool debugCanNissan        = true;
+bool debugCanNissan        = false;
 bool debugError            = true;
 bool debugEthernetGeneral  = false;
 bool debugEthernetMessages = false;
 bool debugEthernetPing     = false;
 bool debugEthernetTraffic  = false;
-bool debugGears            = false;
+bool debugGears            = true;
 bool debugGeneral          = true;
 bool debugPerformance      = true;
-bool debugSensorReadings   = true;
+bool debugSensorReadings   = false;
 bool debugTelemetry        = false;
 
 /* ======================================================================
@@ -100,6 +101,7 @@ ptScheduler ptSendCanMessages           = ptScheduler(PT_TIME_10MS); // Send CAN
 ptScheduler ptReadSwitchStateClutch   = ptScheduler(PT_TIME_100MS);
 ptScheduler ptReadSwitchStateNeutral  = ptScheduler(PT_TIME_100MS);
 ptScheduler ptUpdateAlarmStatesMaster = ptScheduler(PT_TIME_200MS);
+ptScheduler ptUpdateCurrentGear       = ptScheduler(PT_TIME_100MS);
 
 // Low frequency tasks (seconds)
 ptScheduler ptUpdateCheckLightStatus    = ptScheduler(PT_TIME_1S);
@@ -173,6 +175,11 @@ void loop() {
   // Send required CAN messages to the BMW network
   if (ptSendCanMessages.call()) {
     sendCanMessages();
+  }
+
+  // Update the current gear based on the vehicle speed and engine RPM
+  if (ptUpdateCurrentGear.call()) {
+    updateCurrentGear();
   }
 
   // Update the alarm states based on a range of error conditions and take necessary actions

@@ -73,7 +73,6 @@ int  currentOilTempCelsius            = 0;
    ====================================================================== */
 
 int currentAmbientLux                = 0;
-int currentGear                      = 0;
 int currentIntakePressureBank1Kpa    = 0;
 int currentIntakePressureBank2Kpa    = 0;
 int currentIntakePressureManifoldKpa = 0;
