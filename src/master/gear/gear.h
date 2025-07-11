@@ -23,3 +23,4 @@ constexpr float GEAR_RATIOS[NUM_GEARS] = {
 
 void  updateCurrentGear();
 float calculateTyreCircumference();
+void  reportTyreCircumference();

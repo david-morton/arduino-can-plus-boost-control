@@ -22,8 +22,15 @@ float calculateTyreCircumference() {
   float totalDiameterM = totalDiameterMm / 1000.0f;
   float circumferenceM = PI * totalDiameterM;
 
-  DEBUG_GEARS("Calculated tyre circumference: %.2f m", circumferenceM);
   return circumferenceM;
+}
+
+// Report on the tyre circumference and diameter along with how it was calculated
+void reportTyreCircumference() {
+  float diameterMetres = tyreCircumferenceMetres / PI;
+  DEBUG_GENERAL("Calculating tyre circumference ...");
+  DEBUG_GENERAL("\t\tCircumference: %.2fm, Diameter: %.2fm (Width: %dmm, Aspect Ratio: %.2f, Wheel Diameter: %d\")",
+                tyreCircumferenceMetres, diameterMetres, (int)TYRE_WIDTH_MM, TYRE_ASPECT_RATIO, (int)WHEEL_DIAMETER_IN);
 }
 
 // Update the current gear based on vehicle speed and engine RPM
@@ -60,7 +67,8 @@ void updateCurrentGear() {
 
   // Only output debug if gear has changed
   if (debugGears && currentGear != lastReportedGear) {
-    DEBUG_GEARS("Observed ratio: %.2f, Best gear: %d, Error: %.4f", observedRatio, bestGear, smallestError);
+    DEBUG_GEARS("Observed ratio: %.2f, Best gear: %d, Error: %.4f, Speed: %.2f kph, RPM: %d",
+                observedRatio, bestGear, smallestError, currentVehicleSpeedRearKph, currentEngineSpeedRpm);
     lastReportedGear = currentGear;
   }
 }

@@ -121,6 +121,7 @@ void setup() {
   initialiseEthernetShield(ethConfigLocal);
   connectMqttClientToBroker();
   initialiseRtc();
+  reportTyreCircumference();
 }
 
 /* ======================================================================
