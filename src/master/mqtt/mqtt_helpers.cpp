@@ -35,7 +35,7 @@ void connectMqttClientToBroker() {
       DEBUG_GENERAL("\t\tMQTT Client connected");
       mqttBrokerConnected = true;
     } else {
-      DEBUG_ERROR("\t\tMQTT Client NOT connected");
+      DEBUG_ERROR("\tMQTT Client NOT connected");
       mqttBrokerConnected = false;
     }
   }

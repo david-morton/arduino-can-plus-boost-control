@@ -15,7 +15,7 @@ void initialiseRtc() {
   DEBUG_GENERAL("Initialising RTC ...");
 
   if (!rtc.begin()) {
-    DEBUG_ERROR("\t\tRTC not found. Please check the wiring.");
+    DEBUG_ERROR("\tRTC not found. Please check the wiring.");
   } else {
     DateTime now = getRtcCurrentDateTime();
     DEBUG_GENERAL("\t\tRTC initialised successfully. Current RTC time: %04d-%02d-%02d %02d:%02d:%02d",

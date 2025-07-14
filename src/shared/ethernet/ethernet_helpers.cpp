@@ -29,6 +29,6 @@ void initialiseEthernetShield(EthernetConfig &config) {
     ethUdpClient.begin(localArduinoListenPort); // Start listening on the local port
     DEBUG_GENERAL("\t\tListening on local UDP port %u", localArduinoListenPort);
   } else if (eth_status != EthernetW5500) { // hardwareStatus() is a macro or enum constant defined as an int ... apparently
-    DEBUG_ERROR("\t\tEthernet setup status is %s", eth_status);
+    DEBUG_ERROR("\tEthernet setup status is %s", eth_status);
   }
 }

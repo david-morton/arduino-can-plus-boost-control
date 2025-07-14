@@ -68,12 +68,12 @@ void initialiseCanModule(mcp2515_can &canModule, const char *label) {
       DEBUG_GENERAL("\t\t%s CAN module initialised successfully", label);
       return;
     } else {
-      DEBUG_ERROR("\t\t%s CAN module init failed, retrying ...", label);
+      DEBUG_ERROR("\t%s CAN module init failed, retrying ...", label);
       delay(250);
     }
   }
 
-  DEBUG_ERROR("\t\t%s CAN module init failed after maximum retries", label);
+  DEBUG_ERROR("\t%s CAN module init failed after maximum retries", label);
 }
 
 // Configure CAN masks and filters for both buses

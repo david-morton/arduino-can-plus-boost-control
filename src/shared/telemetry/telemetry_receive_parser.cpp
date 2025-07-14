@@ -27,7 +27,7 @@ void parseTelemetryPayload(const char *payload) {
   // Define a buffer size for the telemetry message
   char buffer[TELEMETRY_MESSAGE_BUFFER_SIZE];
 
-  // Check if payload i too large to fit in the buffer
+  // Check if payload is too large to fit in the buffer
   if (strlen(payload) >= TELEMETRY_MESSAGE_BUFFER_SIZE) {
     DEBUG_ERROR("Telemetry message too long (%d bytes), max is %d", strlen(payload), TELEMETRY_MESSAGE_BUFFER_SIZE - 1);
     return;

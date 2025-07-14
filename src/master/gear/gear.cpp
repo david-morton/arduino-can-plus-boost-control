@@ -40,12 +40,20 @@ void updateCurrentGear() {
   // Return 0 if in neutral or clutch is disengaged
   if (currentSwitchStateNeutral || currentSwitchStateClutch) {
     currentGear = 0;
+    if (debugGears && lastReportedGear != 0) {
+      DEBUG_GEARS("Current gear is 0 (neutral or clutch disengaged)");
+    }
+    lastReportedGear = 0; // Update last reported gear to avoid repeated messages
     return;
   }
 
-  // Ignore if speed or RPM are too low to infer gear
-  if (currentVehicleSpeedRearKph < 1 || currentEngineSpeedRpm < 300) {
+  // Ignore if speed or RPM are too low to infer gear (will also dictate no boost target)
+  if (currentVehicleSpeedRearKph < 2 || currentEngineSpeedRpm < 500) {
     currentGear = -1; // Indicate unknown gear
+    if (debugGears && lastReportedGear != -1) {
+      DEBUG_GEARS("Current gear is unknown (speed: %.2f kph, RPM: %d)", currentVehicleSpeedRearKph, currentEngineSpeedRpm);
+    }
+    lastReportedGear = -1; // Update last reported gear to avoid repeated messages
     return;
   }
 

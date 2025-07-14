@@ -10,6 +10,8 @@
 #include "gear/gear.h"
 #include "mqtt/mqtt_helpers.h"
 #include "rtc/rtc_sensor.h"
+#include "sd_card/sd_card.h"
+#include "sd_card/sd_helpers.h"
 #include "shared/alarm/alarm_helpers.h"
 #include "shared/command_ids.h"
 #include "shared/common_task_scheduling.h"
@@ -36,7 +38,7 @@ bool debugEthernetGeneral  = false;
 bool debugEthernetMessages = false;
 bool debugEthernetPing     = false;
 bool debugEthernetTraffic  = false;
-bool debugGears            = true;
+bool debugGears            = false;
 bool debugGeneral          = true;
 bool debugPerformance      = true;
 bool debugSensorReadings   = false;
@@ -96,6 +98,7 @@ float currentVehicleSpeedRearKph  = 0; // Vehicle speed from rear wheels
 ptScheduler ptReadCurrentEngineSpeedRpm = ptScheduler(PT_TIME_50MS);
 ptScheduler ptHandleCommonTasks         = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
 ptScheduler ptSendCanMessages           = ptScheduler(PT_TIME_10MS); // Send CAN messages to BMW network
+ptScheduler ptHandleSdCardTasks         = ptScheduler(PT_TIME_50MS); // Handle SD card tasks
 
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptReadSwitchStateClutch   = ptScheduler(PT_TIME_100MS);
@@ -117,11 +120,12 @@ void setup() {
 
   DEBUG_GENERAL("Entering main setup phase ...");
 
-  initialiseCanModules();
-  initialiseEthernetShield(ethConfigLocal);
-  connectMqttClientToBroker();
+  initialiseSdBreakout();
   initialiseRtc();
+  initialiseEthernetShield(ethConfigLocal);
+  initialiseCanModules();
   reportTyreCircumference();
+  connectMqttClientToBroker();
 }
 
 /* ======================================================================
@@ -186,5 +190,10 @@ void loop() {
   // Update the alarm states based on a range of error conditions and take necessary actions
   if (ptUpdateAlarmStatesMaster.call()) {
     handleAllAlarmStatesMaster();
+  }
+
+  // Handle scheduled tasks related to SD card operations
+  if (sdCardInserted && ptHandleSdCardTasks.call()) {
+    handleSdCardScheduledTasks();
   }
 }

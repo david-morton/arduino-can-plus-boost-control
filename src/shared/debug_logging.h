@@ -17,6 +17,7 @@ extern bool debugGears;
 extern bool debugGeneral;
 extern bool debugMux;
 extern bool debugPerformance;
+extern bool debugSdCard;
 extern bool debugSensorReadings;
 extern bool debugTelemetry;
 
@@ -63,7 +64,7 @@ inline void printDebugTimestamp() {
   _DEBUG_PRINTF(debugCanNissan, "CAN NISSAN", fmt, ##__VA_ARGS__)
 
 #define DEBUG_ERROR(fmt, ...) \
-  _DEBUG_PRINTF(debugError, "ERROR", fmt, ##__VA_ARGS__)
+  _DEBUG_PRINTF(debugError, "ERROR **", fmt, ##__VA_ARGS__)
 
 #define DEBUG_ETHERNET_GENERAL(fmt, ...) \
   _DEBUG_PRINTF(debugEthernetGeneral, "ETHERNET GENERAL", fmt, ##__VA_ARGS__)
@@ -94,6 +95,9 @@ inline void printDebugTimestamp() {
 
 #define DEBUG_TELEMETRY(fmt, ...) \
   _DEBUG_PRINTF(debugTelemetry, "TELEMETRY", fmt, ##__VA_ARGS__)
+
+#define DEBUG_SD(fmt, ...) \
+  _DEBUG_PRINTF(debugSdCard, "SD CARD", fmt, ##__VA_ARGS__)
 
 /* ======================================================================
    FUNCTION PROTOTYPES

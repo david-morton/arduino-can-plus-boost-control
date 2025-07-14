@@ -37,7 +37,7 @@ void initialiseAmbientLightSensor() {
     DEBUG_GENERAL("\t\tBH1750 light sensor initialized successfully.");
   } else {
     sensorAvailable = false;
-    DEBUG_ERROR("\t\tFailed to initialize BH1750 light sensor! Sensor unavailable.");
+    DEBUG_ERROR("\tFailed to initialize BH1750 light sensor! Sensor unavailable.");
   }
 }
 
