@@ -30,6 +30,5 @@ extern char telemetryLogFilename[FILENAME_BUFFER_SIZE];
 
 bool generateNextAvailableLogFilename(char *buffer, size_t bufferSize, const DateTime &now, const char *extension);
 void initialiseSdBreakout();
-void reportSdCardInfo();
 void handleSdCardScheduledTasks();
 void createSdLogFiles();
