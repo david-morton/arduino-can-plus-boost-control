@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTClib.h"
+#include <RTClib.h>
 
 /* ======================================================================
    FUNCTION PROTOTYPES

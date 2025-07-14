@@ -120,8 +120,8 @@ void setup() {
 
   DEBUG_GENERAL("Entering main setup phase ...");
 
-  initialiseSdBreakout();
   initialiseRtc();
+  initialiseSdBreakout(); // Depends on RTC for timestamping
   initialiseEthernetShield(ethConfigLocal);
   initialiseCanModules();
   reportTyreCircumference();

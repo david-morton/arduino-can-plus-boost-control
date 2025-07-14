@@ -1,6 +1,13 @@
 #pragma once
 
 #include <Arduino.h>
+#include <RTClib.h>
+
+/* ======================================================================
+   DEFINES
+   ====================================================================== */
+
+#define FILENAME_BUFFER_SIZE 13 // Size of the buffer for filenames
 
 /* ======================================================================
    PIN CONSTANTS
@@ -14,11 +21,15 @@ const byte SD_CD_PIN = 8; // Card detect pin for the SD card breakout board
    ====================================================================== */
 
 extern bool sdCardInserted;
+extern bool sdLogCreatedTelemetry;
+extern char telemetryLogFilename[FILENAME_BUFFER_SIZE];
 
 /* ======================================================================
    FUNCTION PROTYPES
    ====================================================================== */
 
+bool generateNextAvailableLogFilename(char *buffer, size_t bufferSize, const DateTime &now, const char *extension);
 void initialiseSdBreakout();
 void reportSdCardInfo();
 void handleSdCardScheduledTasks();
+void createSdLogFiles();
