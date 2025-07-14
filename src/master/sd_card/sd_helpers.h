@@ -7,7 +7,7 @@
    DEFINES
    ====================================================================== */
 
-#define FILENAME_BUFFER_SIZE 13 // Size of the buffer for filenames
+#define FILENAME_BUFFER_SIZE 16 // Size of the buffer for filenames
 
 /* ======================================================================
    PIN CONSTANTS

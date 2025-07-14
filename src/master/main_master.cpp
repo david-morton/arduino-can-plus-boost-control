@@ -41,6 +41,7 @@ bool debugEthernetTraffic  = false;
 bool debugGears            = false;
 bool debugGeneral          = true;
 bool debugPerformance      = true;
+bool debugSdCard           = true;
 bool debugSensorReadings   = false;
 bool debugTelemetry        = false;
 
