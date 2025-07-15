@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <RTClib.h>
+#include <SD.h>
 
 /* ======================================================================
    DEFINES
@@ -21,15 +22,15 @@ const byte SD_CD_PIN = 8; // Card detect pin for the SD card breakout board
    ====================================================================== */
 
 extern bool sdCardInserted;
-extern bool sdLogCreatedTelemetry;
-extern bool sdReadyToLogTelemetry;
-extern char telemetryLogFilename[FILENAME_BUFFER_SIZE];
+extern File logFileTelemetry;
 
 /* ======================================================================
-   FUNCTION PROTYPES
+   FUNCTION PROTOTYPES
    ====================================================================== */
 
 bool generateNextAvailableLogFilename(char *buffer, size_t bufferSize, const DateTime &now, const char *extension);
-void initialiseSdBreakout();
-void handleSdCardScheduledTasks();
 void createSdLogFiles();
+void flushAndCloseLogFile();
+void handleEngineStateChange();
+void handleSdCardScheduledTasks();
+void initialiseSdBreakout();

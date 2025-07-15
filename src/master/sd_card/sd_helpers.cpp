@@ -6,28 +6,30 @@
 
 #include "../../shared/debug_logging.h"
 #include "../rtc/rtc_sensor.h"
-#include "sd_helpers.h"
 #include "sd_card.h"
+#include "sd_helpers.h"
 
 /* ======================================================================
    SCHEDULED TASK OBJECTS
    ====================================================================== */
 
-// ptScheduler ptWriteErrorLog       = ptScheduler(PT_TIME_500MS);
-ptScheduler ptWriteTelemetryLog   = ptScheduler(PT_TIME_500MS);
-// ptScheduler ptDetectEngineStopped = ptScheduler(PT_TIME_500MS);
+ptScheduler ptWriteTelemetryLog     = ptScheduler(PT_TIME_500MS);
+ptScheduler ptCheckForEngineStopped = ptScheduler(PT_TIME_500MS);
+ptScheduler ptFlushLogFiles         = ptScheduler(PT_TIME_5S);
 
-// TODO: Look at how we start / stop logging based on engine state and the sdReadyToLogTelemetry flag.
-// Most likely this wants to be on a scheduled task that checks the engine state and sets the flag accordingly.
+/* ======================================================================
+   VARIABLES
+   ====================================================================== */
+
+bool sdCardInserted                             = false;
+bool sdReadyToLogTelemetry                      = false;
+bool sdLogTelemetry                             = false;
+char telemetryLogFilename[FILENAME_BUFFER_SIZE] = {0};
+File logFileTelemetry;
 
 /* ======================================================================
    FUNCTION DEFINITIONS
    ====================================================================== */
-
-// Initializes the SD card and prepares log files for use
-bool sdCardInserted        = false;
-bool sdReadyToLogTelemetry = false;
-char telemetryLogFilename[FILENAME_BUFFER_SIZE];
 
 void initialiseSdBreakout() {
   DEBUG_GENERAL("Initialising SD card breakout ...");
@@ -52,31 +54,30 @@ void initialiseSdBreakout() {
   }
 }
 
-// Generates timestamped log files with file name format: "YYMMDDnn.xxx" where nn is
-// a sequential number and xxx indicates the type of log (e.g. err for error). The
-// default csv extension is used for telemetry logs as the most common use case.
+// Generates timestamped log files with file name format: "YYMMDDnn.xxx"
 void createSdLogFiles() {
   DateTime now = getRtcCurrentDateTime();
 
   if (generateNextAvailableLogFilename(telemetryLogFilename, sizeof(telemetryLogFilename), now, "CSV")) {
-    File logFileTelemetry = SD.open(telemetryLogFilename, FILE_WRITE);
+    logFileTelemetry = SD.open(telemetryLogFilename, FILE_WRITE);
     if (logFileTelemetry) {
-      bool headerWriteResult = writeSdTelemetryLogHeader(&logFileTelemetry); // Write header row for telemetry log
+      bool headerWriteResult = writeSdTelemetryLogHeader(&logFileTelemetry); // Write header row
       if (headerWriteResult) {
         sdReadyToLogTelemetry = true;
         DEBUG_GENERAL("\t\tCreated telemetry log file with header: %s", telemetryLogFilename);
       } else {
-        DEBUG_ERROR("\tFailed to write header row to telemetry log file: %s", telemetryLogFilename);
+        DEBUG_ERROR("\tFailed to write header to telemetry log file: %s", telemetryLogFilename);
+        logFileTelemetry.close();
+        logFileTelemetry      = File();
         sdReadyToLogTelemetry = false;
       }
-      logFileTelemetry.close(); // Always close after creating
     } else {
-      sdReadyToLogTelemetry = false;
       DEBUG_ERROR("\tFailed to open telemetry log file: %s", telemetryLogFilename);
+      sdReadyToLogTelemetry = false;
     }
   } else {
-    sdReadyToLogTelemetry = false;
     DEBUG_ERROR("\tFailed to find available telemetry log filename");
+    sdReadyToLogTelemetry = false;
   }
 }
 
@@ -93,12 +94,57 @@ bool generateNextAvailableLogFilename(char *buffer, size_t bufferSize, const Dat
   return false;
 }
 
+// Flush and close a log file safely
+void flushAndCloseFile(File &file, const char *label) {
+  if (file) {
+    file.flush();
+    file.close();
+    file = File(); // Reset to null state
+    DEBUG_SD("Flushed and closed %s file.", label);
+  } else {
+    DEBUG_SD("%s file was not open, nothing to close.", label);
+  }
+}
 
+// Handle engine state changes for telemetry logging
+void handleEngineStateChange() {
+  if (currentEngineSpeedRpm < 2000 && sdLogTelemetry == true) {
+    sdLogTelemetry = false;
+    DEBUG_SD("Engine stopped. Stopping telemetry logging.");
+    flushAndCloseFile(logFileTelemetry, "Telemetry");
+  } else if (currentEngineSpeedRpm >= 2000 && sdLogTelemetry == false) {
+    DEBUG_SD("Engine running at %d RPM. Starting telemetry logging.", currentEngineSpeedRpm);
+    // Reopen file if needed
+    if (!logFileTelemetry) {
+      logFileTelemetry = SD.open(telemetryLogFilename, FILE_WRITE);
+      if (!logFileTelemetry) {
+        sdLogTelemetry = false;
+        DEBUG_ERROR("Failed to reopen telemetry log file: %s", telemetryLogFilename);
+      } else {
+        sdLogTelemetry = true;
+        DEBUG_SD("Reopened telemetry log file: %s", telemetryLogFilename);
+      }
+    } else {
+      sdLogTelemetry = true; // Already open
+      DEBUG_SD("Telemetry log file already open: %s", telemetryLogFilename);
+    }
+  }
+}
 
 // Execute scheduled tasks related to SD card operations
 void handleSdCardScheduledTasks() {
   // Write telemetry data to the log file
-  if (sdReadyToLogTelemetry && ptWriteTelemetryLog.call()) {
+  if (sdReadyToLogTelemetry && sdLogTelemetry && ptWriteTelemetryLog.call()) {
     writeSdTelemetryLogLine();
+  }
+
+  // Flush log files if required
+  if (sdLogTelemetry && ptFlushLogFiles.call()) {
+    logFileTelemetry.flush();
+  }
+
+  // Check if the engine has stopped and handle logging accordingly
+  if (ptCheckForEngineStopped.call()) {
+    handleEngineStateChange();
   }
 }

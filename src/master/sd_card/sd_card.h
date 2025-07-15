@@ -1,7 +1,7 @@
 #pragma once
 
-#include <SD.h>
 #include "../../shared/variables_vehicle_parameters.h"
+#include <SD.h>
 
 /* ======================================================================
    ENUMS
@@ -18,8 +18,8 @@ enum TelemetryType {
    ====================================================================== */
 
 typedef struct {
-  const char *label;
-  void *valuePointer;
+  const char   *label;
+  void         *valuePointer;
   TelemetryType type;
 } TelemetryEntry;
 
@@ -28,11 +28,11 @@ typedef struct {
    ====================================================================== */
 
 extern TelemetryEntry telemetryMetrics[];
-extern const size_t NUM_TELEMETRY_METRICS;
+extern const size_t   NUM_TELEMETRY_METRICS;
 
 /* ======================================================================
    FUNCTION PROTOTYPES
    ====================================================================== */
 
-void writeSdTelemetryLogLine();
 bool writeSdTelemetryLogHeader(File *logFileTelemetry);
+void writeSdTelemetryLogLine();
