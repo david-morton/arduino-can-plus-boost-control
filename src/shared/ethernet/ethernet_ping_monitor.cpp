@@ -1,6 +1,7 @@
 #include "ethernet_ping_monitor.h"
 #include "../debug_logging.h"
 #include "../variables_programmatic.h"
+#include "ethernet_helpers.h"
 #include "ethernet_send_udp.h"
 
 /* ======================================================================
@@ -126,8 +127,10 @@ void handlePingTimeoutsAndLoss() {
   pingLossPercent = (lost * 100.0f) / count;
 
   if (pingLossPercent >= 25.0f) {
-    DEBUG_ERROR("ERROR: High ping loss detected: %.1f%% (%u samples)", pingLossPercent, count);
+    globalHealthEthernetPeerOnline = false; // High packet loss, mark Ethernet as disconnected
+    DEBUG_ERROR("ERROR: High ping loss detected: %.1f%% (%u samples). Most ethernet traffic disabled.", pingLossPercent, count);
   } else {
+    globalHealthEthernetPeerOnline = true; // Reset connection status if loss is acceptable
     DEBUG_PERFORMANCE("Ping RTT: %.2f ms | Loss: %.1f%% (%u samples)", avgRttMs, pingLossPercent, count);
   }
 }

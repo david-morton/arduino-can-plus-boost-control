@@ -7,6 +7,8 @@
    CONFIGURE THINGS
    ====================================================================== */
 
+extern bool           globalHealthEthernetConnected;
+extern bool           globalHealthEthernetPeerOnline;
 extern EthernetClient ethClient;
 
 struct EthernetConfig {
@@ -19,3 +21,4 @@ struct EthernetConfig {
    ====================================================================== */
 
 void initialiseEthernetShield(EthernetConfig &config);
+void updateEthernetLinkStatus();

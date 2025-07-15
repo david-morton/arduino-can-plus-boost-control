@@ -21,11 +21,13 @@ ptScheduler ptFlushLogFiles         = ptScheduler(PT_TIME_5S);
    VARIABLES
    ====================================================================== */
 
-bool sdCardInserted                             = false;
-bool sdReadyToLogTelemetry                      = false;
-bool sdLogTelemetry                             = false;
-char telemetryLogFilename[FILENAME_BUFFER_SIZE] = {0};
-File logFileTelemetry;
+bool      globalHealthSdCardLogging                  = true; // Global flag to control SD card logging health
+bool      sdCardInserted                             = false;
+bool      sdReadyToLogTelemetry                      = false;
+bool      sdLogTelemetry                             = false;
+char      telemetryLogFilename[FILENAME_BUFFER_SIZE] = {0};
+const int ENGINE_STOPPED_RPM_THRESHOLD               = 2000; // RPM threshold to consider engine stopped
+File      logFileTelemetry;
 
 /* ======================================================================
    FUNCTION DEFINITIONS
@@ -46,11 +48,13 @@ void initialiseSdBreakout() {
       createSdLogFiles(); // Initialize log files
     } else {
       DEBUG_ERROR("\tSD.begin failed. Card initialization failed.");
-      sdCardInserted = false;
+      sdCardInserted            = false;
+      globalHealthSdCardLogging = false; // Disable logging if SD card initialization fails
     }
   } else {
     DEBUG_ERROR("\tNo SD card detected.");
-    sdCardInserted = false;
+    sdCardInserted            = false;
+    globalHealthSdCardLogging = false; // Disable logging if no card is detected
   }
 }
 
@@ -108,11 +112,11 @@ void flushAndCloseFile(File &file, const char *label) {
 
 // Handle engine state changes for telemetry logging
 void handleEngineStateChange() {
-  if (currentEngineSpeedRpm < 2000 && sdLogTelemetry == true) {
+  if (currentEngineSpeedRpm < ENGINE_STOPPED_RPM_THRESHOLD && sdLogTelemetry == true) {
     sdLogTelemetry = false;
     DEBUG_SD("Engine stopped. Stopping telemetry logging.");
     flushAndCloseFile(logFileTelemetry, "Telemetry");
-  } else if (currentEngineSpeedRpm >= 2000 && sdLogTelemetry == false) {
+  } else if (currentEngineSpeedRpm >= ENGINE_STOPPED_RPM_THRESHOLD && sdLogTelemetry == false) {
     DEBUG_SD("Engine running at %d RPM. Starting telemetry logging.", currentEngineSpeedRpm);
     // Reopen file if needed
     if (!logFileTelemetry) {

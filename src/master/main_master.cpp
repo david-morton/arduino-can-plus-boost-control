@@ -194,7 +194,7 @@ void loop() {
   }
 
   // Handle scheduled tasks related to SD card operations
-  if (sdCardInserted && ptHandleSdCardTasks.call()) {
+  if (globalHealthSdCardLogging && ptHandleSdCardTasks.call()) {
     handleSdCardScheduledTasks();
   }
 }

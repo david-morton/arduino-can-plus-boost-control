@@ -15,6 +15,7 @@ TelemetryEntry telemetryMetrics[] = {
     {"Rear Speed", &currentVehicleSpeedRearKph, TYPE_FLOAT},
     {"Engine Temp", &currentEngineTempCelcius, TYPE_INT},
     {"Clutch Engaged", &currentSwitchStateClutch, TYPE_BOOL},
+    {"In Neutral", &currentSwitchStateNeutral, TYPE_BOOL},
 };
 
 const size_t NUM_TELEMETRY_METRICS = sizeof(telemetryMetrics) / sizeof(telemetryMetrics[0]);

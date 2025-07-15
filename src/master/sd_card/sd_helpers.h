@@ -21,7 +21,7 @@ const byte SD_CD_PIN = 8; // Card detect pin for the SD card breakout board
    VARIABLES
    ====================================================================== */
 
-extern bool sdCardInserted;
+extern bool globalHealthSdCardLogging;
 extern File logFileTelemetry;
 
 /* ======================================================================
