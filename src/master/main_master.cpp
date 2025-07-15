@@ -10,7 +10,7 @@
 #include "gear/gear.h"
 #include "mqtt/mqtt_helpers.h"
 #include "rtc/rtc_sensor.h"
-#include "sd_card/sd_card.h"
+// #include "sd_card/sd_card.h"
 #include "sd_card/sd_helpers.h"
 #include "shared/alarm/alarm_helpers.h"
 #include "shared/command_ids.h"

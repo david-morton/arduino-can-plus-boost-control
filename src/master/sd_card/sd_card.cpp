@@ -1,54 +1,77 @@
-#include <ptScheduler.h>
+#include <SD.h>
 
 #include "sd_helpers.h"
+#include "sd_card.h"
+#include "../../shared/variables_vehicle_parameters.h"
+#include "../../shared/debug_logging.h"
+
+/* ======================================================================
+   VARIABLES
+   ====================================================================== */
+
+File logFileTelemetry;
+unsigned long lastFlushMillis = 0;
+const unsigned long FLUSH_INTERVAL_MS = 5000; // flush every 5 seconds
+
+TelemetryEntry telemetryMetrics[] = {
+  {"Front Speed (kph)",     &currentVehicleSpeedFrontKph,    TYPE_FLOAT},
+  {"Rear Speed (kph)",      &currentVehicleSpeedRearKph,     TYPE_FLOAT},
+  {"Engine Temp (°C)",      &currentEngineTempCelcius,       TYPE_INT},
+  {"Clutch Engaged",        &currentSwitchStateClutch,       TYPE_BOOL},
+};
+
+const size_t NUM_TELEMETRY_METRICS = sizeof(telemetryMetrics) / sizeof(telemetryMetrics[0]);
 
 /* ======================================================================
    FUNCTION DEFINITIONS
    ====================================================================== */
 
-// File logFile;
-// bool logFileOpen = false;
-// char currentLogFilename[32]; // Example: "log_20250712_203015.txt"
+// Write header row for telemetry log file
+bool writeSdTelemetryLogHeader(File *file) {
+  if (!file) return false;
 
-// void onEngineStart() {
-//   // Called when engine RPM goes from 0 -> non-zero
-//   generateTimestampedFilename(currentLogFilename);
-//   logFile = SD.open(currentLogFilename, FILE_WRITE);
-//   if (logFile) {
-//     DEBUG_SD("Opened log file: %s", currentLogFilename);
-//     logFileOpen = true;
-//   } else {
-//     DEBUG_SD("Failed to open log file!");
-//   }
-// }
-
-// void logDataLine(const char *data) {
-//   if (logFileOpen) {
-//     logFile.println(data);
-//     logFile.flush(); // Protect against sudden power loss
-//   }
-// }
-
-// void onEngineShutdown() {
-//   // Called when engine RPM = 0 and has stayed 0 for some timeout
-//   if (logFileOpen) {
-//     DEBUG_SD("Closing log file due to engine shutdown");
-//     logFile.close();
-//     logFileOpen = false;
-//   }
-// }
+  for (size_t i = 0; i < NUM_TELEMETRY_METRICS; ++i) {
+    file->print(telemetryMetrics[i].label);
+    if (i < NUM_TELEMETRY_METRICS - 1) file->print(",");
+  }
+  file->println();
+  return true;
+}
 
 
-// unsigned long engineZeroRpmStart = 0;
+// Write latest data to the telemetry log file.
+void writeSdTelemetryLogLine() {
+  if (!logFileTelemetry) {
+    logFileTelemetry = SD.open(telemetryLogFilename, FILE_WRITE);
+    if (!logFileTelemetry) {
+      DEBUG_ERROR("Failed to reopen telemetry log file.");
+      sdReadyToLogTelemetry = false;
+      return;
+    }
+  }
 
-// void checkForEngineShutdown(unsigned int currentRpm) {
-//   if (currentRpm == 0) {
-//     if (engineZeroRpmStart == 0) {
-//       engineZeroRpmStart = millis();
-//     } else if (millis() - engineZeroRpmStart > 5000) {
-//       onEngineShutdown();  // Been 0 RPM for 5 seconds
-//     }
-//   } else {
-//     engineZeroRpmStart = 0;  // Reset if engine is running again
-//   }
-// }
+  for (size_t i = 0; i < NUM_TELEMETRY_METRICS; ++i) {
+    switch (telemetryMetrics[i].type) {
+      case TYPE_FLOAT:
+        logFileTelemetry.print(*(float *)(telemetryMetrics[i].valuePointer), 2);
+        break;
+      case TYPE_INT:
+        logFileTelemetry.print(*(int *)(telemetryMetrics[i].valuePointer));
+        break;
+      case TYPE_BOOL:
+        logFileTelemetry.print(*(bool *)(telemetryMetrics[i].valuePointer) ? "1" : "0");
+        break;
+    }
+
+    if (i < NUM_TELEMETRY_METRICS - 1) logFileTelemetry.print(",");
+  }
+
+  logFileTelemetry.println();
+
+  // Periodically flush to disk
+  unsigned long now = millis();
+  if (now - lastFlushMillis >= FLUSH_INTERVAL_MS) {
+    logFileTelemetry.flush();
+    lastFlushMillis = now;
+  }
+}

@@ -7,14 +7,18 @@
 #include "../../shared/debug_logging.h"
 #include "../rtc/rtc_sensor.h"
 #include "sd_helpers.h"
+#include "sd_card.h"
 
 /* ======================================================================
    SCHEDULED TASK OBJECTS
    ====================================================================== */
 
-ptScheduler ptWriteErrorLog       = ptScheduler(PT_TIME_500MS);
+// ptScheduler ptWriteErrorLog       = ptScheduler(PT_TIME_500MS);
 ptScheduler ptWriteTelemetryLog   = ptScheduler(PT_TIME_500MS);
-ptScheduler ptDetectEngineStopped = ptScheduler(PT_TIME_500MS);
+// ptScheduler ptDetectEngineStopped = ptScheduler(PT_TIME_500MS);
+
+// TODO: Look at how we start / stop logging based on engine state and the sdReadyToLogTelemetry flag.
+// Most likely this wants to be on a scheduled task that checks the engine state and sets the flag accordingly.
 
 /* ======================================================================
    FUNCTION DEFINITIONS
@@ -22,9 +26,8 @@ ptScheduler ptDetectEngineStopped = ptScheduler(PT_TIME_500MS);
 
 // Initializes the SD card and prepares log files for use
 bool sdCardInserted        = false;
-bool sdLogCreatedTelemetry = false;
+bool sdReadyToLogTelemetry = false;
 char telemetryLogFilename[FILENAME_BUFFER_SIZE];
-int  telemetryLogIndex = 0;
 
 void initialiseSdBreakout() {
   DEBUG_GENERAL("Initialising SD card breakout ...");
@@ -50,22 +53,29 @@ void initialiseSdBreakout() {
 }
 
 // Generates timestamped log files with file name format: "YYMMDDnn.xxx" where nn is
-// a sequential number and xxx indicates the type of log (e.g. tel for telemetry).
+// a sequential number and xxx indicates the type of log (e.g. err for error). The
+// default csv extension is used for telemetry logs as the most common use case.
 void createSdLogFiles() {
   DateTime now = getRtcCurrentDateTime();
 
-  if (generateNextAvailableLogFilename(telemetryLogFilename, sizeof(telemetryLogFilename), now, "TEL")) {
+  if (generateNextAvailableLogFilename(telemetryLogFilename, sizeof(telemetryLogFilename), now, "CSV")) {
     File logFileTelemetry = SD.open(telemetryLogFilename, FILE_WRITE);
     if (logFileTelemetry) {
+      bool headerWriteResult = writeSdTelemetryLogHeader(&logFileTelemetry); // Write header row for telemetry log
+      if (headerWriteResult) {
+        sdReadyToLogTelemetry = true;
+        DEBUG_GENERAL("\t\tCreated telemetry log file with header: %s", telemetryLogFilename);
+      } else {
+        DEBUG_ERROR("\tFailed to write header row to telemetry log file: %s", telemetryLogFilename);
+        sdReadyToLogTelemetry = false;
+      }
       logFileTelemetry.close(); // Always close after creating
-      sdLogCreatedTelemetry = true;
-      DEBUG_GENERAL("\t\tCreated telemetry log file: %s", telemetryLogFilename);
     } else {
-      sdLogCreatedTelemetry = false;
+      sdReadyToLogTelemetry = false;
       DEBUG_ERROR("\tFailed to open telemetry log file: %s", telemetryLogFilename);
     }
   } else {
-    sdLogCreatedTelemetry = false;
+    sdReadyToLogTelemetry = false;
     DEBUG_ERROR("\tFailed to find available telemetry log filename");
   }
 }
@@ -80,10 +90,15 @@ bool generateNextAvailableLogFilename(char *buffer, size_t bufferSize, const Dat
       return true;
     }
   }
-
   return false;
 }
 
+
+
 // Execute scheduled tasks related to SD card operations
 void handleSdCardScheduledTasks() {
+  // Write telemetry data to the log file
+  if (sdReadyToLogTelemetry && ptWriteTelemetryLog.call()) {
+    writeSdTelemetryLogLine();
+  }
 }

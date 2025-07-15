@@ -22,6 +22,7 @@ const byte SD_CD_PIN = 8; // Card detect pin for the SD card breakout board
 
 extern bool sdCardInserted;
 extern bool sdLogCreatedTelemetry;
+extern bool sdReadyToLogTelemetry;
 extern char telemetryLogFilename[FILENAME_BUFFER_SIZE];
 
 /* ======================================================================
