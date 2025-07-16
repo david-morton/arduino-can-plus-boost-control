@@ -13,6 +13,7 @@
 
 // Check all current critical alarm conditions, and update the alarm state accordingly
 void updateLocalCriticalAlarmState() {
+  // TODO: Add more critical alarm conditions as needed
   if (currentEngineSpeedRpm > alarmThresholdsCritical.engineRpmMax) {
     localAlarmCriticalState = true;
   } else {
@@ -22,6 +23,7 @@ void updateLocalCriticalAlarmState() {
 
 // Check all current warning alarm conditions, and update the alarm state accordingly
 void updateLocalWarningAlarmState() {
+  // TODO: Add more warning alarm conditions as needed
   if (pingLossPercent > alarmThresholdsWarning.pingLossPercent) {
     localAlarmWarningState = true;
   } else {
@@ -44,8 +46,10 @@ void handleAllAlarmStatesSlave() {
 
   // If the global critical alarm state is active, enable the buzzer
   if (globalAlarmCriticalState) {
+    // TODO: Evaluate if there are any actions to perform here or if they are handled in respective logic
     alarmBuzzerCriticalEnable();
   } else if (globalAlarmWarningState) {
+    // TODO: Evaluate if there are any actions to perform here or if they are handled in respective logic
     alarmBuzzerWarningEnable();
   } else {
     // If no alarms are active, disable the buzzer

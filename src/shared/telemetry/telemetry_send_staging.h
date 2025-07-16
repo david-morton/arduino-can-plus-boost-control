@@ -14,10 +14,14 @@ typedef enum {
   SENSOR_CLUTCH,
   SENSOR_NEUTRAL,
   SENSOR_RPM,
+  BOOST_TARGET,
+  BOOST_MANIFOLD,
+  BOOST_BANK1,
+  BOOST_BANK2,
   NUM_TELEMETRY_FIELDS // Always last, this is used to count the number of fields
 } TelemetryField;
 
-// This enum defines the classes of telemetry messages that can be staged and sent
+// This enum defines the classes of telemetry messages that can be staged and sent.
 typedef enum {
   MSG_SLAVE_LOW_FREQUENCY = 0,
   MSG_SLAVE_MED_FREQUENCY,
@@ -61,16 +65,24 @@ extern TelemetrySlot telemetryStaging[NUM_TELEMETRY_FIELDS];
    MAPPING TELEMETRY KEYS TO MESSAGE CLASSES
    ====================================================================== */
 
+// This mapping defines which telemetry fields go into which message classes.
+// The frequency for each class is via ptScheduler objects in common_task_scheduling.cpp
+// and it is from the perspective of the sender. ie: MSG_SLAVE denotes that the slave
+// Arduino is sending this message class.
 static inline const TelemetryMessageClass keyToMessageClass[NUM_TELEMETRY_FIELDS] = {
     [SENSOR_LUX]              = MSG_SLAVE_LOW_FREQUENCY,
     [SENSOR_ELECTRONICS_TEMP] = MSG_SLAVE_LOW_FREQUENCY,
     [SENSOR_CLUTCH]           = MSG_SLAVE_MED_FREQUENCY,
     [SENSOR_NEUTRAL]          = MSG_SLAVE_MED_FREQUENCY,
-    [SENSOR_RPM]              = MSG_SLAVE_HIGH_FREQUENCY};
+    [SENSOR_RPM]              = MSG_SLAVE_HIGH_FREQUENCY,
+    [BOOST_TARGET]            = MSG_MASTER_MED_FREQUENCY,
+    [BOOST_MANIFOLD]          = MSG_SLAVE_MED_FREQUENCY,
+    [BOOST_BANK1]             = MSG_SLAVE_MED_FREQUENCY,
+    [BOOST_BANK2]             = MSG_SLAVE_MED_FREQUENCY};
 
 /* ======================================================================
     FUNCTION PROTOTYPES
    ====================================================================== */
 
-void           buildTelemetryItem(TelemetryField key, float value);
-void           sendStagedTelemetry(TelemetryMessageClass msgClass, int commandId);
+void buildTelemetryItem(TelemetryField key, float value);
+void sendStagedTelemetry(TelemetryMessageClass msgClass, int commandId);

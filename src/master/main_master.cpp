@@ -3,6 +3,7 @@
 #include <ptScheduler.h>
 
 #include "alarm/alarms_master.h"
+#include "boost/boost_helpers.h"
 #include "can/can_helpers.h"
 #include "can/can_receive.h"
 #include "can/can_send.h"
@@ -10,7 +11,6 @@
 #include "gear/gear.h"
 #include "mqtt/mqtt_helpers.h"
 #include "rtc/rtc_sensor.h"
-// #include "sd_card/sd_card.h"
 #include "sd_card/sd_helpers.h"
 #include "shared/alarm/alarm_helpers.h"
 #include "shared/command_ids.h"
@@ -31,6 +31,7 @@
    VARIABLES: Debug and stat output
    ====================================================================== */
 
+bool debugBoost            = true;
 bool debugCanBmw           = false;
 bool debugCanNissan        = false;
 bool debugError            = true;
@@ -41,7 +42,7 @@ bool debugEthernetTraffic  = false;
 bool debugGears            = false;
 bool debugGeneral          = true;
 bool debugPerformance      = true;
-bool debugSdCard           = true;
+bool debugSdCard           = false;
 bool debugSensorReadings   = false;
 bool debugTelemetry        = false;
 
@@ -58,38 +59,35 @@ EthernetConfig ethConfigLocal = {
 const IPAddress remoteArduinoIp(192, 168, 10, 101);
 
 /* ======================================================================
-   VARIABLES: Engine parameters from CAN or remote Arduino
+   VARIABLES: From CAN or remote Arduino
    ====================================================================== */
 
-int currentEngineTempCelcius = 0; // Read from Nissan CAN
+bool currentSwitchStateClutchEngaged; // Read from remote Arduino
+bool currentSwitchStateInNeutral;     // Read from remote Arduino
+int  currentEngineSpeedRpm      = 0;  // Read from remote Arduino
+int  currentEngineTempCelcius   = 0;  // Read from Nissan CAN
+int  currentOilPressureGaugeKpa = 0;  // Read from remote Arduino
+int  currentOilTempCelsius      = 0;  // Read from remote Arduino
 
 /* ======================================================================
-   VARIABLES: General use / functional
+   VARIABLES: Read from CAN buses
    ====================================================================== */
 
-float valueFromRemote; // Scratch variable to transport variable values from remote Arduino
+float currentVehicleSpeedFrontKph = 0; // Read from BMW CAN
+float currentVehicleSpeedRearKph  = 0; // Read from BMW CAN
 
 /* ======================================================================
-   VARIABLES: Physical sensor inputs local to Arduino
+   VARIABLES: Physical sensor inputs local to master Arduino
    ====================================================================== */
 
 int currentLuxReading      = 0; // Variable to store the current lux reading from remote Arduino
 int currentElectronicsTemp = 0; // Variable to store the current electronics temperature reading from RTC
 
 /* ======================================================================
-   VARIABLES: Read from slave Arduino
+   VARIABLES: General use / functional
    ====================================================================== */
 
-bool currentSwitchStateClutch;
-bool currentSwitchStateNeutral;
-int  currentEngineSpeedRpm = 0;
-
-/* ======================================================================
-   VARIABLES: Read from CAN buses
-   ====================================================================== */
-
-float currentVehicleSpeedFrontKph = 0; // Vehicle speed from front wheels
-float currentVehicleSpeedRearKph  = 0; // Vehicle speed from rear wheels
+float valueFromRemote; // Scratch variable to transport variable values from remote Arduino
 
 /* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
@@ -105,6 +103,7 @@ ptScheduler ptHandleSdCardTasks         = ptScheduler(PT_TIME_50MS); // Handle S
 ptScheduler ptReadSwitchStateClutch   = ptScheduler(PT_TIME_100MS);
 ptScheduler ptReadSwitchStateNeutral  = ptScheduler(PT_TIME_100MS);
 ptScheduler ptUpdateAlarmStatesMaster = ptScheduler(PT_TIME_200MS);
+ptScheduler ptUpdateBoostTargetKpa    = ptScheduler(PT_TIME_200MS);
 ptScheduler ptUpdateCurrentGear       = ptScheduler(PT_TIME_100MS);
 
 // Low frequency tasks (seconds)
@@ -155,11 +154,11 @@ void loop() {
 
   // Update the current clutch and neutral statuses from the remote Arduino
   if (ptReadSwitchStateClutch.call() && handleTelemetryFloat(SENSOR_CLUTCH, &valueFromRemote)) {
-    currentSwitchStateClutch = valueFromRemote;
+    currentSwitchStateClutchEngaged = valueFromRemote;
   }
 
   if (ptReadSwitchStateNeutral.call() && handleTelemetryFloat(SENSOR_NEUTRAL, &valueFromRemote)) {
-    currentSwitchStateNeutral = valueFromRemote;
+    currentSwitchStateInNeutral = valueFromRemote;
   }
 
   // Update the current RPM reading from the remote Arduino
@@ -196,5 +195,10 @@ void loop() {
   // Handle scheduled tasks related to SD card operations
   if (globalHealthSdCardLogging && ptHandleSdCardTasks.call()) {
     handleSdCardScheduledTasks();
+  }
+
+  // Update the boost target Kpa based on various conditions
+  if (ptUpdateBoostTargetKpa.call()) {
+    updateBoostTargetGaugeKpa();
   }
 }

@@ -21,18 +21,43 @@ ptScheduler ptFlushLogFiles         = ptScheduler(PT_TIME_5S);
    VARIABLES
    ====================================================================== */
 
-bool      globalHealthSdCardLogging                  = true; // Global flag to control SD card logging health
-bool      sdCardInserted                             = false;
-bool      sdReadyToLogTelemetry                      = false;
-bool      sdLogTelemetry                             = false;
-char      telemetryLogFilename[FILENAME_BUFFER_SIZE] = {0};
-const int ENGINE_STOPPED_RPM_THRESHOLD               = 2000; // RPM threshold to consider engine stopped
-File      logFileTelemetry;
+bool          globalHealthSdCardLogging                  = true; // Global flag to control SD card logging health
+bool          sdCardInserted                             = false;
+bool          sdReadyToLogTelemetry                      = false;
+bool          sdLogTelemetry                             = false;
+char          telemetryLogFilename[FILENAME_BUFFER_SIZE] = {0};
+const int     ENGINE_STOPPED_RPM_THRESHOLD               = 2000; // RPM threshold to consider engine stopped
+File          logFileTelemetry;
+DateTime      rtcStartTime;
+unsigned long millisAtRtcStart = 0;
 
 /* ======================================================================
    FUNCTION DEFINITIONS
    ====================================================================== */
 
+// Get current date and time from the RTC sensor
+void updateRtcStartTime() {
+  rtcStartTime     = getRtcCurrentDateTime();
+  millisAtRtcStart = millis();
+  DEBUG_GENERAL("\tRTC start time updated: %02d:%02d:%02d", rtcStartTime.hour(), rtcStartTime.minute(), rtcStartTime.second());
+}
+
+// Get ISO 8601 timestamp in the format "YYYY-MM-DDTHH:MM:SS.sss"
+void getIso8601Timestamp(char *buffer, size_t bufferSize) {
+  unsigned long elapsed = millis() - millisAtRtcStart;
+
+  // Add elapsed seconds to the RTC base
+  DateTime currentTime = rtcStartTime + TimeSpan(0, 0, 0, elapsed / 1000);
+  int      millisPart  = elapsed % 1000;
+
+  snprintf(buffer, bufferSize,
+           "%04d-%02d-%02dT%02d:%02d:%02d.%03d",
+           currentTime.year(), currentTime.month(), currentTime.day(),
+           currentTime.hour(), currentTime.minute(), currentTime.second(),
+           millisPart);
+}
+
+// Initialises the SD card breakout board and checks for card presence
 void initialiseSdBreakout() {
   DEBUG_GENERAL("Initialising SD card breakout ...");
 
@@ -45,7 +70,8 @@ void initialiseSdBreakout() {
     if (SD.begin(SD_CS_PIN)) {
       DEBUG_GENERAL("\t\tSD card initialized successfully.");
       sdCardInserted = true;
-      createSdLogFiles(); // Initialize log files
+      updateRtcStartTime(); // Update RTC start time on successful SD card initialization
+      createSdLogFiles();   // Initialize log files
     } else {
       DEBUG_ERROR("\tSD.begin failed. Card initialization failed.");
       sdCardInserted            = false;

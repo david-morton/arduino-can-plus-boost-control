@@ -6,6 +6,7 @@
    HELPER: Global flags and functions for debugging
    ====================================================================== */
 
+extern bool debugBoost;
 extern bool debugCanBmw;
 extern bool debugCanNissan;
 extern bool debugError;
@@ -56,6 +57,9 @@ inline void printDebugTimestamp() {
       Serial.println(_buf);                             \
     }                                                   \
   } while (0)
+
+#define DEBUG_BOOST(fmt, ...) \
+  _DEBUG_PRINTF(debugBoost, "BOOST", fmt, ##__VA_ARGS__)
 
 #define DEBUG_CAN_BMW(fmt, ...) \
   _DEBUG_PRINTF(debugCanBmw, "CAN BMW", fmt, ##__VA_ARGS__)

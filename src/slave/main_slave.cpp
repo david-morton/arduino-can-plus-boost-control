@@ -55,28 +55,28 @@ const IPAddress remoteArduinoIp(192, 168, 10, 100);
    VARIABLES: Physical sensor inputs from mux
    ====================================================================== */
 
-bool currentSwitchStateClutch         = false;
-bool currentSwitchStateNeutral        = false;
-int  currentBrakePressureFrontKpa     = 0;
-int  currentBrakePressureRearKpa      = 0;
-int  currentCoolantTempCelsius        = 0;
-int  currentCrankCaseVacuumKpa        = 0;
-int  currentFuelPressureKpa           = 0;
-int  currentIntakeTempBank1Celsius    = 0;
-int  currentIntakeTempBank2Celsius    = 0;
-int  currentIntakeTempManifoldCelsius = 0;
-int  currentOilPressureKpa            = 0;
-int  currentOilTempCelsius            = 0;
+bool currentSwitchStateClutchEngaged   = false;
+bool currentSwitchStateInNeutral       = false;
+int  currentBrakePressureFrontGaugeKpa = 0;
+int  currentBrakePressureRearGaugeKpa  = 0;
+int  currentCoolantTempCelsius         = 0;
+int  currentCrankCaseVacuumGaugeKpa    = 0;
+int  currentFuelPressureGaugeKpa       = 0;
+int  currentIntakeTempBank1Celsius     = 0;
+int  currentIntakeTempBank2Celsius     = 0;
+int  currentIntakeTempManifoldCelsius  = 0;
+int  currentOilPressureGaugeKpa        = 0;
+int  currentOilTempCelsius             = 0;
 
 /* ======================================================================
    VARIABLES: Physical sensor inputs local to Arduino
    ====================================================================== */
 
-int currentAmbientLux                = 0;
-int currentIntakePressureBank1Kpa    = 0;
-int currentIntakePressureBank2Kpa    = 0;
-int currentIntakePressureManifoldKpa = 0;
-int currentEngineSpeedRpm            = 0;
+int currentAmbientLux                     = 0;
+int currentIntakePressureBank1GaugeKpa    = 0;
+int currentIntakePressureBank2GaugeKpa    = 0;
+int currentIntakePressureManifoldGaugeKpa = 0;
+int currentEngineSpeedRpm                 = 0;
 
 /* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
@@ -132,11 +132,11 @@ void loop() {
 
   // Read the state of clutch and neutral switches, and update current variables
   if (ptReadSwitchStateClutch.call()) {
-    buildTelemetryItem(SENSOR_CLUTCH, currentSwitchStateClutch = readStableMuxDigitalChannelReading(MUX_CHANNEL_CLUTCH_SWITCH, 3, 2));
+    buildTelemetryItem(SENSOR_CLUTCH, currentSwitchStateClutchEngaged = readStableMuxDigitalChannelReading(MUX_CHANNEL_CLUTCH_SWITCH, 3, 2));
   }
 
   if (ptReadSwitchStateNeutral.call()) {
-    buildTelemetryItem(SENSOR_NEUTRAL, currentSwitchStateNeutral = readStableMuxDigitalChannelReading(MUX_CHANNEL_NEUTRAL_SWITCH, 3, 2));
+    buildTelemetryItem(SENSOR_NEUTRAL, currentSwitchStateInNeutral = readStableMuxDigitalChannelReading(MUX_CHANNEL_NEUTRAL_SWITCH, 3, 2));
   }
 
   // Get the current RPM value, and stage for telemetry transmission. This will also update the RPM calculation frequency based on the current RPM

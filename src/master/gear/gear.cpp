@@ -38,7 +38,7 @@ void updateCurrentGear() {
   static int lastReportedGear = -99; // Invalid initial value to force first debug output
 
   // Return 0 if in neutral or clutch is disengaged
-  if (currentSwitchStateNeutral || currentSwitchStateClutch) {
+  if (currentSwitchStateInNeutral || currentSwitchStateClutchEngaged) {
     currentGear = 0;
     if (debugGears && lastReportedGear != 0) {
       DEBUG_GEARS("Current gear is 0 (neutral or clutch disengaged)");

@@ -21,8 +21,10 @@ const byte SD_CD_PIN = 8; // Card detect pin for the SD card breakout board
    VARIABLES
    ====================================================================== */
 
-extern bool globalHealthSdCardLogging;
-extern File logFileTelemetry;
+extern bool          globalHealthSdCardLogging;
+extern File          logFileTelemetry;
+extern DateTime      rtcStartTime;
+extern unsigned long millisAtRtcStart;
 
 /* ======================================================================
    FUNCTION PROTOTYPES
@@ -31,6 +33,8 @@ extern File logFileTelemetry;
 bool generateNextAvailableLogFilename(char *buffer, size_t bufferSize, const DateTime &now, const char *extension);
 void createSdLogFiles();
 void flushAndCloseLogFile();
+void getIso8601Timestamp(char *buffer, size_t bufferSize);
 void handleEngineStateChange();
 void handleSdCardScheduledTasks();
 void initialiseSdBreakout();
+void updateRtcStartTime();

@@ -23,6 +23,3 @@ void sendDataStateToRemote() {
 
   sendUdpMessageWithCommand(CMD_SYSTEM_DATA, buffer);
 }
-
-// [00:00:34.001] [DEBUG ETHERNET MESSAGES] Sent UDP message with command ID 5: 5,warn=0,crit=0
-// [00:00:34.003] [DEBUG ERROR] Global Alarm States: Critical: ON, Warning: OFF

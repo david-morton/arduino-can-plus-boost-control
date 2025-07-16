@@ -1,0 +1,34 @@
+#include <ptScheduler.h>
+
+#include "../../shared/alarm/alarm_helpers.h"
+#include "../../shared/debug_logging.h"
+#include "../../shared/variables_vehicle_parameters.h"
+#include "../check_light/check_light.h"
+#include "boost_helpers.h"
+
+/* ======================================================================
+   VARIABLES
+   ====================================================================== */
+
+int currentBoostTargetGaugeKpa = 0;
+
+/* ======================================================================
+   SCHEDULER OBJECTS
+   ====================================================================== */
+
+/* ======================================================================
+   FUNCTION DEFINITIONS
+   ====================================================================== */
+
+// Update the boost target Kpa based on various conditions
+void updateBoostTargetGaugeKpa() {
+  // Set to 0 and return for known states where boost should not be applied
+  if (globalAlarmCriticalState || globalAlarmWarningState || currentCheckEngineLightState != CHECK_LIGHT_OFF ||
+      currentSwitchStateClutchEngaged || currentSwitchStateInNeutral ||
+      currentEngineTempCelcius < 80 || currentOilTempCelsius < 60 || currentOilPressureGaugeKpa < 100) {
+    currentBoostTargetGaugeKpa = 0;
+    return;
+  }
+  currentBoostTargetGaugeKpa = 20;
+  // TODO: Implement logic to calculate the boost target based on other parameters like gear, wheel spin etc
+}

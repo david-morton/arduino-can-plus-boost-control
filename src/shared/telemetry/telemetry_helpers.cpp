@@ -1,5 +1,5 @@
-#include "telemetry_send_staging.h"
 #include "../debug_logging.h"
+#include "telemetry_send_staging.h"
 
 /* ======================================================================
    FUNCTION DEFINITIONS
@@ -11,13 +11,21 @@ const char *getTelemetryKeyForField(TelemetryField field) {
     case SENSOR_LUX:
       return "lux";
     case SENSOR_CLUTCH:
-      return "clutch";
+      return "clutchEngaged";
     case SENSOR_NEUTRAL:
-      return "neutral";
+      return "inNeutral";
     case SENSOR_ELECTRONICS_TEMP:
       return "electronicsTemp";
     case SENSOR_RPM:
       return "rpm";
+    case BOOST_TARGET:
+      return "boostTargetKpa";
+    case BOOST_MANIFOLD:
+      return "boostManifoldKpa";
+    case BOOST_BANK1:
+      return "boostBank1Kpa";
+    case BOOST_BANK2:
+      return "boostBank2Kpa";
     default:
       return nullptr;
   }

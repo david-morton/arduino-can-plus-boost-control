@@ -24,8 +24,6 @@ void buildTelemetryItem(TelemetryField key, float value) {
 
   telemetryStaging[key].value = value;
   telemetryStaging[key].valid = true;
-
-  // DEBUG_TELEMETRY("Staged telemetry: key=%d (%s), value=%.2f", key, getTelemetryKeyForField((TelemetryField)key), value);
 }
 
 // Build and send staged telemetry for a specific message class
