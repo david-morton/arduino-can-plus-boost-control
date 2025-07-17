@@ -3,10 +3,10 @@
 #include <Arduino.h>
 
 /* ======================================================================
-   DEFINES
+   CONSTANTS
    ====================================================================== */
 
-#define DIGITAL_VOLTAGE_THRESHOLD 500 // Threshold for digital logic read via analog pin
+constexpr int DIGITAL_VOLTAGE_THRESHOLD = 500; // Threshold for digital logic read via analog pin
 
 /* ======================================================================
    FUNCTION PROTOTYPES

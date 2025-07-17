@@ -44,12 +44,12 @@ typedef struct {
 } TelemetrySlot;
 
 /* ======================================================================
-   STATIC CONSTANTS
+   CONSTANTS
    ====================================================================== */
 
-#define MAX_CHARS_PER_KV_PAIR 20 // e.g., "engineTemp=-123.45,"
-#define SAFETY_MARGIN_BYTES 8    // Some slack for formatting
-#define TELEMETRY_MESSAGE_BUFFER_SIZE ((NUM_TELEMETRY_FIELDS * MAX_CHARS_PER_KV_PAIR) + SAFETY_MARGIN_BYTES)
+constexpr int MAX_CHARS_PER_KV_PAIR         = 20; // e.g., "engineTemp=-123.45,"
+constexpr int SAFETY_MARGIN_BYTES           = 8;  // Some slack for formatting
+constexpr int TELEMETRY_MESSAGE_BUFFER_SIZE = ((NUM_TELEMETRY_FIELDS * MAX_CHARS_PER_KV_PAIR) + SAFETY_MARGIN_BYTES);
 
 // Ensure the telemetry message buffer size is reasonable for our use case.
 // This may need to be adjusted based on the actual number of fields and their expected sizes.

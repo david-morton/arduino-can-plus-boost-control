@@ -5,10 +5,10 @@
 #include <SD.h>
 
 /* ======================================================================
-   DEFINES
+   CONSTANTS
    ====================================================================== */
 
-#define FILENAME_BUFFER_SIZE 16 // Size of the buffer for filenames
+constexpr auto FILENAME_BUFFER_SIZE = 16; // Size of the buffer for filenames
 
 /* ======================================================================
    PIN CONSTANTS

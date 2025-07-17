@@ -21,8 +21,7 @@ extern int  currentOilTempCelsius;             // Mux channel voltage divided 1.
    VARIABLES: Physical sensor inputs read directly on slave Arduino
    ====================================================================== */
 
-extern int currentAmbientLux; // I2C Light sensor
-
+extern int currentAmbientLux;                     // I2C Light sensor
 extern int currentIntakePressureBank1GaugeKpa;    // Analogue Bosch 3 bar TMAP
 extern int currentIntakePressureBank2GaugeKpa;    // Analogue Bosch 3 bar TMAP
 extern int currentIntakePressureManifoldGaugeKpa; // Analogue Bosch 3 bar TMAP

@@ -4,7 +4,7 @@
 #include "../../shared/debug_logging.h"
 #include "../../shared/variables_vehicle_parameters.h"
 #include "../check_light/check_light.h"
-#include "boost_helpers.h"
+#include "boost_helpers_master.h"
 
 /* ======================================================================
    VARIABLES

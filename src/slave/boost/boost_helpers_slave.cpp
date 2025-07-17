@@ -1,18 +1,11 @@
-#pragma once
-
-#include <Arduino.h>
-
-/* ======================================================================
-   CONSTANTS
-   ====================================================================== */
-
-// Define the moving window array size for light readings
-constexpr int LIGHT_SENSOR_READINGS_SIZE = 5;
+#include "../../shared/debug_logging.h"
+#include "../../shared/variables_vehicle_parameters.h"
 
 /* ======================================================================
-   FUNCTION PROTOTYPES
+   VARIABLES
    ====================================================================== */
 
-void initialiseAmbientLightSensor();
-void readAmbientLightSensor();
-int  calculateAverageLux();
+
+/* ======================================================================
+   FUNCTION DEFINITIONS
+   ====================================================================== */

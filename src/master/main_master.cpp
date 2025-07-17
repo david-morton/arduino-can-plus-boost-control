@@ -3,7 +3,7 @@
 #include <ptScheduler.h>
 
 #include "alarm/alarms_master.h"
-#include "boost/boost_helpers.h"
+#include "boost/boost_helpers_master.h"
 #include "can/can_helpers.h"
 #include "can/can_receive.h"
 #include "can/can_send.h"
@@ -62,7 +62,7 @@ const IPAddress remoteArduinoIp(192, 168, 10, 101);
    VARIABLES: Read from CAN buses
    ====================================================================== */
 
-int  currentEngineTempCelcius     = 0;  // Read from Nissan CAN
+int   currentEngineTempCelcius    = 0; // Read from Nissan CAN
 float currentVehicleSpeedFrontKph = 0; // Read from BMW CAN
 float currentVehicleSpeedRearKph  = 0; // Read from BMW CAN
 

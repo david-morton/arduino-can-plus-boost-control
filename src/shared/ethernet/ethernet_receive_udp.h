@@ -3,8 +3,12 @@
 #include <Arduino.h>
 #include <Ethernet.h>
 
+/* ======================================================================
+   CONSTANTS
+   ====================================================================== */
+
 // Define the packet buffer sizes in bytes (maximum size of UDP packets)
-#define RECEIVE_PACKET_BUFFER_SIZE 256
+constexpr int RECEIVE_PACKET_BUFFER_SIZE = 256;
 
 extern char udpReceiveBuffer[RECEIVE_PACKET_BUFFER_SIZE];
 
