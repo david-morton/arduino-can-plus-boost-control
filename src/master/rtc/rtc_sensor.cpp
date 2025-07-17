@@ -1,11 +1,16 @@
 #include <Arduino.h>
 #include <RTClib.h>
 
-
 #include "../../shared/debug_logging.h"
 #include "rtc_sensor.h"
 
 RTC_DS3231 rtc;
+
+/* ======================================================================
+   VARIABLES
+   ====================================================================== */
+
+int currentElectronicsRtcTemp = 0; // Variable to store the current electronics temperature reading from RTC
 
 /* ======================================================================
    FUNCTION DEFINITIONS

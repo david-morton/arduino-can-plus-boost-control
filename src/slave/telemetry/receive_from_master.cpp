@@ -4,10 +4,11 @@
 #include "../../shared/telemetry/telemetry_receive_parser.h"
 #include "../../shared/variables_vehicle_parameters.h"
 
-
 /* ======================================================================
-   VARIABLES: From CAN or remote Arduino
+   VARIABLES: From remote Arduino
    ====================================================================== */
+
+int currentBoostTargetGaugeKpa = 0;
 
 /* ======================================================================
    VARIABLES: General use / functional

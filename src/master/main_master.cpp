@@ -59,20 +59,6 @@ EthernetConfig ethConfigLocal = {
 const IPAddress remoteArduinoIp(192, 168, 10, 101);
 
 /* ======================================================================
-   VARIABLES: Read from CAN buses
-   ====================================================================== */
-
-int   currentEngineTempCelcius    = 0; // Read from Nissan CAN
-float currentVehicleSpeedFrontKph = 0; // Read from BMW CAN
-float currentVehicleSpeedRearKph  = 0; // Read from BMW CAN
-
-/* ======================================================================
-   VARIABLES: Physical sensor inputs local to master Arduino
-   ====================================================================== */
-
-int currentElectronicsRtcTemp = 0; // Variable to store the current electronics temperature reading from RTC
-
-/* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
    ====================================================================== */
 
@@ -122,7 +108,7 @@ void loop() {
   // Check for, and process any incoming UDP messages as fast as possible within the main loop
   handleIncomingUdpMessage();
 
-  // Handle shared scheduled tasks. Most of these are common tasks that are run on both master and slave Arduinos
+  // Handle shared scheduled tasks. Most of these are common tasks that are run on both MASTER AND SLAVE Arduinos
   if (ptHandleCommonTasks.call()) {
     handleCommonScheduledTasks();
   }

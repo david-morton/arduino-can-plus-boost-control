@@ -20,6 +20,7 @@ int  luxValue                                        = 0;     // Variable to sto
 int  lightSensorReadings[LIGHT_SENSOR_READINGS_SIZE] = {0};   // Array to store multiple readings
 int  lightSensorReadingIndex                         = 0;     // Current index in circular buffer
 int  defaultLuxValue                                 = 200;   // Default lux value to return if sensor reading is invalid
+int  currentAmbientLux                               = 0;     // Variable to store the current ambient light level in lux
 
 /* ======================================================================
    FUNCTION DEFINITIONS

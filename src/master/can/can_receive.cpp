@@ -4,6 +4,14 @@
 #include "can_helpers.h"
 
 /* ======================================================================
+   VARIABLES: Read from CAN buses
+   ====================================================================== */
+
+int   currentEngineTempCelcius    = 0; // Read from Nissan CAN
+float currentVehicleSpeedFrontKph = 0; // Read from BMW CAN
+float currentVehicleSpeedRearKph  = 0; // Read from BMW CAN
+
+/* ======================================================================
    FUNCTION DEFINITIONS
    ====================================================================== */
 

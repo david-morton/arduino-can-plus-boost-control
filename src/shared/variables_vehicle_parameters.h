@@ -18,6 +18,12 @@ extern int  currentOilPressureGaugeKpa;        // Mux channel analogue
 extern int  currentOilTempCelsius;             // Mux channel voltage divided 1.5k ?
 
 /* ======================================================================
+   VARIABLES: Physical sensor inputs read directly on master Arduino
+   ====================================================================== */
+
+extern int currentElectronicsRtcTemp; // Read from RTC sensor on master Arduino
+
+/* ======================================================================
    VARIABLES: Physical sensor inputs read directly on slave Arduino
    ====================================================================== */
 

@@ -9,12 +9,11 @@
    VARIABLES
    ====================================================================== */
 
-const int              rpmCalculationFrequencyThreshold = 1500; // RPM threshold to switch between fast and slow update frequency
-const int              rpmPulsesPerRevolution           = 3;    // Number of pulses on the signal wire per crank revolution
-unsigned long          previousRpmPulseCounter;                 // Will store previous the number of pulses counted
-unsigned long          previousRpmPulseTime;                    // Will store previous ISR micros value for calculations
-volatile unsigned long latestRpmPulseCounter = 0;               // Will store latest number of pulses counted
-volatile unsigned long latestRpmPulseTime    = micros();        // Will store latest ISR micros value for calculations
+int                    currentEngineSpeedRpm = 0;        // Current RPM value
+unsigned long          previousRpmPulseCounter;          // Will store previous the number of pulses counted
+unsigned long          previousRpmPulseTime;             // Will store previous ISR micros value for calculations
+volatile unsigned long latestRpmPulseCounter = 0;        // Will store latest number of pulses counted
+volatile unsigned long latestRpmPulseTime    = micros(); // Will store latest ISR micros value for calculations
 
 /* ======================================================================
    ISR: Update the RPM counter and time via interrupt

@@ -1,8 +1,10 @@
 #include <Arduino.h>
 #include <ptScheduler.h>
 
+#include "../shared/ethernet/ethernet_helpers.h"
 #include "alarm/alarm_buzzer.h"
 #include "alarm/alarms_slave.h"
+#include "boost/boost_control.h"
 #include "engine_speed/engine_speed.h"
 #include "lux_sensor/lux_sensor.h"
 #include "mux/mux_helpers.h"
@@ -13,7 +15,6 @@
 #include "shared/command_ids.h"
 #include "shared/common_task_scheduling.h"
 #include "shared/debug_logging.h"
-#include "shared/ethernet/ethernet_helpers.h"
 #include "shared/ethernet/ethernet_receive_udp.h"
 #include "shared/ethernet/ethernet_send_udp.h"
 #include "shared/telemetry/telemetry_send_staging.h"
@@ -28,6 +29,7 @@
    VARIABLES: Debug and stat output
    ====================================================================== */
 
+bool debugBoost            = true;
 bool debugError            = true;
 bool debugEthernetGeneral  = false;
 bool debugEthernetMessages = false;
@@ -56,28 +58,8 @@ const IPAddress remoteArduinoIp(192, 168, 10, 100);
    VARIABLES: Physical sensor inputs from mux
    ====================================================================== */
 
-bool currentSwitchStateClutchEngaged   = false;
-bool currentSwitchStateInNeutral       = false;
-int  currentBrakePressureFrontGaugeKpa = 0;
-int  currentBrakePressureRearGaugeKpa  = 0;
-int  currentCoolantTempCelsius         = 0;
-int  currentCrankCaseVacuumGaugeKpa    = 0;
-int  currentFuelPressureGaugeKpa       = 0;
-int  currentIntakeTempBank1Celsius     = 0;
-int  currentIntakeTempBank2Celsius     = 0;
-int  currentIntakeTempManifoldCelsius  = 0;
-int  currentOilPressureGaugeKpa        = 0;
-int  currentOilTempCelsius             = 0;
-
-/* ======================================================================
-   VARIABLES: Physical sensor inputs local to Arduino
-   ====================================================================== */
-
-int currentAmbientLux                     = 0;
-int currentIntakePressureBank1GaugeKpa    = 0;
-int currentIntakePressureBank2GaugeKpa    = 0;
-int currentIntakePressureManifoldGaugeKpa = 0;
-int currentEngineSpeedRpm                 = 0;
+bool currentSwitchStateClutchEngaged = false;
+bool currentSwitchStateInNeutral     = false;
 
 /* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
@@ -86,6 +68,7 @@ int currentEngineSpeedRpm                 = 0;
 // High frequency tasks (tens of milliseconds)
 ptScheduler ptHandleCommonTasks                = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
 ptScheduler ptHandleTelemetryReceivedFromSlave = ptScheduler(PT_TIME_10MS); // Handle staged telemetry data received from remote Arduino
+ptScheduler ptHandleBoostControlTasks          = ptScheduler(PT_TIME_20MS); // Handle boost control tasks, such as solenoid control and pressure monitoring
 
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptReadSwitchStateClutch       = ptScheduler(PT_TIME_100MS);
@@ -122,7 +105,7 @@ void loop() {
   // Check for, and process any incoming UDP messages as fast as possible within the main loop
   handleIncomingUdpMessage();
 
-  // Handle shared scheduled tasks. Most of these are common tasks that are run on both master and slave Arduinos
+  // Handle shared scheduled tasks. Most of these are common tasks that are run on both MASTER AND SLAVE Arduinos
   if (ptHandleCommonTasks.call()) {
     handleCommonScheduledTasks();
   }
@@ -130,6 +113,11 @@ void loop() {
   // Handle telemetry data received from remote Arduino
   if (ptHandleTelemetryReceivedFromSlave.call()) {
     handleTelemetryReceivedFromMaster();
+  }
+
+  // Handle boost control tasks, such as solenoid control and pressure monitoring
+  if (ptHandleBoostControlTasks.call()) {
+    handleBoosControlTasks();
   }
 
   // Read ambient light sensor value at a defined interval and store for transmission
