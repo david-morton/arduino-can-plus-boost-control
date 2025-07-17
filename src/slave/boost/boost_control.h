@@ -4,4 +4,3 @@
    FUNCTION PROTOTYPES
    ====================================================================== */
 
-void handleTelemetryReceivedFromMaster();

@@ -77,15 +77,15 @@ int currentElectronicsRtcTemp = 0; // Variable to store the current electronics 
    ====================================================================== */
 
 // High frequency tasks (tens of milliseconds)
-ptScheduler ptHandleCommonTasks               = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
-ptScheduler ptHandleTelemetryReceivedFromSlave = ptScheduler(PT_TIME_10MS); // Handle telemetry data received from remote Arduino
-ptScheduler ptSendCanMessages                 = ptScheduler(PT_TIME_10MS); // Send CAN messages to BMW network
-ptScheduler ptHandleSdCardTasks               = ptScheduler(PT_TIME_50MS); // Handle SD card tasks
+ptScheduler ptHandleCommonTasks                = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
+ptScheduler ptHandleTelemetryReceivedFromSlave = ptScheduler(PT_TIME_10MS); // Handle staged telemetry data received from remote Arduino
+ptScheduler ptSendCanMessages                  = ptScheduler(PT_TIME_10MS); // Send CAN messages to BMW network
+ptScheduler ptHandleSdCardTasks                = ptScheduler(PT_TIME_50MS); // Handle SD card tasks
 
 // Medium frequency tasks (hundreds of milliseconds)
-ptScheduler ptUpdateAlarmStatesMaster = ptScheduler(PT_TIME_200MS);
-ptScheduler ptUpdateBoostTargetKpa    = ptScheduler(PT_TIME_200MS);
-ptScheduler ptUpdateCurrentGear       = ptScheduler(PT_TIME_100MS);
+ptScheduler ptUpdateAlarmStatesMaster   = ptScheduler(PT_TIME_200MS);
+ptScheduler ptUpdateBoostTargetKpaGauge = ptScheduler(PT_TIME_200MS);
+ptScheduler ptUpdateCurrentGear         = ptScheduler(PT_TIME_100MS);
 
 // Low frequency tasks (seconds)
 ptScheduler ptUpdateCheckLightStatus    = ptScheduler(PT_TIME_1S);
@@ -163,7 +163,7 @@ void loop() {
   }
 
   // Update the boost target Kpa based on various conditions
-  if (ptUpdateBoostTargetKpa.call()) {
+  if (ptUpdateBoostTargetKpaGauge.call()) {
     updateBoostTargetGaugeKpa();
   }
 }

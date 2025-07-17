@@ -84,8 +84,8 @@ int currentEngineSpeedRpm                 = 0;
    ====================================================================== */
 
 // High frequency tasks (tens of milliseconds)
-ptScheduler ptHandleCommonTasks      = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
-ptScheduler ptHandleTelemetryReceive = ptScheduler(PT_TIME_10MS); // Handle telemetry data received from remote Arduino
+ptScheduler ptHandleCommonTasks                = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
+ptScheduler ptHandleTelemetryReceivedFromSlave = ptScheduler(PT_TIME_10MS); // Handle staged telemetry data received from remote Arduino
 
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptReadSwitchStateClutch       = ptScheduler(PT_TIME_100MS);
@@ -125,6 +125,11 @@ void loop() {
   // Handle shared scheduled tasks. Most of these are common tasks that are run on both master and slave Arduinos
   if (ptHandleCommonTasks.call()) {
     handleCommonScheduledTasks();
+  }
+
+  // Handle telemetry data received from remote Arduino
+  if (ptHandleTelemetryReceivedFromSlave.call()) {
+    handleTelemetryReceivedFromMaster();
   }
 
   // Read ambient light sensor value at a defined interval and store for transmission
