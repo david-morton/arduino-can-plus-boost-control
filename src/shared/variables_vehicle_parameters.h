@@ -34,7 +34,7 @@ extern int currentEngineSpeedRpm;                 // Interrupt measured square w
 
 extern float currentVehicleSpeedFrontKph;
 extern float currentVehicleSpeedRearKph;
-extern int   currentElectronicsTempCelcius;
+extern int   currentElectronicsRtcTempCelcius;
 extern int   currentEngineTempCelcius;
 
 /* ======================================================================

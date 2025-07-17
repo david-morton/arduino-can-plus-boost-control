@@ -19,11 +19,11 @@
 #include "shared/ethernet/ethernet_helpers.h"
 #include "shared/ethernet/ethernet_receive_udp.h"
 #include "shared/ethernet/ethernet_send_udp.h"
-#include "shared/telemetry/telemetry_receive_parser.h"
 #include "shared/telemetry/telemetry_send_staging.h"
 #include "shared/udp_command_dispatcher.h"
 #include "shared/variables_programmatic.h"
 #include "shared/variables_vehicle_parameters.h"
+#include "telemetry/receive_from_slave.h"
 
 #define CAN_2515
 
@@ -59,20 +59,10 @@ EthernetConfig ethConfigLocal = {
 const IPAddress remoteArduinoIp(192, 168, 10, 101);
 
 /* ======================================================================
-   VARIABLES: From CAN or remote Arduino
-   ====================================================================== */
-
-bool currentSwitchStateClutchEngaged; // Read from remote Arduino
-bool currentSwitchStateInNeutral;     // Read from remote Arduino
-int  currentEngineSpeedRpm      = 0;  // Read from remote Arduino
-int  currentEngineTempCelcius   = 0;  // Read from Nissan CAN
-int  currentOilPressureGaugeKpa = 0;  // Read from remote Arduino
-int  currentOilTempCelsius      = 0;  // Read from remote Arduino
-
-/* ======================================================================
    VARIABLES: Read from CAN buses
    ====================================================================== */
 
+int  currentEngineTempCelcius     = 0;  // Read from Nissan CAN
 float currentVehicleSpeedFrontKph = 0; // Read from BMW CAN
 float currentVehicleSpeedRearKph  = 0; // Read from BMW CAN
 
@@ -80,35 +70,25 @@ float currentVehicleSpeedRearKph  = 0; // Read from BMW CAN
    VARIABLES: Physical sensor inputs local to master Arduino
    ====================================================================== */
 
-int currentLuxReading      = 0; // Variable to store the current lux reading from remote Arduino
-int currentElectronicsTemp = 0; // Variable to store the current electronics temperature reading from RTC
-
-/* ======================================================================
-   VARIABLES: General use / functional
-   ====================================================================== */
-
-float valueFromRemote; // Scratch variable to transport variable values from remote Arduino
+int currentElectronicsRtcTemp = 0; // Variable to store the current electronics temperature reading from RTC
 
 /* ======================================================================
    OBJECTS: Pretty tiny scheduler objects / tasks
    ====================================================================== */
 
 // High frequency tasks (tens of milliseconds)
-ptScheduler ptReadCurrentEngineSpeedRpm = ptScheduler(PT_TIME_50MS);
-ptScheduler ptHandleCommonTasks         = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
-ptScheduler ptSendCanMessages           = ptScheduler(PT_TIME_10MS); // Send CAN messages to BMW network
-ptScheduler ptHandleSdCardTasks         = ptScheduler(PT_TIME_50MS); // Handle SD card tasks
+ptScheduler ptHandleCommonTasks               = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
+ptScheduler ptHandleTelemetryReceivedFromSlave = ptScheduler(PT_TIME_10MS); // Handle telemetry data received from remote Arduino
+ptScheduler ptSendCanMessages                 = ptScheduler(PT_TIME_10MS); // Send CAN messages to BMW network
+ptScheduler ptHandleSdCardTasks               = ptScheduler(PT_TIME_50MS); // Handle SD card tasks
 
 // Medium frequency tasks (hundreds of milliseconds)
-ptScheduler ptReadSwitchStateClutch   = ptScheduler(PT_TIME_100MS);
-ptScheduler ptReadSwitchStateNeutral  = ptScheduler(PT_TIME_100MS);
 ptScheduler ptUpdateAlarmStatesMaster = ptScheduler(PT_TIME_200MS);
 ptScheduler ptUpdateBoostTargetKpa    = ptScheduler(PT_TIME_200MS);
 ptScheduler ptUpdateCurrentGear       = ptScheduler(PT_TIME_100MS);
 
 // Low frequency tasks (seconds)
 ptScheduler ptUpdateCheckLightStatus    = ptScheduler(PT_TIME_1S);
-ptScheduler ptGetCurrentLuxReading      = ptScheduler(PT_TIME_2S);
 ptScheduler ptGetElectronicsTemperature = ptScheduler(PT_TIME_1MIN);
 
 /* ======================================================================
@@ -147,29 +127,14 @@ void loop() {
     handleCommonScheduledTasks();
   }
 
-  // Update the current lux reading from the remote Arduino
-  if (ptGetCurrentLuxReading.call() && handleTelemetryFloat(SENSOR_LUX, &valueFromRemote)) {
-    currentLuxReading = valueFromRemote;
-  }
-
-  // Update the current clutch and neutral statuses from the remote Arduino
-  if (ptReadSwitchStateClutch.call() && handleTelemetryFloat(SENSOR_CLUTCH, &valueFromRemote)) {
-    currentSwitchStateClutchEngaged = valueFromRemote;
-  }
-
-  if (ptReadSwitchStateNeutral.call() && handleTelemetryFloat(SENSOR_NEUTRAL, &valueFromRemote)) {
-    currentSwitchStateInNeutral = valueFromRemote;
-  }
-
-  // Update the current RPM reading from the remote Arduino
-  // If the remote Arduino is not sending new RPM data, this will not update
-  if (ptReadCurrentEngineSpeedRpm.call() && handleTelemetryFloat(SENSOR_RPM, &valueFromRemote)) {
-    currentEngineSpeedRpm = valueFromRemote;
+  // Handle telemetry data received from remote Arduino
+  if (ptHandleTelemetryReceivedFromSlave.call()) {
+    handleTelemetryReceivedFromSlave();
   }
 
   // Read the electronics temperature from the RTC sensor
   if (ptGetElectronicsTemperature.call()) {
-    currentElectronicsTemp = getRtcCurrentTemperature();
+    currentElectronicsRtcTemp = getRtcCurrentTemperature();
   }
 
   // Update the status of the check light

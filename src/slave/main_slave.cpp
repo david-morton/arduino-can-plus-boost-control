@@ -20,6 +20,7 @@
 #include "shared/udp_command_dispatcher.h"
 #include "shared/variables_programmatic.h"
 #include "shared/variables_vehicle_parameters.h"
+#include "telemetry/receive_from_master.h"
 
 #define CAN_2515
 
@@ -83,7 +84,8 @@ int currentEngineSpeedRpm                 = 0;
    ====================================================================== */
 
 // High frequency tasks (tens of milliseconds)
-ptScheduler ptHandleCommonTasks = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
+ptScheduler ptHandleCommonTasks      = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
+ptScheduler ptHandleTelemetryReceive = ptScheduler(PT_TIME_10MS); // Handle telemetry data received from remote Arduino
 
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptReadSwitchStateClutch       = ptScheduler(PT_TIME_100MS);
