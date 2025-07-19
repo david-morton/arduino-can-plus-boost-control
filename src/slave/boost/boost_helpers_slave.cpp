@@ -27,5 +27,5 @@ int readBosch3BarTmapPressure(uint8_t pin) {
   pinVoltage             = constrain(pinVoltage, 0.0f, sensorSupplyVoltage);        // Clamp to expected range
   float pressureAbsolute = ((pinVoltage / sensorSupplyVoltage) - c0) / c1;
   float pressureGaugeKpa = pressureAbsolute - 100.0f; // Convert to gauge pressure
-  return static_cast<int>(pressureGaugeKpa);
+  return pressureGaugeKpa;
 }

@@ -4,3 +4,5 @@
    FUNCTION PROTOTYPES
    ====================================================================== */
 
+void configureBoostControlPidControl();
+void calculateAndApplyBoostControl();

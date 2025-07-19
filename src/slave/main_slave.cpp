@@ -5,6 +5,7 @@
 #include "alarm/alarm_buzzer.h"
 #include "alarm/alarms_slave.h"
 #include "boost/boost_control.h"
+#include "boost/boost_pid.h"
 #include "engine_speed/engine_speed.h"
 #include "lux_sensor/lux_sensor.h"
 #include "mux/mux_helpers.h"
@@ -92,6 +93,7 @@ void setup() {
   initialiseEthernetShield(ethConfigLocal);
   initialiseAmbientLightSensor();
   performAlarmBuzzerStartupBeep();
+  configureBoostControlPidControl();
 }
 
 /* ======================================================================
@@ -117,7 +119,7 @@ void loop() {
 
   // Handle boost control tasks, such as solenoid control and pressure monitoring
   if (ptHandleBoostControlTasks.call()) {
-    handleBoosControlTasks();
+    handleBoostControlTasks();
   }
 
   // Read ambient light sensor value at a defined interval and store for transmission

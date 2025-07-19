@@ -27,11 +27,8 @@ extern int currentElectronicsRtcTemp; // Read from RTC sensor on master Arduino
    VARIABLES: Physical sensor inputs read directly on slave Arduino
    ====================================================================== */
 
-extern int currentAmbientLux;                     // I2C Light sensor
-extern int currentIntakePressureBank1GaugeKpa;    // Analogue Bosch 3 bar TMAP
-extern int currentIntakePressureBank2GaugeKpa;    // Analogue Bosch 3 bar TMAP
-extern int currentIntakePressureManifoldGaugeKpa; // Analogue Bosch 3 bar TMAP
-extern int currentEngineSpeedRpm;                 // Interrupt measured square wave from Nissan ECU
+extern int currentAmbientLux;     // I2C Light sensor
+extern int currentEngineSpeedRpm; // Interrupt measured square wave from Nissan ECU
 
 /* ======================================================================
    VARIABLES: Values populated on master Arduino

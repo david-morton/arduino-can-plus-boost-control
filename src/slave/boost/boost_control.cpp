@@ -6,25 +6,28 @@
 #include "../pin_assignments_slave.h"
 #include "boost_control.h"
 #include "boost_helpers_slave.h"
+#include "boost_pid.h"
 
 /* ======================================================================
    VARIABLES
    ====================================================================== */
 
-bool targetZeroBoost                       = false; // Global failsafe flag to set target boost to zero
-int  boostTargetGaugeKpa                   = 0;
-int  currentIntakePressureBank1GaugeKpa    = 0;
-int  currentIntakePressureBank2GaugeKpa    = 0;
-int  currentIntakePressureManifoldGaugeKpa = 0;
+bool   targetZeroBoost                       = false; // Global failsafe flag to set target boost to zero
+double boostTargetGaugeKpa                   = 0;
+double currentIntakePressureBank1GaugeKpa    = 0;
+double currentIntakePressureBank2GaugeKpa    = 0;
+double currentIntakePressureManifoldGaugeKpa = 0;
 
 /* ======================================================================
    SCHEDULER OBJECTS
    ====================================================================== */
 
+// High frequency tasks (tens of milliseconds)
+ptScheduler ptCalculateAndApplyBoostControl(PT_TIME_50MS);
+ptScheduler ptReadIntakePressuresGaugeKpa(PT_TIME_50MS);
+
 // Medium frequency tasks (hundreds of milliseconds)
-ptScheduler ptCheckGlobalWarningAndErrorConditions(PT_TIME_50MS);
-ptScheduler ptReadIntakePressuresGaugeKpa(PT_TIME_100MS);
-ptScheduler ptUpdateBoostTargetGaugeKpa(PT_TIME_100MS);
+ptScheduler ptCheckGlobalWarningAndErrorConditions(PT_TIME_100MS);
 
 // Low frequency tasks (seconds)
 ptScheduler ptOutputBoostDebug(PT_TIME_5S);
@@ -35,22 +38,15 @@ ptScheduler ptOutputBoostDebug(PT_TIME_5S);
 
 // TODO: We want to initialise our referance pressures before startupup to account for altitude or similar
 
-void handleBoosControlTasks() {
+void handleBoostControlTasks() {
   // Check for global warning and error conditions and set target boost to zero if any are present. We will use this to
   // override any target value which may be set by the master Arduino if comms are lost or a local alarm condition is triggered.
   if (ptCheckGlobalWarningAndErrorConditions.call()) {
     if (globalAlarmWarningState || globalAlarmCriticalState) {
-      targetZeroBoost = true;
-    } else {
-      targetZeroBoost = false;
-    }
-  }
-
-  // Update the target boost value from the master Arduino if it is not zero and no global alarm conditions are present
-  if (ptUpdateBoostTargetGaugeKpa.call()) {
-    if (targetZeroBoost) {
+      targetZeroBoost     = true;
       boostTargetGaugeKpa = 0;
     } else {
+      targetZeroBoost     = false;
       boostTargetGaugeKpa = recommendedBoostTargetGaugeKpa;
     }
   }
@@ -62,7 +58,10 @@ void handleBoosControlTasks() {
     currentIntakePressureManifoldGaugeKpa = readBosch3BarTmapPressure(PIN_TMAP_PRESSURE_MANIFOLD);
   }
 
-  // TODO: Implement boost solenoid control logic here based on the target boost and current intake pressures.
+  // Calculate and apply the PID control for boost solenoids
+  if (ptCalculateAndApplyBoostControl.call()) {
+    calculateAndApplyBoostControl();
+  }
 
   // Log debug data when needed
   if (debugBoost && ptOutputBoostDebug.call()) {
