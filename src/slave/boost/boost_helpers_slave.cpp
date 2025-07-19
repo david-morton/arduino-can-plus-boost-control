@@ -7,8 +7,7 @@
    CONSTANTS
    ====================================================================== */
 
-// Constants for the Bosch 3 Bar TMAP pressure sensor calculations
-// as per https://www.bosch-motorsport-shop.com.au/t-map-sensor-3-bar-130-deg-c
+// Constants for the Bosch 3 Bar TMAP pressure sensor calculations as per https://www.bosch-motorsport-shop.com.au/t-map-sensor-3-bar-130-deg-c
 constexpr float c0 = 5.4f / 280.0f;
 constexpr float c1 = 0.85f / 280.0f;
 
@@ -17,10 +16,6 @@ constexpr float sensorSupplyVoltage = 5.0f;
 
 // ADC resolution for Arduino (10-bit ADC yields values from 0–1023)
 constexpr float adcResolution = 1023.0f;
-
-/* ======================================================================
-   VARIABLES
-   ====================================================================== */
 
 /* ======================================================================
    FUNCTION DEFINITIONS

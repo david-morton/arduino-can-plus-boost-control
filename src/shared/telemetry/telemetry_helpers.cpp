@@ -8,23 +8,23 @@
 // Reverse lookup: get field enum from key string
 const char *getTelemetryKeyForField(TelemetryField field) {
   switch (field) {
-    case SENSOR_LUX:
+    case TM_LUX:
       return "lux";
-    case SENSOR_CLUTCH:
+    case TM_CLUTCH_IN:
       return "clutchEngaged";
-    case SENSOR_NEUTRAL:
+    case TM_IN_NEUTRAL:
       return "inNeutral";
-    case SENSOR_ELECTRONICS_TEMP:
+    case TM_ELECTRONICS_TEMP:
       return "electronicsTemp";
-    case SENSOR_RPM:
+    case TM_RPM:
       return "rpm";
-    case BOOST_TARGET:
-      return "boostTargetKpa";
-    case BOOST_MANIFOLD:
+    case TM_BOOST_RECOMMENDATION:
+      return "boostRecommendationKpa";
+    case TM_BOOST_MANIFOLD:
       return "boostManifoldKpa";
-    case BOOST_BANK1:
+    case TM_BOOST_BANK1:
       return "boostBank1Kpa";
-    case BOOST_BANK2:
+    case TM_BOOST_BANK2:
       return "boostBank2Kpa";
     default:
       return nullptr;
@@ -33,11 +33,11 @@ const char *getTelemetryKeyForField(TelemetryField field) {
 
 // Reverse lookup table matching key strings to enum fields
 TelemetryField getTelemetryFieldForKey(const char *key) {
-  for (int i = 0; i < NUM_TELEMETRY_FIELDS; i++) {
+  for (int i = 0; i < TM_COUNT; i++) {
     const char *knownKey = getTelemetryKeyForField((TelemetryField)i);
     if (knownKey != nullptr && strcmp(knownKey, key) == 0) {
       return (TelemetryField)i;
     }
   }
-  return NUM_TELEMETRY_FIELDS; // Invalid
+  return TM_COUNT; // Invalid
 }

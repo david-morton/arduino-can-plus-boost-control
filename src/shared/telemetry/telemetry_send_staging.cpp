@@ -8,7 +8,7 @@
    ====================================================================== */
 
 // Define the number of telemetry fields
-TelemetrySlot telemetryStaging[NUM_TELEMETRY_FIELDS];
+TelemetrySlot telemetryStaging[TM_COUNT];
 
 /* ======================================================================
    FUNCTION DEFINITIONS
@@ -17,19 +17,20 @@ TelemetrySlot telemetryStaging[NUM_TELEMETRY_FIELDS];
 // Add a telemetry item to the staging area ready to pickup and send
 // New sensor key value pais are defined in getTelemetryKeyForField and telemetry_send_staging.h
 void buildTelemetryItem(TelemetryField key, float value) {
-  if (key >= NUM_TELEMETRY_FIELDS) {
+  if (key >= TM_COUNT) {
     DEBUG_ERROR("Invalid telemetry key during staging: %d", key);
     return;
   }
 
   telemetryStaging[key].value = value;
   telemetryStaging[key].valid = true;
+  // DEBUG_TELEMETRY_STAGING("Staged telemetry item: %s = %g", getTelemetryKeyForField(key), value);
 }
 
 // Build and send staged telemetry for a specific message class
 // This function will send all valid telemetry items for the specified message class
 void sendStagedTelemetry(TelemetryMessageClass msgClass, int commandId) {
-  if (msgClass >= NUM_MESSAGE_CLASSES) {
+  if (msgClass >= MC_COUNT) {
     DEBUG_ERROR("Invalid message class: %d", msgClass);
     return;
   }
@@ -37,7 +38,7 @@ void sendStagedTelemetry(TelemetryMessageClass msgClass, int commandId) {
   char   messageBuffer[TELEMETRY_MESSAGE_BUFFER_SIZE];
   size_t offset = 0;
 
-  for (int key = 0; key < NUM_TELEMETRY_FIELDS; key++) {
+  for (int key = 0; key < TM_COUNT; key++) {
     if (keyToMessageClass[key] != msgClass) {
       continue; // Skip if the key does not match the requested message class
     }
@@ -68,7 +69,7 @@ void sendStagedTelemetry(TelemetryMessageClass msgClass, int commandId) {
   }
 
   // Clear and update sent values only for relevant fields
-  for (int key = 0; key < NUM_TELEMETRY_FIELDS; key++) {
+  for (int key = 0; key < TM_COUNT; key++) {
     if (keyToMessageClass[key] == msgClass && telemetryStaging[key].valid) {
       telemetryStaging[key].lastSent = telemetryStaging[key].value;
       telemetryStaging[key].valid    = false;

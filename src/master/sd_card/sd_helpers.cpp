@@ -39,7 +39,7 @@ unsigned long millisAtRtcStart = 0;
 void updateRtcStartTime() {
   rtcStartTime     = getRtcCurrentDateTime();
   millisAtRtcStart = millis();
-  DEBUG_GENERAL("\tRTC start time updated: %02d:%02d:%02d", rtcStartTime.hour(), rtcStartTime.minute(), rtcStartTime.second());
+  DEBUG_GENERAL("\t\tRTC start time updated: %02d:%02d:%02d", rtcStartTime.hour(), rtcStartTime.minute(), rtcStartTime.second());
 }
 
 // Get ISO 8601 timestamp in the format "YYYY-MM-DDTHH:MM:SS.sss"

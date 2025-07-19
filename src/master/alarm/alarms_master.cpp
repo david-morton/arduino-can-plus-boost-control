@@ -2,6 +2,7 @@
 
 #include "../../shared/alarm/alarm_helpers.h"
 #include "../../shared/debug_logging.h"
+#include "../../shared/ethernet/ethernet_helpers.h"
 #include "../../shared/variables_programmatic.h"
 #include "../../shared/variables_vehicle_parameters.h"
 #include "alarms_master.h"
@@ -23,7 +24,7 @@ void updateLocalCriticalAlarmState() {
 // Check all current warning alarm conditions, and update the alarm state accordingly
 void updateLocalWarningAlarmState() {
   // TODO: Add more warning alarm conditions as needed
-  if (pingLossPercent > alarmThresholdsWarning.pingLossPercent) {
+  if (pingLossPercent > alarmThresholdsWarning.pingLossPercent || !globalHealthEthernetConnected || !globalHealthEthernetPeerOnline) {
     localAlarmWarningState = true;
   } else {
     localAlarmWarningState = false;

@@ -46,7 +46,7 @@ extern int   currentEngineTempCelcius;
    VARIABLES: Derived or calculated values on master Arduino
    ====================================================================== */
 
-extern int currentBoostTargetGaugeKpa;
+extern int recommendedBoostTargetGaugeKpa;
 extern int currentCheckEngineLightState;
 extern int currentGear;
 extern int currentRadiatorFanDutyPercentage;

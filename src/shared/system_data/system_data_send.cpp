@@ -1,9 +1,9 @@
 #include <Arduino.h>
 
 #include "../alarm/alarm_helpers.h"
-#include "../command_ids.h"
 #include "../debug_logging.h"
 #include "../ethernet/ethernet_send_udp.h"
+#include "../telemetry/telemetry_payload_ids.h"
 #include "system_data_send.h"
 
 /* ======================================================================
@@ -21,5 +21,5 @@ void sendDataStateToRemote() {
     return;
   }
 
-  sendUdpMessageWithCommand(CMD_SYSTEM_DATA, buffer);
+  sendUdpMessageWithCommand(PAYLOAD_ID_SYSTEM_DATA, buffer);
 }

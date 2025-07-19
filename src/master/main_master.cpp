@@ -13,12 +13,12 @@
 #include "rtc/rtc_sensor.h"
 #include "sd_card/sd_helpers.h"
 #include "shared/alarm/alarm_helpers.h"
-#include "shared/command_ids.h"
 #include "shared/common_task_scheduling.h"
 #include "shared/debug_logging.h"
 #include "shared/ethernet/ethernet_helpers.h"
 #include "shared/ethernet/ethernet_receive_udp.h"
 #include "shared/ethernet/ethernet_send_udp.h"
+#include "shared/telemetry/telemetry_payload_ids.h"
 #include "shared/telemetry/telemetry_send_staging.h"
 #include "shared/udp_command_dispatcher.h"
 #include "shared/variables_programmatic.h"
@@ -31,7 +31,7 @@
    VARIABLES: Debug and stat output
    ====================================================================== */
 
-bool debugBoost            = true;
+bool debugBoost            = false;
 bool debugCanBmw           = false;
 bool debugCanNissan        = false;
 bool debugError            = true;
@@ -41,7 +41,7 @@ bool debugEthernetPing     = false;
 bool debugEthernetTraffic  = false;
 bool debugGears            = false;
 bool debugGeneral          = true;
-bool debugPerformance      = true;
+bool debugPerformance      = false;
 bool debugSdCard           = false;
 bool debugSensorReadings   = false;
 bool debugTelemetry        = false;
@@ -69,9 +69,10 @@ ptScheduler ptSendCanMessages                  = ptScheduler(PT_TIME_10MS); // S
 ptScheduler ptHandleSdCardTasks                = ptScheduler(PT_TIME_50MS); // Handle SD card tasks
 
 // Medium frequency tasks (hundreds of milliseconds)
-ptScheduler ptUpdateAlarmStatesMaster   = ptScheduler(PT_TIME_200MS);
-ptScheduler ptUpdateBoostTargetKpaGauge = ptScheduler(PT_TIME_200MS);
-ptScheduler ptUpdateCurrentGear         = ptScheduler(PT_TIME_100MS);
+ptScheduler ptUpdateAlarmStatesMaster    = ptScheduler(PT_TIME_200MS);
+ptScheduler ptUpdateBoostTargetKpaGauge  = ptScheduler(PT_TIME_200MS);
+ptScheduler ptUpdateCurrentGear          = ptScheduler(PT_TIME_100MS);
+ptScheduler ptSendRecommendedBoostTarget = ptScheduler(PT_TIME_100MS);
 
 // Low frequency tasks (seconds)
 ptScheduler ptUpdateCheckLightStatus    = ptScheduler(PT_TIME_1S);
@@ -118,6 +119,11 @@ void loop() {
     handleTelemetryReceivedFromSlave();
   }
 
+  // Stage the recommended boost target for sending
+  if (ptSendRecommendedBoostTarget.call()) {
+    buildTelemetryItem(TM_BOOST_RECOMMENDATION, recommendedBoostTargetGaugeKpa);
+  }
+
   // Read the electronics temperature from the RTC sensor
   if (ptGetElectronicsTemperature.call()) {
     currentElectronicsRtcTemp = getRtcCurrentTemperature();
@@ -150,6 +156,6 @@ void loop() {
 
   // Update the boost target Kpa based on various conditions
   if (ptUpdateBoostTargetKpaGauge.call()) {
-    updateBoostTargetGaugeKpa();
+    updateRecommendedBoostTargetGaugeKpa();
   }
 }

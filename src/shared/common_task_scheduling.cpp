@@ -2,13 +2,13 @@
 #include <ptScheduler.h>
 
 #include "../shared/common_task_scheduling.h"
-#include "shared/command_ids.h"
 #include "shared/debug_logging.h"
 #include "shared/ethernet/ethernet_helpers.h"
 #include "shared/ethernet/ethernet_ping_monitor.h"
 #include "shared/ethernet/ethernet_receive_udp.h"
 #include "shared/ethernet/ethernet_send_udp.h"
 #include "shared/system_data/system_data_send.h"
+#include "shared/telemetry/telemetry_payload_ids.h"
 #include "shared/telemetry/telemetry_send_staging.h"
 
 #ifdef ARDUINO_MASTER
@@ -31,8 +31,8 @@ unsigned long arduinoLoopExecutionCount = 0;
 ptScheduler ptSendDataStateToRemote = ptScheduler(PT_TIME_200MS);
 
 // Low frequency tasks (seconds)
-ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_1MIN);
 ptScheduler ptHandlePingTimeoutsAndLoss      = ptScheduler(PT_TIME_10S);
+ptScheduler ptReportArduinoPerformanceStats  = ptScheduler(PT_TIME_1MIN);
 ptScheduler ptSendPingRequestToRemoteArduino = ptScheduler(PT_TIME_1S);
 ptScheduler ptUpdateEthernetLinkStatus       = ptScheduler(PT_TIME_1S);
 
@@ -58,17 +58,17 @@ void handleCommonScheduledTasks() {
 
   // Send low frequency messages if peer is online
   if (globalHealthEthernetConnected && globalHealthEthernetPeerOnline && ptSendLowFrequencyMessages.call()) {
-    sendStagedTelemetry(TELEMETRY_CLASS_LOW, CMD_LOW_FREQUENCY_MESSAGES);
+    sendStagedTelemetry(TELEMETRY_CLASS_LOW, PAYLOAD_ID_LOW_FREQUENCY_MESSAGES);
   }
 
   // Send medium frequency messages if peer is online
   if (globalHealthEthernetConnected && globalHealthEthernetPeerOnline && ptSendMediumFrequencyMessages.call()) {
-    sendStagedTelemetry(TELEMETRY_CLASS_MED, CMD_MED_FREQUENCY_MESSAGES);
+    sendStagedTelemetry(TELEMETRY_CLASS_MED, PAYLOAD_ID_MED_FREQUENCY_MESSAGES);
   }
 
   // Send high frequency messages if peer is online
   if (globalHealthEthernetConnected && globalHealthEthernetPeerOnline && ptSendHighFrequencyMessages.call()) {
-    sendStagedTelemetry(TELEMETRY_CLASS_HIGH, CMD_HIGH_FREQUENCY_MESSAGES);
+    sendStagedTelemetry(TELEMETRY_CLASS_HIGH, PAYLOAD_ID_HIGH_FREQUENCY_MESSAGES);
   }
 
   // Report ping RTT stats (if needed) from buffer average

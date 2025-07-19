@@ -2,9 +2,9 @@
 #include <EthernetUdp.h>
 #include <SPI.h>
 
-#include "../command_ids.h"
 #include "../debug_logging.h"
 #include "../system_data/system_data_receive.h"
+#include "../telemetry/telemetry_payload_ids.h"
 #include "../telemetry/telemetry_receive_parser.h"
 #include "../udp_command_dispatcher.h"
 #include "../variables_programmatic.h"
@@ -128,27 +128,21 @@ void handleIncomingUdpMessage() {
   char *payloadStr = strtok(nullptr, "");
 
   switch (commandId) {
-    case CMD_RECEIVE_PING_REQUEST:
+    case PAYLOAD_ID_RECEIVE_PING_REQUEST:
       handlePingRequestOrResponse(0, payloadStr, strlen(payloadStr));
       break;
 
-    case CMD_RECEIVE_PING_RESPONSE:
+    case PAYLOAD_ID_RECEIVE_PING_RESPONSE:
       handlePingRequestOrResponse(1, payloadStr, strlen(payloadStr));
       break;
 
-    case CMD_LOW_FREQUENCY_MESSAGES:
+    case PAYLOAD_ID_LOW_FREQUENCY_MESSAGES:
+    case PAYLOAD_ID_MED_FREQUENCY_MESSAGES:
+    case PAYLOAD_ID_HIGH_FREQUENCY_MESSAGES:
       parseTelemetryPayload(payloadStr);
       break;
 
-    case CMD_MED_FREQUENCY_MESSAGES:
-      parseTelemetryPayload(payloadStr);
-      break;
-
-    case CMD_HIGH_FREQUENCY_MESSAGES:
-      parseTelemetryPayload(payloadStr);
-      break;
-
-    case CMD_SYSTEM_DATA:
+    case PAYLOAD_ID_SYSTEM_DATA:
       parseSystemDataPayload(payloadStr);
       break;
 
@@ -161,12 +155,12 @@ void handleIncomingUdpMessage() {
 // Report on UDP received message statistics, including messages per second (as integer)
 void reportUdpMessageReceiveStats() {
   static unsigned long lastStatsReportTime = 0;
-  static unsigned long lastMessageCount = 0;
+  static unsigned long lastMessageCount    = 0;
 
-  unsigned long currentTime = millis();
-  unsigned long elapsedTime = currentTime - lastStatsReportTime;
+  unsigned long currentTime        = millis();
+  unsigned long elapsedTime        = currentTime - lastStatsReportTime;
   unsigned long messagesThisPeriod = receiveUdpTotalMessageCount - lastMessageCount;
-  unsigned int messagesPerSecond = 0;
+  unsigned int  messagesPerSecond  = 0;
 
   if (elapsedTime > 0) {
     messagesPerSecond = (messagesThisPeriod * 1000UL) / elapsedTime;
@@ -180,5 +174,5 @@ void reportUdpMessageReceiveStats() {
                     outOfSequencePercentage, receiveOutOfSequenceCount, messagesPerSecond);
 
   lastStatsReportTime = currentTime;
-  lastMessageCount = receiveUdpTotalMessageCount;
+  lastMessageCount    = receiveUdpTotalMessageCount;
 }

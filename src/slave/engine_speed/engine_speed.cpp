@@ -35,9 +35,9 @@ int getCurrentEngineSpeedRpm() {
     return 0; // No pulses detected yet
   }
 
-  detachInterrupt(digitalPinToInterrupt(ARDUINO_PIN_TACH_SIGNAL));
+  detachInterrupt(digitalPinToInterrupt(PIN_TACH_SIGNAL));
   int currentEngineSpeedRpm = calculateRpm();
-  attachInterrupt(digitalPinToInterrupt(ARDUINO_PIN_TACH_SIGNAL), updateRpmPulse, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIN_TACH_SIGNAL), updateRpmPulse, RISING);
   return currentEngineSpeedRpm;
 }
 

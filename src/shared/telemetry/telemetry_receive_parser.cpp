@@ -52,7 +52,7 @@ void parseTelemetryPayload(const char *payload) {
 
     TelemetryField field = getTelemetryFieldForKey(key);
 
-    if (field == NUM_TELEMETRY_FIELDS) {
+    if (field == TM_COUNT) {
       DEBUG_ERROR("Telemetry parse error: unknown key [%s]", key);
       pair = strtok(nullptr, ",");
       continue;
@@ -68,7 +68,7 @@ void parseTelemetryPayload(const char *payload) {
     telemetryStaging[field].value = value;
     telemetryStaging[field].valid = true;
 
-    DEBUG_TELEMETRY("Stored telemetry value [%s] = %.2f", key, value);
+    DEBUG_TELEMETRY("Stored received telemetry value [%s] = %.2f", key, value);
 
     pair = strtok(nullptr, ",");
   }

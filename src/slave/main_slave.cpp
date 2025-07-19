@@ -12,11 +12,11 @@
 #include "pin_assignments_slave.h"
 #include "pin_configuration_slave.h"
 #include "shared/alarm/alarm_helpers.h"
-#include "shared/command_ids.h"
 #include "shared/common_task_scheduling.h"
 #include "shared/debug_logging.h"
 #include "shared/ethernet/ethernet_receive_udp.h"
 #include "shared/ethernet/ethernet_send_udp.h"
+#include "shared/telemetry/telemetry_payload_ids.h"
 #include "shared/telemetry/telemetry_send_staging.h"
 #include "shared/udp_command_dispatcher.h"
 #include "shared/variables_programmatic.h"
@@ -122,21 +122,21 @@ void loop() {
 
   // Read ambient light sensor value at a defined interval and store for transmission
   if (ptReadCurrentLuxReading.call()) {
-    buildTelemetryItem(SENSOR_LUX, currentAmbientLux = calculateAverageLux());
+    buildTelemetryItem(TM_LUX, currentAmbientLux = calculateAverageLux());
   }
 
   // Read the state of clutch and neutral switches, and update current variables
   if (ptReadSwitchStateClutch.call()) {
-    buildTelemetryItem(SENSOR_CLUTCH, currentSwitchStateClutchEngaged = readStableMuxDigitalChannelReading(MUX_CHANNEL_CLUTCH_SWITCH, 3, 2));
+    buildTelemetryItem(TM_CLUTCH_IN, currentSwitchStateClutchEngaged = readStableMuxDigitalChannelReading(MUX_CHANNEL_CLUTCH_SWITCH, 3, 2));
   }
 
   if (ptReadSwitchStateNeutral.call()) {
-    buildTelemetryItem(SENSOR_NEUTRAL, currentSwitchStateInNeutral = readStableMuxDigitalChannelReading(MUX_CHANNEL_NEUTRAL_SWITCH, 3, 2));
+    buildTelemetryItem(TM_IN_NEUTRAL, currentSwitchStateInNeutral = readStableMuxDigitalChannelReading(MUX_CHANNEL_NEUTRAL_SWITCH, 3, 2));
   }
 
   // Get the current RPM value, and stage for telemetry transmission. This will also update the RPM calculation frequency based on the current RPM
   if (ptUpdateCurrentEngineSpeedRpm.call()) {
-    buildTelemetryItem(SENSOR_RPM, currentEngineSpeedRpm = getCurrentEngineSpeedRpm());
+    buildTelemetryItem(TM_RPM, currentEngineSpeedRpm = getCurrentEngineSpeedRpm());
     updateRpmSchedulerFrequency(ptUpdateCurrentEngineSpeedRpm, currentEngineSpeedRpm);
   }
 

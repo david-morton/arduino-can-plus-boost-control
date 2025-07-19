@@ -10,7 +10,7 @@
    VARIABLES
    ====================================================================== */
 
-int currentBoostTargetGaugeKpa = 0;
+int recommendedBoostTargetGaugeKpa = 0;
 
 /* ======================================================================
    SCHEDULER OBJECTS
@@ -21,15 +21,17 @@ int currentBoostTargetGaugeKpa = 0;
    ====================================================================== */
 
 // Update the boost target Kpa based on various conditions
-void updateBoostTargetGaugeKpa() {
+void updateRecommendedBoostTargetGaugeKpa() {
   // Set to 0 and return for known states where boost should not be applied
   if (globalAlarmCriticalState || globalAlarmWarningState || currentCheckEngineLightState != CHECK_LIGHT_OFF ||
       currentSwitchStateClutchEngaged || currentSwitchStateInNeutral ||
       currentEngineTempCelcius < 80 || currentOilTempCelsius < 60 || currentOilPressureGaugeKpa < 100) {
-    currentBoostTargetGaugeKpa = 0;
+    recommendedBoostTargetGaugeKpa = 20; //TODO: Change to 0 when boost control is implemented
+    DEBUG_BOOST("Setting recommended boost target to 20 kPa due to error condition or vehicle parameters");
     return;
   }
-  currentBoostTargetGaugeKpa = 20;
+  recommendedBoostTargetGaugeKpa = 30;
+  DEBUG_BOOST("Setting recommended boost target to %d kPa", recommendedBoostTargetGaugeKpa);
   // TODO: Implement logic to calculate the boost target based on other parameters like gear, wheel spin etc
 }
 

@@ -9,7 +9,7 @@
    PIN DEFINITIONS
    ====================================================================== */
 
-const byte alarmBuzzerPin = ARDUINO_PIN_BUZZER;
+const byte alarmBuzzerPin = PIN_BUZZER;
 
 /* ======================================================================
    VARIABLES

@@ -10,11 +10,11 @@
    VARIABLES: Pin constants
    ====================================================================== */
 
-const int  muxS0Pin     = ARDUINO_MUX_S0;
-const int  muxS1Pin     = ARDUINO_MUX_S1;
-const int  muxS2Pin     = ARDUINO_MUX_S2;
-const int  muxS3Pin     = ARDUINO_MUX_S3;
-const byte muxSignalPin = ARDUINO_PIN_MUX_SIGNAL;
+const int  muxS0Pin     = PIN_MUX_S0;
+const int  muxS1Pin     = PIN_MUX_S1;
+const int  muxS2Pin     = PIN_MUX_S2;
+const int  muxS3Pin     = PIN_MUX_S3;
+const byte muxSignalPin = PIN_MUX_SIGNAL;
 
 /* ======================================================================
    OBJECT DECLARATIOS

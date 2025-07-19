@@ -8,7 +8,7 @@
    PIN ASSIGNMENTS
    ====================================================================== */
 
-// const byte rpmSignalPin = ARDUINO_PIN_TACH_SIGNAL;
+// const byte rpmSignalPin = PIN_TACH_SIGNAL;
 
 /* ======================================================================
    FUNCTION DEFINITIONS
@@ -19,18 +19,21 @@ void configureAllPins() {
   DEBUG_GENERAL("Configuring all pins for Arduino ...");
 
   // Set pin modes for MUX control pins
-  pinMode(ARDUINO_MUX_S0, OUTPUT);
-  pinMode(ARDUINO_MUX_S1, OUTPUT);
-  pinMode(ARDUINO_MUX_S2, OUTPUT);
-  pinMode(ARDUINO_MUX_S3, OUTPUT);
-  pinMode(ARDUINO_PIN_MUX_SIGNAL, INPUT);
+  pinMode(PIN_MUX_S0, OUTPUT);
+  pinMode(PIN_MUX_S1, OUTPUT);
+  pinMode(PIN_MUX_S2, OUTPUT);
+  pinMode(PIN_MUX_S3, OUTPUT);
+  pinMode(PIN_MUX_SIGNAL, INPUT);
 
   // Set pin modes for vehicle sensors and actuators
-  pinMode(ARDUINO_PIN_BUZZER, OUTPUT);
-  pinMode(ARDUINO_PIN_TACH_SIGNAL, INPUT_PULLUP);
-  pinMode(ARDUINO_BOOST_SOLENOID_BANK1, OUTPUT);
-  pinMode(ARDUINO_BOOST_SOLENOID_BANK2, OUTPUT);
+  pinMode(PIN_BUZZER, OUTPUT);
+  pinMode(PIN_TACH_SIGNAL, INPUT_PULLUP);
+  pinMode(PIN_TMAP_PRESSURE_BANK1, INPUT);
+  pinMode(PIN_TMAP_PRESSURE_BANK2, INPUT);
+  pinMode(PIN_TMAP_PRESSURE_MANIFOLD, INPUT);
+  pinMode(PIN_BOOST_SOLENOID_BANK1, OUTPUT);
+  pinMode(PIN_BOOST_SOLENOID_BANK2, OUTPUT);
 
   // Attach the interrupt to the RPM signal pin
-  attachInterrupt(digitalPinToInterrupt(ARDUINO_PIN_TACH_SIGNAL), updateRpmPulse, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIN_TACH_SIGNAL), updateRpmPulse, RISING);
 }

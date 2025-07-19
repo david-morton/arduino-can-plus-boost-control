@@ -42,22 +42,22 @@ ptScheduler ptGetCurrentLuxReading = ptScheduler(PT_TIME_2S);
 // Handle staged telemetry data received from remote Arduino (slave)
 void handleTelemetryReceivedFromSlave() {
   // Update the current lux reading from the remote Arduino
-  if (ptGetCurrentLuxReading.call() && handleTelemetryFloat(SENSOR_LUX, &valueFromRemote)) {
+  if (ptGetCurrentLuxReading.call() && handleTelemetryFloat(TM_LUX, &valueFromRemote)) {
     currentLuxReading = valueFromRemote;
   }
 
   // Update the current clutch and neutral statuses from the remote Arduino
-  if (ptGetSwitchStateClutch.call() && handleTelemetryFloat(SENSOR_CLUTCH, &valueFromRemote)) {
+  if (ptGetSwitchStateClutch.call() && handleTelemetryFloat(TM_CLUTCH_IN, &valueFromRemote)) {
     currentSwitchStateClutchEngaged = valueFromRemote;
   }
 
-  if (ptGetSwitchStateNeutral.call() && handleTelemetryFloat(SENSOR_NEUTRAL, &valueFromRemote)) {
+  if (ptGetSwitchStateNeutral.call() && handleTelemetryFloat(TM_IN_NEUTRAL, &valueFromRemote)) {
     currentSwitchStateInNeutral = valueFromRemote;
   }
 
   // Update the current RPM reading from the remote Arduino
   // If the remote Arduino is not sending new RPM data, this will not update
-  if (ptGetCurrentEngineSpeedRpm.call() && handleTelemetryFloat(SENSOR_RPM, &valueFromRemote)) {
+  if (ptGetCurrentEngineSpeedRpm.call() && handleTelemetryFloat(TM_RPM, &valueFromRemote)) {
     currentEngineSpeedRpm = valueFromRemote;
   }
 }
