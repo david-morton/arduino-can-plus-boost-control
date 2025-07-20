@@ -31,7 +31,7 @@ bool writeSdTelemetryLogHeader(File *file) {
   if (!file)
     return false;
 
-  file->print("Timestamp,");
+  file->print("Time,");
   for (size_t i = 0; i < NUM_TELEMETRY_METRICS; ++i) {
     file->print(telemetryMetrics[i].label);
     if (i < NUM_TELEMETRY_METRICS - 1)
@@ -47,7 +47,7 @@ void writeSdTelemetryLogLine() {
     return;
 
   char timestampBuffer[32];
-  getIso8601Timestamp(timestampBuffer, sizeof(timestampBuffer));
+  generateLogTimestamp(timestampBuffer, sizeof(timestampBuffer));
   logFileTelemetry.print(timestampBuffer);
   logFileTelemetry.print(",");
 

@@ -31,7 +31,7 @@
    VARIABLES: Debug and stat output
    ====================================================================== */
 
-bool debugBoost            = false;
+bool debugBoost            = true;
 bool debugCanBmw           = false;
 bool debugCanNissan        = false;
 bool debugError            = true;
@@ -70,7 +70,7 @@ ptScheduler ptHandleSdCardTasks                = ptScheduler(PT_TIME_50MS); // H
 
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptUpdateAlarmStatesMaster    = ptScheduler(PT_TIME_200MS);
-ptScheduler ptUpdateBoostTargetKpaGauge  = ptScheduler(PT_TIME_200MS);
+ptScheduler ptUpdateBoostTargetKpaGauge  = ptScheduler(PT_TIME_100MS);
 ptScheduler ptUpdateCurrentGear          = ptScheduler(PT_TIME_100MS);
 ptScheduler ptSendRecommendedBoostTarget = ptScheduler(PT_TIME_100MS);
 

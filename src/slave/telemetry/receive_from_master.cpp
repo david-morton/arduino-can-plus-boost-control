@@ -8,7 +8,7 @@
    VARIABLES: From remote Arduino
    ====================================================================== */
 
-int recommendedBoostTargetGaugeKpa = 0;
+int recommendedBoostTargetGaugeKpa = -1;
 
 /* ======================================================================
    VARIABLES: General use / functional
@@ -21,7 +21,7 @@ float valueFromRemote; // Scratch variable to transport variable values from rem
    ====================================================================== */
 
 // Medium frequency tasks (hundreds of milliseconds)
-ptScheduler ptGetRecommendedBoostTargetGaugeKpa = ptScheduler(PT_TIME_100MS);
+ptScheduler ptUpdateRecommendedBoostTargetGaugeKpa = ptScheduler(PT_TIME_100MS);
 
 /* ======================================================================
    FUNCTION DEFINITIONS
@@ -31,7 +31,7 @@ ptScheduler ptGetRecommendedBoostTargetGaugeKpa = ptScheduler(PT_TIME_100MS);
 void handleTelemetryReceivedFromMaster() {
 
   // Get the recommended boost target gauge Kpa from the master Arduino via staged data
-  if (ptGetRecommendedBoostTargetGaugeKpa.call() && handleTelemetryFloat(TM_BOOST_RECOMMENDATION, &valueFromRemote)) {
+  if (ptUpdateRecommendedBoostTargetGaugeKpa.call() && handleTelemetryFloat(TM_BOOST_RECOMMENDATION, &valueFromRemote)) {
     recommendedBoostTargetGaugeKpa = valueFromRemote;
   }
 }

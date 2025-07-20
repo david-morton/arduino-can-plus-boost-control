@@ -13,26 +13,36 @@
 int recommendedBoostTargetGaugeKpa = 0;
 
 /* ======================================================================
-   SCHEDULER OBJECTS
-   ====================================================================== */
-
-/* ======================================================================
    FUNCTION DEFINITIONS
    ====================================================================== */
 
 // Update the boost target Kpa based on various conditions
 void updateRecommendedBoostTargetGaugeKpa() {
+  static int previousRecommendedBoostTargetGaugeKpa = -1;
+
   // Set to 0 and return for known states where boost should not be applied
+  // TODO: Add in other alarm conditions when sensors are implemented like currentOilTempCelsius < 60 || currentOilPressureGaugeKpa < 100
   if (globalAlarmCriticalState || globalAlarmWarningState || currentCheckEngineLightState != CHECK_LIGHT_OFF ||
-      currentSwitchStateClutchEngaged || currentSwitchStateInNeutral ||
-      currentEngineTempCelcius < 80 || currentOilTempCelsius < 60 || currentOilPressureGaugeKpa < 100) {
-    recommendedBoostTargetGaugeKpa = 20; //TODO: Change to 0 when boost control is implemented
-    DEBUG_BOOST("Setting recommended boost target to 20 kPa due to error condition or vehicle parameters");
+      currentSwitchStateClutchEngaged || currentSwitchStateInNeutral || currentEngineTempCelcius < 80) {
+    recommendedBoostTargetGaugeKpa = 0;
+    // Log the recommended boost target if it has changed
+    if (debugBoost && recommendedBoostTargetGaugeKpa != previousRecommendedBoostTargetGaugeKpa) {
+      DEBUG_BOOST("Setting recommended boost target to %d kPa", recommendedBoostTargetGaugeKpa);
+      previousRecommendedBoostTargetGaugeKpa = recommendedBoostTargetGaugeKpa;
+    }
     return;
   }
-  recommendedBoostTargetGaugeKpa = 30;
-  DEBUG_BOOST("Setting recommended boost target to %d kPa", recommendedBoostTargetGaugeKpa);
   // TODO: Implement logic to calculate the boost target based on other parameters like gear, wheel spin etc
+  if (currentVehicleSpeedRearKph > 80) {
+    recommendedBoostTargetGaugeKpa = 30;
+  } else {
+    recommendedBoostTargetGaugeKpa = 10;
+  }
+  // Log the recommended boost target if it has changed
+  if (debugBoost && recommendedBoostTargetGaugeKpa != previousRecommendedBoostTargetGaugeKpa) {
+    DEBUG_BOOST("Setting recommended boost target to %d kPa", recommendedBoostTargetGaugeKpa);
+    previousRecommendedBoostTargetGaugeKpa = recommendedBoostTargetGaugeKpa;
+  }
 }
 
 /* ======================================================================

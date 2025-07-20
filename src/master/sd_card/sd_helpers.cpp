@@ -21,12 +21,13 @@ ptScheduler ptFlushLogFiles         = ptScheduler(PT_TIME_5S);
    VARIABLES
    ====================================================================== */
 
-bool          globalHealthSdCardLogging                  = true; // Global flag to control SD card logging health
-bool          sdCardInserted                             = false;
-bool          sdReadyToLogTelemetry                      = false;
-bool          sdLogTelemetry                             = false;
-char          telemetryLogFilename[FILENAME_BUFFER_SIZE] = {0};
-const int     ENGINE_STOPPED_RPM_THRESHOLD               = 2000; // RPM threshold to consider engine stopped
+bool globalHealthSdCardLogging                  = true; // Global flag to control SD card logging health
+bool sdCardInserted                             = false;
+bool sdReadyToLogTelemetry                      = false;
+bool sdLogTelemetry                             = false;
+char telemetryLogFilename[FILENAME_BUFFER_SIZE] = {0};
+// TODO: Update this RPM value to 300 or similar
+const int     ENGINE_STOPPED_RPM_THRESHOLD = 2000; // RPM threshold to consider engine stopped
 File          logFileTelemetry;
 DateTime      rtcStartTime;
 unsigned long millisAtRtcStart = 0;
@@ -43,7 +44,7 @@ void updateRtcStartTime() {
 }
 
 // Get ISO 8601 timestamp in the format "YYYY-MM-DDTHH:MM:SS.sss"
-void getIso8601Timestamp(char *buffer, size_t bufferSize) {
+void generateLogTimestamp(char *buffer, size_t bufferSize) {
   unsigned long elapsed = millis() - millisAtRtcStart;
 
   // Add elapsed seconds to the RTC base
@@ -51,10 +52,7 @@ void getIso8601Timestamp(char *buffer, size_t bufferSize) {
   int      millisPart  = elapsed % 1000;
 
   snprintf(buffer, bufferSize,
-           "%04d-%02d-%02dT%02d:%02d:%02d.%03d",
-           currentTime.year(), currentTime.month(), currentTime.day(),
-           currentTime.hour(), currentTime.minute(), currentTime.second(),
-           millisPart);
+           "%02d:%02d:%02d.%03d", currentTime.hour(), currentTime.minute(), currentTime.second(), millisPart);
 }
 
 // Initialises the SD card breakout board and checks for card presence

@@ -67,13 +67,13 @@ bool currentSwitchStateInNeutral     = false;
    ====================================================================== */
 
 // High frequency tasks (tens of milliseconds)
-ptScheduler ptHandleCommonTasks                = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
-ptScheduler ptHandleTelemetryReceivedFromSlave = ptScheduler(PT_TIME_10MS); // Handle staged telemetry data received from remote Arduino
-ptScheduler ptHandleBoostControlTasks          = ptScheduler(PT_TIME_20MS); // Handle boost control tasks, such as solenoid control and pressure monitoring
+ptScheduler ptHandleCommonTasks                 = ptScheduler(PT_TIME_10MS); // Common tasks that are run on both master and slave Arduinos
+ptScheduler ptHandleTelemetryReceivedFromMaster = ptScheduler(PT_TIME_10MS); // Handle staged telemetry data received from remote Arduino
+ptScheduler ptHandleBoostControlTasks           = ptScheduler(PT_TIME_20MS); // Handle boost control tasks, such as solenoid control and pressure monitoring
 
 // Medium frequency tasks (hundreds of milliseconds)
-ptScheduler ptReadSwitchStateClutch       = ptScheduler(PT_TIME_100MS);
-ptScheduler ptReadSwitchStateNeutral      = ptScheduler(PT_TIME_100MS);
+ptScheduler ptReadSwitchStateClutch       = ptScheduler(PT_TIME_50MS);
+ptScheduler ptReadSwitchStateNeutral      = ptScheduler(PT_TIME_50MS);
 ptScheduler ptUpdateAlarmStatesSlave      = ptScheduler(PT_TIME_200MS);
 ptScheduler ptUpdateCurrentEngineSpeedRpm = ptScheduler(PT_TIME_200MS); // Initially set to 200ms, will be adjusted based on current RPM
 
@@ -113,7 +113,7 @@ void loop() {
   }
 
   // Handle telemetry data received from remote Arduino
-  if (ptHandleTelemetryReceivedFromSlave.call()) {
+  if (ptHandleTelemetryReceivedFromMaster.call()) {
     handleTelemetryReceivedFromMaster();
   }
 

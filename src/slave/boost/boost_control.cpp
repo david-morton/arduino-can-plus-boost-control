@@ -4,6 +4,7 @@
 #include "../../shared/debug_logging.h"
 #include "../../shared/variables_vehicle_parameters.h"
 #include "../pin_assignments_slave.h"
+#include "../telemetry/receive_from_master.h"
 #include "boost_control.h"
 #include "boost_helpers_slave.h"
 #include "boost_pid.h"
@@ -27,7 +28,6 @@ ptScheduler ptCalculateAndApplyBoostControl(PT_TIME_50MS);
 ptScheduler ptReadIntakePressuresGaugeKpa(PT_TIME_50MS);
 
 // Medium frequency tasks (hundreds of milliseconds)
-ptScheduler ptCheckGlobalWarningAndErrorConditions(PT_TIME_100MS);
 
 // Low frequency tasks (seconds)
 ptScheduler ptOutputBoostDebug(PT_TIME_5S);
@@ -41,14 +41,12 @@ ptScheduler ptOutputBoostDebug(PT_TIME_5S);
 void handleBoostControlTasks() {
   // Check for global warning and error conditions and set target boost to zero if any are present. We will use this to
   // override any target value which may be set by the master Arduino if comms are lost or a local alarm condition is triggered.
-  if (ptCheckGlobalWarningAndErrorConditions.call()) {
-    if (globalAlarmWarningState || globalAlarmCriticalState) {
-      targetZeroBoost     = true;
-      boostTargetGaugeKpa = 0;
-    } else {
-      targetZeroBoost     = false;
-      boostTargetGaugeKpa = recommendedBoostTargetGaugeKpa;
-    }
+  if (globalAlarmWarningState || globalAlarmCriticalState) {
+    targetZeroBoost     = true;
+    boostTargetGaugeKpa = 0;
+  } else {
+    targetZeroBoost     = false;
+    boostTargetGaugeKpa = recommendedBoostTargetGaugeKpa;
   }
 
   // Read intake pressure sensors
@@ -68,7 +66,7 @@ void handleBoostControlTasks() {
     if (targetZeroBoost) {
       DEBUG_ERROR("Global warning or error condition detected, setting boost target to zero.");
     }
-    DEBUG_BOOST("Intake Pressures are: Bank 1: %d kPa, Bank 2: %d kPa, Manifold: %d kPa against a target of %d kPa",
+    DEBUG_BOOST("Intake Pressures are: Bank 1: %.0f kPa, Bank 2: %.0f kPa, Manifold: %.0f kPa against a target of %.0f kPa",
                 currentIntakePressureBank1GaugeKpa,
                 currentIntakePressureBank2GaugeKpa,
                 currentIntakePressureManifoldGaugeKpa,

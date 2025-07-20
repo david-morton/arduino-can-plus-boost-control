@@ -33,7 +33,7 @@ extern unsigned long millisAtRtcStart;
 bool generateNextAvailableLogFilename(char *buffer, size_t bufferSize, const DateTime &now, const char *extension);
 void createSdLogFiles();
 void flushAndCloseLogFile();
-void getIso8601Timestamp(char *buffer, size_t bufferSize);
+void generateLogTimestamp(char *buffer, size_t bufferSize);
 void handleEngineStateChange();
 void handleSdCardScheduledTasks();
 void initialiseSdBreakout();
