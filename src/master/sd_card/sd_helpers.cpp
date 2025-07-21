@@ -43,16 +43,19 @@ void updateRtcStartTime() {
   DEBUG_GENERAL("\t\tRTC start time updated: %02d:%02d:%02d", rtcStartTime.hour(), rtcStartTime.minute(), rtcStartTime.second());
 }
 
-// Get ISO 8601 timestamp in the format "YYYY-MM-DDTHH:MM:SS.sss"
+// Get timestamp in the format "HH:MM:SS.sss"
 void generateLogTimestamp(char *buffer, size_t bufferSize) {
   unsigned long elapsed = millis() - millisAtRtcStart;
 
-  // Add elapsed seconds to the RTC base
-  DateTime currentTime = rtcStartTime + TimeSpan(0, 0, 0, elapsed / 1000);
-  int      millisPart  = elapsed % 1000;
+  // Safely add elapsed seconds to the RTC base using epoch math
+  uint32_t baseEpoch    = rtcStartTime.unixtime();
+  uint32_t currentEpoch = baseEpoch + (elapsed / 1000);
+  DateTime currentTime  = DateTime(currentEpoch);
+  uint16_t millisPart   = elapsed % 1000;
 
-  snprintf(buffer, bufferSize,
-           "%02d:%02d:%02d.%03d", currentTime.hour(), currentTime.minute(), currentTime.second(), millisPart);
+  snprintf(buffer, bufferSize, "%02d:%02d:%02d.%03u", currentTime.hour(), currentTime.minute(), currentTime.second(), millisPart);
+
+  DEBUG_SD("Generated log timestamp: %s", buffer);
 }
 
 // Initialises the SD card breakout board and checks for card presence

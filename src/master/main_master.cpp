@@ -31,7 +31,7 @@
    VARIABLES: Debug and stat output
    ====================================================================== */
 
-bool debugBoost            = true;
+bool debugBoost            = false;
 bool debugCanBmw           = false;
 bool debugCanNissan        = false;
 bool debugError            = true;
@@ -44,7 +44,7 @@ bool debugGeneral          = true;
 bool debugPerformance      = false;
 bool debugSdCard           = false;
 bool debugSensorReadings   = false;
-bool debugTelemetry        = false;
+bool debugTelemetry        = true;
 
 /* ======================================================================
    VARIABLES: Ethernet and communication related

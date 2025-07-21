@@ -44,5 +44,4 @@ extern int   currentEngineTempCelcius;
    ====================================================================== */
 
 extern int currentCheckEngineLightState;
-extern int currentGear;
 extern int currentRadiatorFanDutyPercentage;

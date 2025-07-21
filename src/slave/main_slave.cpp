@@ -30,7 +30,7 @@
    VARIABLES: Debug and stat output
    ====================================================================== */
 
-bool debugBoost            = true;
+bool debugBoost            = false;
 bool debugError            = true;
 bool debugEthernetGeneral  = false;
 bool debugEthernetMessages = false;
@@ -74,6 +74,7 @@ ptScheduler ptHandleBoostControlTasks           = ptScheduler(PT_TIME_20MS); // 
 // Medium frequency tasks (hundreds of milliseconds)
 ptScheduler ptReadSwitchStateClutch       = ptScheduler(PT_TIME_50MS);
 ptScheduler ptReadSwitchStateNeutral      = ptScheduler(PT_TIME_50MS);
+ptScheduler ptStageBoostTelemetryItems    = ptScheduler(PT_TIME_100MS);
 ptScheduler ptUpdateAlarmStatesSlave      = ptScheduler(PT_TIME_200MS);
 ptScheduler ptUpdateCurrentEngineSpeedRpm = ptScheduler(PT_TIME_200MS); // Initially set to 200ms, will be adjusted based on current RPM
 
@@ -140,6 +141,13 @@ void loop() {
   if (ptUpdateCurrentEngineSpeedRpm.call()) {
     buildTelemetryItem(TM_RPM, currentEngineSpeedRpm = getCurrentEngineSpeedRpm());
     updateRpmSchedulerFrequency(ptUpdateCurrentEngineSpeedRpm, currentEngineSpeedRpm);
+  }
+
+  // Stage current boost measurements to remote Arduino
+  if (ptStageBoostTelemetryItems.call()) {
+    buildTelemetryItem(TM_BOOST_BANK1, currentIntakePressureBank1GaugeKpa);
+    buildTelemetryItem(TM_BOOST_BANK2, currentIntakePressureBank2GaugeKpa);
+    buildTelemetryItem(TM_BOOST_MANIFOLD, currentIntakePressureManifoldGaugeKpa);
   }
 
   // Update the alarm states based on a range of error conditions and take necessary actions

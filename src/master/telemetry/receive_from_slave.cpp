@@ -15,6 +15,10 @@ int  currentOilPressureGaugeKpa = 0;
 int  currentOilTempCelsius      = 0;
 int  currentLuxReading          = 0;
 
+extern float currentIntakePressureBank1GaugeKpa    = 0;
+extern float currentIntakePressureBank2GaugeKpa    = 0;
+extern float currentIntakePressureManifoldGaugeKpa = 0;
+
 /* ======================================================================
    VARIABLES: General use / functional
    ====================================================================== */
@@ -29,8 +33,9 @@ float valueFromRemote; // Scratch variable to transport variable values from rem
 ptScheduler ptGetCurrentEngineSpeedRpm = ptScheduler(PT_TIME_50MS);
 
 // Medium frequency tasks (hundreds of milliseconds)
-ptScheduler ptGetSwitchStateClutch  = ptScheduler(PT_TIME_100MS);
-ptScheduler ptGetSwitchStateNeutral = ptScheduler(PT_TIME_100MS);
+ptScheduler ptGetSwitchStateClutch        = ptScheduler(PT_TIME_100MS);
+ptScheduler ptGetSwitchStateNeutral       = ptScheduler(PT_TIME_100MS);
+ptScheduler ptGetCurrentBoostMeasurements = ptScheduler(PT_TIME_100MS);
 
 // Low frequency tasks (seconds)
 ptScheduler ptGetCurrentLuxReading = ptScheduler(PT_TIME_2S);
@@ -53,6 +58,19 @@ void handleTelemetryReceivedFromSlave() {
 
   if (ptGetSwitchStateNeutral.call() && handleTelemetryFloat(TM_IN_NEUTRAL, &valueFromRemote)) {
     currentSwitchStateInNeutral = valueFromRemote;
+  }
+
+  // Update the current boost measurements from the remote Arduino
+  if (ptGetCurrentBoostMeasurements.call()) {
+    if (handleTelemetryFloat(TM_BOOST_BANK1, &valueFromRemote)) {
+      currentIntakePressureBank1GaugeKpa = valueFromRemote;
+    }
+    if (handleTelemetryFloat(TM_BOOST_BANK2, &valueFromRemote)) {
+      currentIntakePressureBank2GaugeKpa = valueFromRemote;
+    }
+    if (handleTelemetryFloat(TM_BOOST_MANIFOLD, &valueFromRemote)) {
+      currentIntakePressureManifoldGaugeKpa = valueFromRemote;
+    }
   }
 
   // Update the current RPM reading from the remote Arduino

@@ -2,6 +2,9 @@
 
 #include "../../shared/debug_logging.h"
 #include "../../shared/variables_vehicle_parameters.h"
+#include "../boost/boost_helpers_master.h"
+#include "../gear/gear.h"
+#include "../telemetry/receive_from_slave.h"
 #include "sd_card.h"
 #include "sd_helpers.h"
 
@@ -15,6 +18,11 @@ TelemetryEntry telemetryMetrics[] = {
     {"Front Speed", &currentVehicleSpeedFrontKph, TYPE_FLOAT},
     {"Rear Speed", &currentVehicleSpeedRearKph, TYPE_FLOAT},
     {"Engine Temp", &currentEngineTempCelcius, TYPE_INT},
+    {"Boost Recommended", &recommendedBoostTargetGaugeKpa, TYPE_INT},
+    {"Gear", &currentGear, TYPE_INT},
+    {"Boost Bank 1", &currentIntakePressureBank1GaugeKpa, TYPE_FLOAT},
+    {"Boost Bank 2", &currentIntakePressureBank2GaugeKpa, TYPE_FLOAT},
+    {"Boost Manifold", &currentIntakePressureManifoldGaugeKpa, TYPE_FLOAT},
     {"Clutch Engaged", &currentSwitchStateClutchEngaged, TYPE_BOOL},
     {"In Neutral", &currentSwitchStateInNeutral, TYPE_BOOL},
 };
