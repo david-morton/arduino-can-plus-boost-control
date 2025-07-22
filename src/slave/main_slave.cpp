@@ -21,7 +21,6 @@
 #include "shared/telemetry/telemetry_send_staging.h"
 #include "shared/udp_command_dispatcher.h"
 #include "shared/variables_programmatic.h"
-#include "shared/variables_vehicle_parameters.h"
 #include "telemetry/receive_from_master.h"
 
 #define CAN_2515

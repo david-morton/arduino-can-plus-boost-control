@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 #include "../../shared/debug_logging.h"
-#include "../../shared/variables_vehicle_parameters.h"
+#include "../telemetry/receive_from_slave.h"
 
 /* ======================================================================
    FUNCTION DEFINITIONS
@@ -16,15 +16,15 @@ float calculateRpmMultiplier() {
   static const float measuredHexConversionMultiplerValues[numPoints] = {5.9, 5.4, 5.2, 5.15, 5.1, 5.05, 5.0, 5.0};
 
   // Calculate the rpmHexConversionMultipler based on linear interpolation of measured data points
-  if (currentEngineSpeedRpm <= 1200) {
+  if (currentEngineSpeedRpmFromSlave <= 1200) {
     return measuredHexConversionMultiplerValues[0]; // 5.9
-  } else if (currentEngineSpeedRpm >= 7000) {
+  } else if (currentEngineSpeedRpmFromSlave >= 7000) {
     return measuredHexConversionMultiplerValues[numPoints - 1]; // 5.0
   } else {
     // Find the two nearest RPM values in the table
     int i;
     for (i = 0; i < numPoints - 1; ++i) {
-      if (measuredRpmValues[i + 1] >= currentEngineSpeedRpm) {
+      if (measuredRpmValues[i + 1] >= currentEngineSpeedRpmFromSlave) {
         break;
       }
     }
@@ -34,7 +34,7 @@ float calculateRpmMultiplier() {
     float y0 = measuredHexConversionMultiplerValues[i];
     float y1 = measuredHexConversionMultiplerValues[i + 1];
 
-    rpmHexConversionMultipler = y0 + (y1 - y0) * (currentEngineSpeedRpm - x0) / (x1 - x0);
+    rpmHexConversionMultipler = y0 + (y1 - y0) * (currentEngineSpeedRpmFromSlave - x0) / (x1 - x0);
   }
   return rpmHexConversionMultipler;
 };

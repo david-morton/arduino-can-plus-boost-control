@@ -1,7 +1,6 @@
 #include <Arduino.h>
 
 #include "../../shared/debug_logging.h"
-#include "../../shared/variables_vehicle_parameters.h"
 
 /* ======================================================================
    CONSTANTS

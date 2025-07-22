@@ -4,9 +4,15 @@
    VARIABLES
    ====================================================================== */
 
-extern float currentIntakePressureBank1GaugeKpa;
-extern float currentIntakePressureBank2GaugeKpa;
-extern float currentIntakePressureManifoldGaugeKpa;
+extern bool currentSwitchStateClutchEngagedFromSlave;
+extern bool currentSwitchStateInNeutralFromSlave;
+
+extern float currentIntakePressureBank1GaugeKpaFromSlave;
+extern float currentIntakePressureBank2GaugeKpaFromSlave;
+extern float currentIntakePressureManifoldGaugeKpaFromSlave;
+
+extern int currentEngineSpeedRpmFromSlave;
+extern int currentLuxReadingFromSlave;
 
 /* ======================================================================
 FUNCTION PROTOTYPES

@@ -2,7 +2,6 @@
 
 #include "../../shared/alarm/alarm_helpers.h"
 #include "../../shared/debug_logging.h"
-#include "../../shared/variables_vehicle_parameters.h"
 #include "../pin_assignments_slave.h"
 #include "../telemetry/receive_from_master.h"
 #include "boost_control.h"
@@ -46,7 +45,7 @@ void handleBoostControlTasks() {
     boostTargetGaugeKpa = 0;
   } else {
     targetZeroBoost     = false;
-    boostTargetGaugeKpa = recommendedBoostTargetGaugeKpa;
+    boostTargetGaugeKpa = recommendedBoostTargetGaugeKpaFromMaster;
   }
 
   // Read intake pressure sensors

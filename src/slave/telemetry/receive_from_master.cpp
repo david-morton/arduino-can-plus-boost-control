@@ -2,13 +2,12 @@
 
 #include "../../shared/debug_logging.h"
 #include "../../shared/telemetry/telemetry_receive_parser.h"
-#include "../../shared/variables_vehicle_parameters.h"
 
 /* ======================================================================
    VARIABLES: From remote Arduino
    ====================================================================== */
 
-int recommendedBoostTargetGaugeKpa = -1;
+int recommendedBoostTargetGaugeKpaFromMaster = -1;
 
 /* ======================================================================
    VARIABLES: General use / functional
@@ -32,6 +31,6 @@ void handleTelemetryReceivedFromMaster() {
 
   // Get the recommended boost target gauge Kpa from the master Arduino via staged data
   if (ptUpdateRecommendedBoostTargetGaugeKpa.call() && handleTelemetryFloat(TM_BOOST_RECOMMENDATION, &valueFromRemote)) {
-    recommendedBoostTargetGaugeKpa = valueFromRemote;
+    recommendedBoostTargetGaugeKpaFromMaster = valueFromRemote;
   }
 }

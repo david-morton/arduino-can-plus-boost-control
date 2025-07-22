@@ -3,6 +3,14 @@
 #include <mcp2515_can.h>
 
 /* ======================================================================
+   VARIABLES
+   ====================================================================== */
+
+extern int   currentEngineTempCelcius;    // Read from Nissan CAN
+extern float currentVehicleSpeedFrontKph; // Read from BMW CAN
+extern float currentVehicleSpeedRearKph;  // Read from BMW CAN
+
+/* ======================================================================
    STRUCTS
    ====================================================================== */
 

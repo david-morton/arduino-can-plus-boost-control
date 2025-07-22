@@ -6,6 +6,7 @@
 
 #include "../../shared/debug_logging.h"
 #include "../rtc/rtc_sensor.h"
+#include "../telemetry/receive_from_slave.h"
 #include "sd_card.h"
 #include "sd_helpers.h"
 
@@ -139,12 +140,12 @@ void flushAndCloseFile(File &file, const char *label) {
 
 // Handle engine state changes for telemetry logging
 void handleEngineStateChange() {
-  if (currentEngineSpeedRpm < ENGINE_STOPPED_RPM_THRESHOLD && sdLogTelemetry == true) {
+  if (currentEngineSpeedRpmFromSlave < ENGINE_STOPPED_RPM_THRESHOLD && sdLogTelemetry == true) {
     sdLogTelemetry = false;
     DEBUG_SD("Engine stopped. Stopping telemetry logging.");
     flushAndCloseFile(logFileTelemetry, "Telemetry");
-  } else if (currentEngineSpeedRpm >= ENGINE_STOPPED_RPM_THRESHOLD && sdLogTelemetry == false) {
-    DEBUG_SD("Engine running at %d RPM. Starting telemetry logging.", currentEngineSpeedRpm);
+  } else if (currentEngineSpeedRpmFromSlave >= ENGINE_STOPPED_RPM_THRESHOLD && sdLogTelemetry == false) {
+    DEBUG_SD("Engine running at %d RPM. Starting telemetry logging.", currentEngineSpeedRpmFromSlave);
     // Reopen file if needed
     if (!logFileTelemetry) {
       logFileTelemetry = SD.open(telemetryLogFilename, FILE_WRITE);

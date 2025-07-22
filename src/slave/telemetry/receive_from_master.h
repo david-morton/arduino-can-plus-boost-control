@@ -4,7 +4,7 @@
    VARIABLES
    ====================================================================== */
 
-extern int recommendedBoostTargetGaugeKpa;
+extern int recommendedBoostTargetGaugeKpaFromMaster;
 
 /* ======================================================================
    FUNCTION PROTOTYPES

@@ -2,8 +2,9 @@
 
 #include "../../shared/alarm/alarm_helpers.h"
 #include "../../shared/debug_logging.h"
-#include "../../shared/variables_vehicle_parameters.h"
+#include "../can/can_receive.h"
 #include "../check_light/check_light.h"
+#include "../telemetry/receive_from_slave.h"
 #include "boost_helpers_master.h"
 
 /* ======================================================================
@@ -21,9 +22,9 @@ void updateRecommendedBoostTargetGaugeKpa() {
   static int previousRecommendedBoostTargetGaugeKpa = -1;
 
   // Set to 0 and return for known states where boost should not be applied
-  // TODO: Add in other alarm conditions when sensors are implemented like currentOilTempCelsius < 60 || currentOilPressureGaugeKpa < 100
+  // TODO: Add in other alarm conditions when sensors are implemented like currentOilTempCelsiusFromSlave < 60 || currentOilPressureGaugeKpaFromSlave < 100
   if (globalAlarmCriticalState || globalAlarmWarningState || currentCheckEngineLightState != CHECK_LIGHT_OFF ||
-      currentSwitchStateClutchEngaged || currentSwitchStateInNeutral || currentEngineTempCelcius < 80) {
+      currentSwitchStateClutchEngagedFromSlave || currentSwitchStateInNeutralFromSlave || currentEngineTempCelcius < 80) {
     recommendedBoostTargetGaugeKpa = 0;
     // Log the recommended boost target if it has changed
     if (debugBoost && recommendedBoostTargetGaugeKpa != previousRecommendedBoostTargetGaugeKpa) {

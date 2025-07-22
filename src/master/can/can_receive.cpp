@@ -1,6 +1,5 @@
 #include "can_receive.h"
 #include "../../shared/debug_logging.h"
-#include "../../shared/variables_vehicle_parameters.h"
 #include "can_helpers.h"
 
 /* ======================================================================

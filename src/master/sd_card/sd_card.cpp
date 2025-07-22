@@ -1,8 +1,8 @@
 #include <SD.h>
 
 #include "../../shared/debug_logging.h"
-#include "../../shared/variables_vehicle_parameters.h"
 #include "../boost/boost_helpers_master.h"
+#include "../can/can_receive.h"
 #include "../gear/gear.h"
 #include "../telemetry/receive_from_slave.h"
 #include "sd_card.h"
@@ -14,17 +14,17 @@
 
 // Telemetry metrics to log on the SD card, including a friendly name
 TelemetryEntry telemetryMetrics[] = {
-    {"RPM", &currentEngineSpeedRpm, TYPE_INT},
+    {"RPM", &currentEngineSpeedRpmFromSlave, TYPE_INT},
     {"Front Speed", &currentVehicleSpeedFrontKph, TYPE_FLOAT},
     {"Rear Speed", &currentVehicleSpeedRearKph, TYPE_FLOAT},
     {"Engine Temp", &currentEngineTempCelcius, TYPE_INT},
     {"Boost Recommended", &recommendedBoostTargetGaugeKpa, TYPE_INT},
     {"Gear", &currentGear, TYPE_INT},
-    {"Boost Bank 1", &currentIntakePressureBank1GaugeKpa, TYPE_FLOAT},
-    {"Boost Bank 2", &currentIntakePressureBank2GaugeKpa, TYPE_FLOAT},
-    {"Boost Manifold", &currentIntakePressureManifoldGaugeKpa, TYPE_FLOAT},
-    {"Clutch Engaged", &currentSwitchStateClutchEngaged, TYPE_BOOL},
-    {"In Neutral", &currentSwitchStateInNeutral, TYPE_BOOL},
+    {"Boost Bank 1", &currentIntakePressureBank1GaugeKpaFromSlave, TYPE_FLOAT},
+    {"Boost Bank 2", &currentIntakePressureBank2GaugeKpaFromSlave, TYPE_FLOAT},
+    {"Boost Manifold", &currentIntakePressureManifoldGaugeKpaFromSlave, TYPE_FLOAT},
+    {"Clutch Engaged", &currentSwitchStateClutchEngagedFromSlave, TYPE_BOOL},
+    {"In Neutral", &currentSwitchStateInNeutralFromSlave, TYPE_BOOL},
 };
 
 // Number of telemetry metrics defined above

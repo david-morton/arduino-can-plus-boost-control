@@ -1,6 +1,7 @@
 #include "gear.h"
 #include "../../shared/debug_logging.h"
-#include "../../shared/variables_vehicle_parameters.h"
+#include "../can/can_receive.h"
+#include "../telemetry/receive_from_slave.h"
 
 /* ======================================================================
    VARIABLES
@@ -38,7 +39,7 @@ void updateCurrentGear() {
   static int lastReportedGear = -99; // Invalid initial value to force first debug output
 
   // Return 0 if in neutral or clutch is disengaged
-  if (currentSwitchStateInNeutral || currentSwitchStateClutchEngaged) {
+  if (currentSwitchStateInNeutralFromSlave || currentSwitchStateClutchEngagedFromSlave) {
     currentGear = 0;
     if (debugGears && lastReportedGear != 0) {
       DEBUG_GEARS("Current gear is 0 (neutral or clutch disengaged)");
@@ -48,10 +49,10 @@ void updateCurrentGear() {
   }
 
   // Ignore if speed or RPM are too low to infer gear (will also dictate no boost target)
-  if (currentVehicleSpeedRearKph < 2 || currentEngineSpeedRpm < 500) {
+  if (currentVehicleSpeedRearKph < 2 || currentEngineSpeedRpmFromSlave < 500) {
     currentGear = -1; // Indicate unknown gear
     if (debugGears && lastReportedGear != -1) {
-      DEBUG_GEARS("Current gear is unknown (speed: %.2f kph, RPM: %d)", currentVehicleSpeedRearKph, currentEngineSpeedRpm);
+      DEBUG_GEARS("Current gear is unknown (speed: %.2f kph, RPM: %d)", currentVehicleSpeedRearKph, currentEngineSpeedRpmFromSlave);
     }
     lastReportedGear = -1; // Update last reported gear to avoid repeated messages
     return;
@@ -59,7 +60,7 @@ void updateCurrentGear() {
 
   float vehicleSpeedMPerMin = (currentVehicleSpeedRearKph * 1000.0f) / 60.0f;
 
-  float observedRatio = (currentEngineSpeedRpm * tyreCircumferenceMetres) / (vehicleSpeedMPerMin * FINAL_DRIVE_RATIO);
+  float observedRatio = (currentEngineSpeedRpmFromSlave * tyreCircumferenceMetres) / (vehicleSpeedMPerMin * FINAL_DRIVE_RATIO);
 
   float smallestError = 9999.0f;
   int   bestGear      = 0;
@@ -76,7 +77,7 @@ void updateCurrentGear() {
   // Only output debug if gear has changed
   if (debugGears && currentGear != lastReportedGear) {
     DEBUG_GEARS("Observed ratio: %.2f, Best gear: %d, Error: %.4f, Speed: %.2f kph, RPM: %d",
-                observedRatio, bestGear, smallestError, currentVehicleSpeedRearKph, currentEngineSpeedRpm);
+                observedRatio, bestGear, smallestError, currentVehicleSpeedRearKph, currentEngineSpeedRpmFromSlave);
     lastReportedGear = currentGear;
   }
 }

@@ -2,22 +2,19 @@
 
 #include "../../shared/debug_logging.h"
 #include "../../shared/telemetry/telemetry_receive_parser.h"
-#include "../../shared/variables_vehicle_parameters.h"
 
 /* ======================================================================
    VARIABLES: From CAN or remote Arduino
    ====================================================================== */
 
-bool currentSwitchStateClutchEngaged;
-bool currentSwitchStateInNeutral;
-int  currentEngineSpeedRpm      = 0;
-int  currentOilPressureGaugeKpa = 0;
-int  currentOilTempCelsius      = 0;
-int  currentLuxReading          = 0;
+bool currentSwitchStateClutchEngagedFromSlave;
+bool currentSwitchStateInNeutralFromSlave;
+int  currentEngineSpeedRpmFromSlave = 0;
+int  currentLuxReadingFromSlave     = 0;
 
-extern float currentIntakePressureBank1GaugeKpa    = 0;
-extern float currentIntakePressureBank2GaugeKpa    = 0;
-extern float currentIntakePressureManifoldGaugeKpa = 0;
+float currentIntakePressureBank1GaugeKpaFromSlave    = 0;
+float currentIntakePressureBank2GaugeKpaFromSlave    = 0;
+float currentIntakePressureManifoldGaugeKpaFromSlave = 0;
 
 /* ======================================================================
    VARIABLES: General use / functional
@@ -48,34 +45,34 @@ ptScheduler ptGetCurrentLuxReading = ptScheduler(PT_TIME_2S);
 void handleTelemetryReceivedFromSlave() {
   // Update the current lux reading from the remote Arduino
   if (ptGetCurrentLuxReading.call() && handleTelemetryFloat(TM_LUX, &valueFromRemote)) {
-    currentLuxReading = valueFromRemote;
+    currentLuxReadingFromSlave = valueFromRemote;
   }
 
   // Update the current clutch and neutral statuses from the remote Arduino
   if (ptGetSwitchStateClutch.call() && handleTelemetryFloat(TM_CLUTCH_IN, &valueFromRemote)) {
-    currentSwitchStateClutchEngaged = valueFromRemote;
+    currentSwitchStateClutchEngagedFromSlave = valueFromRemote;
   }
 
   if (ptGetSwitchStateNeutral.call() && handleTelemetryFloat(TM_IN_NEUTRAL, &valueFromRemote)) {
-    currentSwitchStateInNeutral = valueFromRemote;
+    currentSwitchStateInNeutralFromSlave = valueFromRemote;
   }
 
   // Update the current boost measurements from the remote Arduino
   if (ptGetCurrentBoostMeasurements.call()) {
     if (handleTelemetryFloat(TM_BOOST_BANK1, &valueFromRemote)) {
-      currentIntakePressureBank1GaugeKpa = valueFromRemote;
+      currentIntakePressureBank1GaugeKpaFromSlave = valueFromRemote;
     }
     if (handleTelemetryFloat(TM_BOOST_BANK2, &valueFromRemote)) {
-      currentIntakePressureBank2GaugeKpa = valueFromRemote;
+      currentIntakePressureBank2GaugeKpaFromSlave = valueFromRemote;
     }
     if (handleTelemetryFloat(TM_BOOST_MANIFOLD, &valueFromRemote)) {
-      currentIntakePressureManifoldGaugeKpa = valueFromRemote;
+      currentIntakePressureManifoldGaugeKpaFromSlave = valueFromRemote;
     }
   }
 
   // Update the current RPM reading from the remote Arduino
   // If the remote Arduino is not sending new RPM data, this will not update
   if (ptGetCurrentEngineSpeedRpm.call() && handleTelemetryFloat(TM_RPM, &valueFromRemote)) {
-    currentEngineSpeedRpm = valueFromRemote;
+    currentEngineSpeedRpmFromSlave = valueFromRemote;
   }
 }

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../shared/variables_vehicle_parameters.h"
 #include <SD.h>
 
 /* ======================================================================

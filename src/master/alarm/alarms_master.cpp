@@ -4,7 +4,7 @@
 #include "../../shared/debug_logging.h"
 #include "../../shared/ethernet/ethernet_helpers.h"
 #include "../../shared/variables_programmatic.h"
-#include "../../shared/variables_vehicle_parameters.h"
+#include "../can/can_receive.h"
 #include "alarms_master.h"
 
 /* ======================================================================

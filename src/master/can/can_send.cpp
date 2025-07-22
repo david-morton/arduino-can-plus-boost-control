@@ -2,11 +2,12 @@
 #include <ptScheduler.h>
 
 #include "../../shared/debug_logging.h"
-#include "../../shared/variables_vehicle_parameters.h"
 #include "../alarm/alarms_master.h"
 #include "../check_light/check_light.h"
 #include "../rpm/rpm.h"
+#include "../telemetry/receive_from_slave.h"
 #include "can_helpers.h"
+#include "can_receive.h"
 #include "can_send.h"
 
 /* ======================================================================
@@ -64,13 +65,13 @@ void sendEngineRpmToBmwCan() {
 
   float rpmHexConversionMultipler = calculateRpmMultiplier();
 
-  if (currentEngineSpeedRpm != 0 && abs(currentEngineSpeedRpm - previousEngineSpeedRpm) < 750) {
-    multipliedRpm    = currentEngineSpeedRpm * rpmHexConversionMultipler;
+  if (currentEngineSpeedRpmFromSlave != 0 && abs(currentEngineSpeedRpmFromSlave - previousEngineSpeedRpm) < 750) {
+    multipliedRpm    = currentEngineSpeedRpmFromSlave * rpmHexConversionMultipler;
     canPayloadRpm[2] = multipliedRpm;        // LSB
     canPayloadRpm[3] = (multipliedRpm >> 8); // MSB
     CAN_BMW.sendMsgBuf(0x316, 0, 8, canPayloadRpm);
   }
-  previousEngineSpeedRpm = currentEngineSpeedRpm;
+  previousEngineSpeedRpm = currentEngineSpeedRpmFromSlave;
 }
 
 // Send miscellaneous data to the BMW network

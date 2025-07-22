@@ -1,7 +1,6 @@
 #include <PID_v1.h>
 
 #include "../../shared/debug_logging.h"
-#include "../../shared/variables_vehicle_parameters.h"
 #include "../pin_assignments_slave.h"
 #include "boost_control.h"
 
