@@ -10,6 +10,7 @@
 #include "check_light/check_light.h"
 #include "gear/gear.h"
 #include "mqtt/mqtt_helpers.h"
+#include "pin_assignments_master.h"
 #include "rtc/rtc_sensor.h"
 #include "sd_card/sd_helpers.h"
 #include "shared/alarm/alarm_helpers.h"
@@ -51,8 +52,9 @@ bool debugTelemetry        = true;
 
 // Define MAC address and IP address for local Arduino
 EthernetConfig ethConfigLocal = {
-    .mac = {0xA8, 0x61, 0x0A, 0xAE, 0x23, 0x6E},
-    .ip  = IPAddress(192, 168, 10, 100)};
+    .mac   = {0xA8, 0x61, 0x0A, 0xAE, 0x23, 0x6E},
+    .ip    = IPAddress(192, 168, 10, 100),
+    .csPin = PIN_ETHERNET_CS}; // Default CS pin for Ethernet shield
 
 // Define remote IP address for peer Arduino native messeging
 const IPAddress remoteArduinoIp(192, 168, 10, 101);

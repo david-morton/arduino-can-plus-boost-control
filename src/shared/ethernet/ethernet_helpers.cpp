@@ -27,12 +27,14 @@ EthernetUDP    ethUdpClient;
 // Initialise the ethernet shield ready for use
 void initialiseEthernetShield(EthernetConfig &config) {
   DEBUG_GENERAL("Initialising ethernet shield ...");
+  pinMode(config.csPin, OUTPUT);
   Ethernet.begin(config.mac, config.ip);
 
   int eth_status = Ethernet.hardwareStatus();
 
   if (eth_status == EthernetW5500) {
     DEBUG_GENERAL("\t\tW5500 Ethernet controller detected");
+    Ethernet.init(config.csPin);
     ethUdpClient.begin(localArduinoListenPort); // Start listening on the local port
     DEBUG_GENERAL("\t\tListening on local UDP port %u", localArduinoListenPort);
   } else if (eth_status != EthernetW5500) {

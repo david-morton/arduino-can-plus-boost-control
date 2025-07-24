@@ -30,28 +30,28 @@ Below is a complete breakdown of the hardware used for this solution. Refer to t
 | C15           |                                 |                                                  |
 
 # Slave Physical Connections - Arduino
-|  **Arduino Pin** | **Use**                      | **Details**                         |
-|------------------|------------------------------|-------------------------------------|
-| D0               | RESERVED                     | Arduino serial                      |
-| D1               | RESERVED                     | Arduino serial                      |
-| D2               | Tach signal                  | Interrupt-capable input             |
-| D3               | Buzzer                       | Digital output                      |
-| D4               | MUX select bit 0 (S0)        | MUX channel select                  |
-| D5               | Boost solenoid 1             | PWM output                          |
-| D6               | Boost solenoid 2             | PWM output                          |
-| D7               | MUX select bit 1 (S1)        | MUX channel select                  |
-| D8               | MUX select bit 2 (S2)        | MUX channel select                  |
-| D9               | MUX select bit 3 (S3)        | MUX channel select                  |
-| D10              | Ethernet shield CS           | SPI chip select                     |
-| D11              | RESERVED                     | Arduino SPI (MOSI)                  |
-| D12              | RESERVED                     | Arduino SPI (MISO)                  |
-| D13              | RESERVED                     | Arduino SPI (SCK)                   |
-| A0               | Intake pressure (Bank 1)     | Analog input                        |
-| A1               | Intake pressure (Bank 2)     | Analog input                        |
-| A2               | Intake pressure (Manifold)   | Analog input                        |
-| A3               | MUX analog signal            | Output from MUX                     |
-| A4               | RESERVED                     | Arduino I2C (SDA)                   |
-| A5               | RESERVED                     | Arduino I2C (SCL)                   |
+|  **Arduino Pin** | **Use**                      | **Details**                           |
+|------------------|------------------------------|---------------------------------------|
+| D0               | RESERVED                     | Hardware Serial RX                    |
+| D1               | RESERVED                     | Hardware Serial TX                    |
+| D2               | Tach signal                  | Interrupt-capable input               |
+| D3               | Buzzer                       | Digital output                        |
+| D4               | Ethernet shield CS           | Digital output                        |
+| D5               | MUX select bit 0 (S0)        | MUX channel select                    |
+| D6               | MUX select bit 1 (S1)        | MUX channel select                    |
+| D7               | MUX select bit 2 (S2)        | MUX channel select                    |
+| D8               | MUX select bit 3 (S3)        | MUX channel select                    |
+| D9               | Boost solenoid 1             | GPT3A — shared PWM frequency with D10 |
+| D10              | Boost solenoid 2             | GPT3B — shared PWM frequency with D9  |
+| D11              | RESERVED                     | Arduino SPI (MOSI)                    |
+| D12              | RESERVED                     | Arduino SPI (MISO)                    |
+| D13              | RESERVED                     | Arduino SPI (SCK)                     |
+| A0               | Intake pressure (Bank 1)     | Analog input                          |
+| A1               | Intake pressure (Bank 2)     | Analog input                          |
+| A2               | Intake pressure (Manifold)   | Analog input                          |
+| A3               | MUX analog signal            | Output from MUX                       |
+| A4               | RESERVED                     | Arduino I2C (SDA)                     |
+| A5               | RESERVED                     | Arduino I2C (SCL)                     |
 
 # Implementation Detail & Architecture
 - Words here later

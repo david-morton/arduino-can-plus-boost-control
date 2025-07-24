@@ -4,17 +4,22 @@
 #include <Ethernet.h>
 
 /* ======================================================================
-   CONFIGURE THINGS
+   STRUCTURES
+   ====================================================================== */
+
+struct EthernetConfig {
+  byte      mac[6];
+  IPAddress ip;
+  int       csPin;
+};
+
+/* ======================================================================
+   VARIABLES
    ====================================================================== */
 
 extern bool           globalHealthEthernetConnected;
 extern bool           globalHealthEthernetPeerOnline;
 extern EthernetClient ethClient;
-
-struct EthernetConfig {
-  byte      mac[6];
-  IPAddress ip;
-};
 
 /* ======================================================================
    FUNCTION PROTOTYPES

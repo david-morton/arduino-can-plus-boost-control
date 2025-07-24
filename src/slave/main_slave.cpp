@@ -48,8 +48,9 @@ bool debugTelemetry        = false;
 
 // Define MAC address and IP address for local Arduino
 EthernetConfig ethConfigLocal = {
-    .mac = {0xA8, 0x61, 0x0A, 0xAE, 0x1F, 0xF4},
-    .ip  = IPAddress(192, 168, 10, 101)};
+    .mac   = {0xA8, 0x61, 0x0A, 0xAE, 0x1F, 0xF4},
+    .ip    = IPAddress(192, 168, 10, 101),
+    .csPin = PIN_ETHERNET_CS}; // We need the usual default pin 10 for PWM boost control solenoid
 
 // Define remote IP address for peer Arduino native messeging
 const IPAddress remoteArduinoIp(192, 168, 10, 100);

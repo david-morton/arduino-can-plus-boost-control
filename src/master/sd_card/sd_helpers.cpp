@@ -5,6 +5,7 @@
 #include <ptScheduler.h>
 
 #include "../../shared/debug_logging.h"
+#include "../pin_assignments_master.h"
 #include "../rtc/rtc_sensor.h"
 #include "../telemetry/receive_from_slave.h"
 #include "sd_card.h"
